@@ -1,0 +1,60 @@
+# Python bytecode files
+*.pyc
+*.pyo
+__pycache__/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.virtualenv/
+
+# Django secret key and settings files (if you use a separate secret key file)
+*.env
+*.ini
+*.json
+*.yml
+
+# Database files
+db.sqlite3
+*.sqlite3
+
+# Django media and static files
+/media/
+staticfiles/
+
+# PyCharm and VSCode project files (if you're using these IDEs)
+.vscode/
+.idea/
+
+# Editor tfg-ctaima-backends and temporary files
+*~ 
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Coverage reports
+.coverage
+*.coveragerc
+nosetests.xml
+coverage.xml
+*.coveralls
+
+# Test output
+*.out
+
+# Dependency management files (if you’re using pipenv, poetry, or pip)
+Pipfile.lock
+poetry.lock
+
+# Django migrations (optional, but some teams prefer not to commit migration files)
+*/migrations/*
+!*/migrations/__init__.py
+
+# Docker files (if you’re using Docker)
+*.dockerignore
+Dockerfile
+docker-compose.yml
