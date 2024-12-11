@@ -28,7 +28,7 @@ staticfiles/
 .vscode/
 .idea/
 
-# Editor tfg_ctaima_backends and temporary files
+# Editor tfg-ctaima-backends and temporary files
 *~ 
 *.swp
 *.swo

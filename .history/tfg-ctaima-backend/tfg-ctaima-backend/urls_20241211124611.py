@@ -1,5 +1,5 @@
 """
-URL configuration for tfg-ctaima-backend project.
+URL configuration for tfg_ctaima_backend project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.1/topics/http/urls/
@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import UserViewSet, TipoDocumentoViewSet, DocumentoViewSet, ValidacionViewSet, LogViewSet
+from ./tfg_ctaima_backend_app.views import UserViewSet, TipoDocumentoViewSet, DocumentoViewSet, ValidacionViewSet, LogViewSet
 
 # Crear un enrutador para las vistas
 router = DefaultRouter()
