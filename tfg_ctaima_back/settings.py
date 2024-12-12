@@ -12,8 +12,14 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import environ
+import os
 env = environ.Env()
-environ.Env.read_env()  # Lee el archivo .env
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+print("Ruta del .env:", os.path.join(BASE_DIR, '.env'))
+print("¿Existe el archivo?:", os.path.exists(os.path.join(BASE_DIR, '.env')))
 
 DATABASES = {
     'default': {
@@ -26,9 +32,6 @@ DATABASES = {
     }
 }
 
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -53,6 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'tfg_ctaima_app',
 ]
 
 MIDDLEWARE = [
@@ -65,7 +69,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'tfg_ctaima_backend.urls'
+ROOT_URLCONF = 'tfg_ctaima_back.urls'
 
 TEMPLATES = [
     {
@@ -83,7 +87,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'tfg_ctaima_backend.wsgi.application'
+WSGI_APPLICATION = 'tfg_ctaima_back.wsgi.application'
 
 
 # Database

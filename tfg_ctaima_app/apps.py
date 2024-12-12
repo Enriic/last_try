@@ -3,4 +3,4 @@ from django.apps import AppConfig
 
 class TfgCtaimaBackendAppConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'tfg_ctaima_backend-app'
+    name = 'tfg_ctaima_app'

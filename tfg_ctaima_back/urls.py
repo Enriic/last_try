@@ -17,14 +17,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from tfg_ctaima_backend-app.views import UserViewSet, TipoDocumentoViewSet, DocumentoViewSet, ValidacionViewSet, LogViewSet
+from tfg_ctaima_app.views import UserViewSet, DocumentTypeViewSet, DocumentViewSet, ValidationViewSet, LogViewSet
 
 # Crear un enrutador para las vistas
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
-router.register(r'tipodocumentos', TipoDocumentoViewSet)
-router.register(r'documentos', DocumentoViewSet)
-router.register(r'validaciones', ValidacionViewSet)
+router.register(r'tipoDocuments', DocumentTypeViewSet)
+router.register(r'Documents', DocumentViewSet)
+router.register(r'Validationes', ValidationViewSet)
 router.register(r'logs', LogViewSet)
 
 urlpatterns = [
