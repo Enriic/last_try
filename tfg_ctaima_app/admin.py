@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import Document, DocumentType, Log, Validation
+from .models import Document, DocumentType, Log, Validation, Users
+
+@admin.register(Users)
+class UsersAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'email', 'role', 'created_at', 'updated_at']
+    search_fields = ['name', 'email', 'role']
+    list_filter = ['role', 'created_at', 'updated_at']  
 
 @admin.register(DocumentType)
 class DocumentTypeAdmin(admin.ModelAdmin):

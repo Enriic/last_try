@@ -14,6 +14,21 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
+"""
+Endpoints disponibles:
+
+API Endpoints (prefijo: /api/):
+    - /api/users/                    # CRUD de usuarios
+    - /api/documentTypes/           # CRUD de tipos de documentos
+    - /api/documents/               # CRUD de documentos
+    - /api/validations/            # CRUD de validaciones
+    - /api/logs/                    # CRUD de logs
+
+Admin Endpoint:
+    - /admin/                       # Panel de administración de Django
+"""
+
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
@@ -22,9 +37,9 @@ from tfg_ctaima_app.views import UserViewSet, DocumentTypeViewSet, DocumentViewS
 # Crear un enrutador para las vistas
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
-router.register(r'tipoDocuments', DocumentTypeViewSet)
-router.register(r'Documents', DocumentViewSet)
-router.register(r'Validationes', ValidationViewSet)
+router.register(r'documentTypes', DocumentTypeViewSet)
+router.register(r'document', DocumentViewSet)
+router.register(r'validation', ValidationViewSet)
 router.register(r'logs', LogViewSet)
 
 urlpatterns = [

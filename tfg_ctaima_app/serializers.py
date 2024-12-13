@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from .models import User, DocumentType, Document, Validation, Log
+from .models import Users, DocumentType, Document, Validation, Log
 
-class UserSerializer(serializers.ModelSerializer):
+class UsersSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ['id', 'name', 'password', 'email', 'timestamp_created', 'timestamp_updated']
+        model = Users
+        fields = ['id', 'name', 'password', 'email', 'role', 'created_at', 'updated_at']
 
 class DocumentTypeSerializer(serializers.ModelSerializer):
     class Meta:

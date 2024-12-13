@@ -2,14 +2,17 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
-from .models import User, DocumentType, Document, Validation, Log
-from .serializers import UserSerializer, DocumentTypeSerializer, DocumentSerializer, ValidationSerializer, LogSerializer
+from .models import Users, DocumentType, Document, Validation, Log, EventType
+from .serializers import UsersSerializer, DocumentTypeSerializer, DocumentSerializer, ValidationSerializer, LogSerializer
+from tfg_ctaima_app.constants import MOCK_DOCUMENT_URLS
+from .models import EventType
+import random
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
 
-    
+class UsersViewSet(viewsets.ModelViewSet):
+    queryset = Users.objects.all()
+    serializer_class = UsersSerializer
+
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -30,13 +33,16 @@ class DocumentViewSet(viewsets.ModelViewSet):
     serializer_class = DocumentSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
+        data = request.data.copy()
+        data['url'] = random.choice(MOCK_DOCUMENT_URLS) # Select a random document URL from mock data
+        serializer = self.serializer_class(data=data)
+        
         if serializer.is_valid():
             serializer.save()
             # Create a log when a new document is created
             Log.objects.create(
                 user=request.user,
-                event="CREATE",
+                event=EventType.CREATE_DOCUMENT,
                 details=f"Document '{serializer.instance.name}' created."
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -61,7 +67,7 @@ class ValidationViewSet(viewsets.ModelViewSet):
             # Create a log when a new validation is created
             Log.objects.create(
                 user=request.user,
-                event="VALIDATE",
+                event=EventType.CREATE_VALIDATION,
                 details=f"Validation for document '{serializer.instance.document.name}' created."
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -70,6 +76,18 @@ class ValidationViewSet(viewsets.ModelViewSet):
 class DocumentTypeViewSet(viewsets.ModelViewSet):
     queryset = DocumentType.objects.all()
     serializer_class = DocumentTypeSerializer
+
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            Log.objects.create(
+                user=request.user,
+                event=EventType.CREATE_DOCUMENT_TYPE,
+                details=f"Document type '{serializer.instance.name}' created."
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['get'])
     def documents(self, request, pk=None):
@@ -90,3 +108,10 @@ class LogViewSet(viewsets.ModelViewSet):
         if document_id is not None:
             queryset = queryset.filter(document_id=document_id)
         return queryset
+
+def actualizar_estado_tarea(tarea, nuevo_estado):
+    if nuevo_estado in Estado._value2member_map_:
+        tarea.estado = nuevo_estado
+        tarea.save()
+    else:
+        raise ValueError("Estado inválido")
