@@ -1,15 +1,16 @@
 from rest_framework import serializers
-from .models import Users, DocumentType, Document, Validation, Log
+from django.contrib.auth.models import User  # Importar el modelo User de Django
+from .models import DocumentType, Document, Validation, Log
 
-class UsersSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Users
-        fields = ['id', 'name', 'password', 'email', 'role', 'created_at', 'updated_at']
+        model = User
+        fields = ['id', 'username', 'password', 'email', 'first_name', 'last_name', 'date_joined', 'is_staff', 'is_superuser']
 
 class DocumentTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = DocumentType
-        fields = ['id', 'name', 'description', 'fields']
+        fields = ['id','user', 'name', 'description', 'fields']
 
 class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,4 +25,4 @@ class ValidationSerializer(serializers.ModelSerializer):
 class LogSerializer(serializers.ModelSerializer):
     class Meta:
         model = Log
-        fields = ['user', 'event', 'details', 'timestamp']
+        fields = ['id', 'user', 'event', 'details', 'timestamp']

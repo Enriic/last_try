@@ -1,23 +1,119 @@
 from rest_framework import viewsets, status
+from django.contrib.auth.decorators import login_required
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from django.shortcuts import get_object_or_404
-from .models import Users, DocumentType, Document, Validation, Log, EventType
-from .serializers import UsersSerializer, DocumentTypeSerializer, DocumentSerializer, ValidationSerializer, LogSerializer
+from django.contrib.auth.models import User  # Importar el modelo User de Django
+from .models import DocumentType, Document, Validation, Log, EventType
+from .serializers import UserSerializer, DocumentTypeSerializer, DocumentSerializer, ValidationSerializer, LogSerializer
 from tfg_ctaima_app.constants import MOCK_DOCUMENT_URLS
-from .models import EventType
 import random
+from django.contrib.auth import authenticate, login
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+
+@api_view(['POST'])
+def login_view(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+
+    if not username or not password:
+        return Response({'error': 'Debe proporcionar un nombre de usuario y contraseña.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Autenticar usuario
+    user = authenticate(request, username=username, password=password)
+
+    if user is not None:
+        # Iniciar sesión y establecer cookie de sesión
+        login(request, user)
+        Log.objects.create(
+                user=request.user,
+                event=EventType.LOGIN,
+                details=f"Document '{serializer.instance.name}' created."
+            )
+
+        return Response({'message': f'Bienvenido {user.username}!'}, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': 'Credenciales inválidas.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-class UsersViewSet(viewsets.ModelViewSet):
-    queryset = Users.objects.all()
-    serializer_class = UsersSerializer
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]  # Solo usuarios autenticados pueden acceder
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            user = User(
+                username=serializer.validated_data['username'],
+                email=serializer.validated_data['email'],
+                first_name=serializer.validated_data['first_name'],
+                last_name=serializer.validated_data['last_name'],
+                is_staff=serializer.validated_data.get('is_staff', False),
+                is_superuser=serializer.validated_data.get('is_superuser', False)
+            )
+            user.set_password(serializer.validated_data['password'])  # Cifrar la contraseña
+            user.save()
+
+            user = authenticate(username=user.username, password=serializer.validated_data['password'])
+            if user is not None:
+                login(request, user)  # Inicia la sesión y gestiona cookies automáticamente
+
+                Log.objects.create(
+                user=request.user,
+                event=EventType.CREATE_USER,
+                details=f"Document '{serializer.instance.name}' created."
+            )
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    
+    def update(self, request, pk=None):
+        user = self.get_object()
+        serializer = self.serializer_class(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            if 'password' in serializer.validated_data:
+                user.set_password(serializer.validated_data['password'])
+            if 'is_staff' in serializer.validated_data:
+                user.is_staff = serializer.validated_data['is_staff']
+            if 'is_superuser' in serializer.validated_data:
+                user.is_superuser = serializer.validated_data['is_superuser']
+            serializer.save()
+
+            Log.objects.create(
+                user=request.user,
+                event=EventType.UPDATE_USER,
+                details=f"Document '{serializer.instance.name}' created."
+            )
+
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def partial_update(self, request, pk=None):
+        user = self.get_object()
+        serializer = self.serializer_class(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            if 'password' in serializer.validated_data:
+                user.set_password(serializer.validated_data['password'])
+            if 'is_staff' in serializer.validated_data:
+                user.is_staff = serializer.validated_data['is_staff']
+            if 'is_superuser' in serializer.validated_data:
+                user.is_superuser = serializer.validated_data['is_superuser']
+            serializer.save()
+
+            Log.objects.create(
+                user=request.user,
+                event=EventType.UPDATE_USER,
+                details=f"Document '{serializer.instance.name}' created."
+            )
+
+            return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['get'])
@@ -28,15 +124,19 @@ class UsersViewSet(viewsets.ModelViewSet):
         serializer = DocumentSerializer(documents, many=True)
         return Response(serializer.data)
 
+
 class DocumentViewSet(viewsets.ModelViewSet):
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]  # Solo usuarios autenticados pueden acceder
 
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
-        data['url'] = random.choice(MOCK_DOCUMENT_URLS) # Select a random document URL from mock data
+        data['url'] = random.choice(MOCK_DOCUMENT_URLS)  # Select a random document URL from mock data
         serializer = self.serializer_class(data=data)
-        
+        print("User creating document:",request.user)
+
         if serializer.is_valid():
             serializer.save()
             # Create a log when a new document is created
@@ -45,6 +145,8 @@ class DocumentViewSet(viewsets.ModelViewSet):
                 event=EventType.CREATE_DOCUMENT,
                 details=f"Document '{serializer.instance.name}' created."
             )
+
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -100,6 +202,13 @@ class DocumentTypeViewSet(viewsets.ModelViewSet):
 class LogViewSet(viewsets.ModelViewSet):
     queryset = Log.objects.all()
     serializer_class = LogSerializer
+
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def get_queryset(self):
         """Allow filtering logs by document"""
@@ -109,9 +218,4 @@ class LogViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(document_id=document_id)
         return queryset
 
-def actualizar_estado_tarea(tarea, nuevo_estado):
-    if nuevo_estado in Estado._value2member_map_:
-        tarea.estado = nuevo_estado
-        tarea.save()
-    else:
-        raise ValueError("Estado inválido")
+

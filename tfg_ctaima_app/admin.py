@@ -1,11 +1,17 @@
 from django.contrib import admin
-from .models import Document, DocumentType, Log, Validation, Users
+from django.contrib.auth.models import User  # Importar el modelo User de Django
+from django.contrib.auth.admin import UserAdmin  # Importar el administrador del modelo User de Django
+from .models import Document, DocumentType, Log, Validation
 
-@admin.register(Users)
-class UsersAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'email', 'role', 'created_at', 'updated_at']
-    search_fields = ['name', 'email', 'role']
-    list_filter = ['role', 'created_at', 'updated_at']  
+# Comentamos el registro del modelo de usuario personalizado existente
+# @admin.register(Users)
+# class UsersAdmin(admin.ModelAdmin):
+#     list_display = ['id', 'name', 'email', 'role', 'created_at', 'updated_at']
+#     search_fields = ['name', 'email', 'role']
+#     list_filter = ['role', 'created_at', 'updated_at']
+
+# Eliminar la línea que intenta registrar el modelo User de Django
+# admin.site.register(User, UserAdmin)
 
 @admin.register(DocumentType)
 class DocumentTypeAdmin(admin.ModelAdmin):

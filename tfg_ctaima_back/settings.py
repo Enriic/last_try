@@ -13,6 +13,19 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import environ
 import os
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Usa base de datos para almacenar sesiones
+
+# Configurar la duración de la sesión (opcional)
+SESSION_COOKIE_AGE = 1209600  # 2 semanas en segundos
+SESSION_COOKIE_HTTPONLY = True  # Proteger cookies de scripts JavaScript
+
+# Configurar URLs para redireccionamiento (opcional)
+LOGIN_REDIRECT_URL = '/'  # Redirige tras iniciar sesión
+LOGOUT_REDIRECT_URL = '/'  # Redirige tras cerrar sesión
+
+
+
 env = environ.Env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,18 +45,27 @@ DATABASES = {
     }
 }
 
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# SECURITY WARNING: keep the secret key used in production secret! Save it in .env file in production
 SECRET_KEY = 'django-insecure-h@m9yu!1su$2)8%%nywr+&swgw8wlw#9iizf&jb=g+%$7zfgsm'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',  # Por sesión (cookies)
+        'rest_framework.authentication.TokenAuthentication',  # O por token
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+}
 
 
 # Application definition
@@ -59,15 +81,17 @@ INSTALLED_APPS = [
     'tfg_ctaima_app',
 ]
 
+# Habilitar middleware para sesiones
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',  # Importante para cookies de sesión
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',  # Recomendado para seguridad
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Necesario para request.user
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 ROOT_URLCONF = 'tfg_ctaima_back.urls'
 
@@ -88,12 +112,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'tfg_ctaima_back.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-
 
 
 # Password validation
