@@ -14,36 +14,43 @@ from rest_framework import status
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
+from .models import Log, EventType
+
 @api_view(['POST'])
 def login_view(request):
+    # Recibir username y password del cuerpo de la solicitud
     username = request.data.get('username')
     password = request.data.get('password')
 
+    # Verificar que se haya proporcionado nombre de usuario y contraseña
     if not username or not password:
         return Response({'error': 'Debe proporcionar un nombre de usuario y contraseña.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Autenticar usuario
+    # Autenticar el usuario con las credenciales proporcionadas
     user = authenticate(request, username=username, password=password)
 
+    # Si las credenciales son correctas, iniciar sesión y crear log
     if user is not None:
-        # Iniciar sesión y establecer cookie de sesión
-        login(request, user)
+        login(request, user)  # Establecer la sesión con cookies automáticamente
         Log.objects.create(
-                user=request.user,
-                event=EventType.LOGIN,
-                details=f"Document '{serializer.instance.name}' created."
-            )
-
+            user=request.user,
+            event=EventType.LOGIN,
+            details=f'User {user.username} logged in successfully.'
+        )
         return Response({'message': f'Bienvenido {user.username}!'}, status=status.HTTP_200_OK)
-    else:
-        return Response({'error': 'Credenciales inválidas.'}, status=status.HTTP_401_UNAUTHORIZED)
 
+    # Si las credenciales no son correctas
+    return Response({'error': 'Credenciales inválidas.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]  # Solo usuarios autenticados pueden acceder
+
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -73,27 +80,6 @@ class UserViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    
-    def update(self, request, pk=None):
-        user = self.get_object()
-        serializer = self.serializer_class(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            if 'password' in serializer.validated_data:
-                user.set_password(serializer.validated_data['password'])
-            if 'is_staff' in serializer.validated_data:
-                user.is_staff = serializer.validated_data['is_staff']
-            if 'is_superuser' in serializer.validated_data:
-                user.is_superuser = serializer.validated_data['is_superuser']
-            serializer.save()
-
-            Log.objects.create(
-                user=request.user,
-                event=EventType.UPDATE_USER,
-                details=f"Document '{serializer.instance.name}' created."
-            )
-
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, pk=None):
         user = self.get_object()
@@ -116,7 +102,8 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['get'])
+    # Custom action to get all documents from a specific user, detail=True means it's a detail endpoint ex: /user/{userId}/documents
+    @action(detail=True, methods=['get'], url_path='documents')
     def documents(self, request, pk=None):
         """Get all documents for a specific user"""
         user = self.get_object()
@@ -124,13 +111,20 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = DocumentSerializer(documents, many=True)
         return Response(serializer.data)
 
+    # Custom action to get all validations from a specific user, detail=True means it's a detail endpoint ex: /user/{userId}/validations
+    @action(detail=True, methods=['get'], url_path='validations')
+    def validations(self, request, pk=None):
+        """Get all validations for a specific user"""
+        user = self.get_object()
+        validations = Validation.objects.filter(user=user)
+        serializer = ValidationSerializer(validations, many=True)
+        return Response(serializer.data)
+
 
 class DocumentViewSet(viewsets.ModelViewSet):
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]  # Solo usuarios autenticados pueden acceder
-
+    
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
         data['url'] = random.choice(MOCK_DOCUMENT_URLS)  # Select a random document URL from mock data
@@ -146,11 +140,11 @@ class DocumentViewSet(viewsets.ModelViewSet):
                 details=f"Document '{serializer.instance.name}' created."
             )
 
-
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['get'])
+    # Custom action to get all validations for a specific document, detail=True means it's a detail endpoint ex: {id}/validations
+    @action(detail=True, methods=['get'], url_path='validations')
     def validations(self, request, pk=None):
         """Get all validations for a specific document"""
         document = self.get_object()
@@ -158,10 +152,20 @@ class DocumentViewSet(viewsets.ModelViewSet):
         serializer = ValidationSerializer(validations, many=True)
         return Response(serializer.data)
 
+    # Custom action to get all logs for a specific document, detail=True means it's a detail endpoint ex: {id}/logs
+    @action(detail=True, methods=['get'], url_path='logs')
+    def logs(self, request, pk=None):
+        """Get all logs for a specific document"""
+        document = self.get_object()
+        logs = Log.objects.filter(document=document)
+        serializer = LogSerializer(logs, many=True)
+        return Response(serializer.data)
+
+
 class ValidationViewSet(viewsets.ModelViewSet):
     queryset = Validation.objects.all()
     serializer_class = ValidationSerializer
-
+    
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -170,10 +174,34 @@ class ValidationViewSet(viewsets.ModelViewSet):
             Log.objects.create(
                 user=request.user,
                 event=EventType.CREATE_VALIDATION,
-                details=f"Validation for document '{serializer.instance.document.name}' created."
+                details=f"Validation with uuid '{serializer.instance.id}', for document '{serializer.instance.document.name}' has been created."
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def partial_update(self, request, pk=None):
+        validation = self.get_object()
+        serializer = self.serializer_class(validation, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            # Create a log when a validation is updated
+            Log.objects.create(
+                user=request.user,
+                event=EventType.UPDATE_VALIDATION,
+                details=f"Validation with uuid '{serializer.instance.id}', for document '{serializer.instance.document.name}' has been updated."
+            )
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # Custom action to get all logs for a specific validation, detail=True means it's a detail endpoint ex: validation/{id}/logs (not very useful)
+    @action(detail=True, methods=['get'], url_path='logs')
+    def logs(self, request, pk=None):
+        """Get all logs for a specific validation"""
+        validation = self.get_object()
+        logs = Log.objects.filter(details__icontains=f"'{validation.id}'")
+        serializer = LogSerializer(logs, many=True)
+        return Response(serializer.data)
+
 
 class DocumentTypeViewSet(viewsets.ModelViewSet):
     queryset = DocumentType.objects.all()
@@ -209,13 +237,6 @@ class LogViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def get_queryset(self):
-        """Allow filtering logs by document"""
-        queryset = Log.objects.all()
-        document_id = self.request.query_params.get('document_id', None)
-        if document_id is not None:
-            queryset = queryset.filter(document_id=document_id)
-        return queryset
+
 
 

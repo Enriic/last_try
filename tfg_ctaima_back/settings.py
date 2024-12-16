@@ -19,10 +19,14 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Usa base de datos para
 # Configurar la duración de la sesión (opcional)
 SESSION_COOKIE_AGE = 1209600  # 2 semanas en segundos
 SESSION_COOKIE_HTTPONLY = True  # Proteger cookies de scripts JavaScript
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Cerrar sesión al cerrar el navegador
 
 # Configurar URLs para redireccionamiento (opcional)
 LOGIN_REDIRECT_URL = '/'  # Redirige tras iniciar sesión
 LOGOUT_REDIRECT_URL = '/'  # Redirige tras cerrar sesión
+
+SESSION_COOKIE_SECURE = True  # Solo sobre HTTPS
+SESSION_COOKIE_SAMESITE = 'Strict'  # Evita que se envíe con solicitudes de otros orígenes
 
 
 
@@ -59,8 +63,7 @@ ALLOWED_HOSTS = []
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',  # Por sesión (cookies)
-        'rest_framework.authentication.TokenAuthentication',  # O por token
+        'rest_framework.permissions.IsAuthenticated'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
@@ -138,7 +141,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Madrid'
 
 USE_I18N = True
 
