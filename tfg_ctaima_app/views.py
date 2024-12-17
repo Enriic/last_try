@@ -13,15 +13,18 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
-
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from .models import Log, EventType
+from rest_framework.permissions import AllowAny
+from django.views.decorators.csrf import csrf_exempt
 
+@csrf_exempt  # Desactiva la protección CSRF para esta vista
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def login_view(request):
     # Recibir username y password del cuerpo de la solicitud
     username = request.data.get('username')
@@ -33,6 +36,7 @@ def login_view(request):
 
     # Autenticar el usuario con las credenciales proporcionadas
     user = authenticate(request, username=username, password=password)
+    print("User:",user)
 
     # Si las credenciales son correctas, iniciar sesión y crear log
     if user is not None:
@@ -50,8 +54,9 @@ def login_view(request):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-
-
+    
+    @csrf_exempt  # Desactiva la protección CSRF para esta vista
+    @permission_classes([AllowAny])
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -73,7 +78,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 Log.objects.create(
                 user=request.user,
                 event=EventType.CREATE_USER,
-                details=f"Document '{serializer.instance.name}' created."
+                details=f"User '{user.username}' has been created."
             )
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -96,7 +101,7 @@ class UserViewSet(viewsets.ModelViewSet):
             Log.objects.create(
                 user=request.user,
                 event=EventType.UPDATE_USER,
-                details=f"Document '{serializer.instance.name}' created."
+                details=f"User '{serializer.instance.username}' has been updated."
             )
 
             return Response(serializer.data)

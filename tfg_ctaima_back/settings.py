@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import environ
 import os
+import django
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Usa base de datos para almacenar sesiones
 
@@ -63,7 +64,8 @@ ALLOWED_HOSTS = []
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated'
+        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.DjangoModelPermissions'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
