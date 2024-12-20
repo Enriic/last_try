@@ -1,0 +1,29 @@
+@import '~antd/dist/reset.css';
+@import '~antd/es/style/reset.css';
+@import './variables.less';
+@import './global.less';
+
+.ant-spin.layout-loader {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+// Margins
+.mb-15em {
+    margin-bottom: 1.5em !important;
+}
+
+.mt-15em {
+    margin-top: 1.5em;
+}
+
+// Others
+button.ant-btn.not-clickable {
+    color: @text-color;
+}
+
+button.ant-btn.not-clickable:hover {
+    cursor: inherit;
+}
