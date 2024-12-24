@@ -1,0 +1,37 @@
+{
+    "menu": {
+        "dashboard": "Dashboard",
+        "upload": "Upload Document",
+        "users": "Users",
+        "usersList": "User List",
+        "usersCreate": "Create User",
+        "settings": "Settings"
+    },
+    "upload": {
+        "successMessage": "File uploaded successfully",
+        "documentTypeLabel": "Document Type",
+        "documentTypeError": "Please select the document type",
+        "documentTypePlaceholder": "Select the document type",
+        "documentType": {
+            "invoice": "Invoice",
+            "receipt": "Receipt",
+            "report": "Report"
+        },
+        "validationFieldsLabel": "Fields to Validate",
+        "validationFieldsError": "Please select at least one field",
+        "validationFields": {
+            "date": "Date",
+            "amount": "Amount",
+            "client": "Client",
+            "address": "Address",
+            "vendor": "Vendor",
+            "summary": "Summary",
+            "author": "Author"
+        },
+        "fileLabel": "File",
+        "fileError": "Please upload a file",
+        "uploadPrompt": "Click or drag a file to this area to upload",
+        "selectedFile": "Selected file",
+        "submitButton": "Submit"
+    }
+}

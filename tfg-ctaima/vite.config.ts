@@ -19,8 +19,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'), // Alias para `src`
-      '~antd': path.resolve(__dirname, './node_modules/antd'), // Alias para `node_modules`
+      '@': path.resolve(__dirname, './node_modules/'), // Alias para `src`
+      '~antd': path.resolve(__dirname, './node_modules/antd'), // Alias para `node_modules/antd`
+      
     },
   },
 });

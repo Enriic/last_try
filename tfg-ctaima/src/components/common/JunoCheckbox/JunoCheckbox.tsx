@@ -3,7 +3,7 @@ import { IJunoCheckboxProps } from "./JunoCheckboxProps";
 import React from "react";
 
 const JunoCheckbox: React.FC<IJunoCheckboxProps> = ({
-    dataCy,
+    dataCy = "button-test",
     ...restProps
 }) => {
     return (

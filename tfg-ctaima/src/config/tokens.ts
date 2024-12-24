@@ -1,6 +1,10 @@
 
 // src/config/tokens.ts
 
+import Menu, { PageContainer } from "@ant-design/pro-layout";
+
+
+
 const commonTokens = {
     global: {
         fontFamily: "'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
@@ -11,17 +15,21 @@ const commonTokens = {
         borderRadiusBase: 16,  // Radio de los bordes
         borderWidthBase: "1px",  // Ancho del borde
         spaceXS: "8px",  // Espaciado pequeño (xs)
-        spaceSM: "16px",  // Espaciado mediano (sm)   
+        spaceSM: "16px",  // Espaciado mediano (sm)
     },
+
     Button: {
 
     },
+
     Card: {
 
     },
     Input: {
         borderRadius: 16,
-    }
+    },
+
+    
 }
 
 
@@ -39,27 +47,31 @@ export const lightThemeTokens = {
         borderColorBase: "#d9d9d9",  // Color base de los bordes
         borderColorSplit: "#f0f0f0",  // Color de los bordes de separación
         boxShadowBase: "0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05)",  // Sombra base
-        bodyBackground: "#fff",  // Color de fondo del cuerpo
+        
     },
     components: {
         Button: {
             ...commonTokens.Button,
         },
+
         Card: {
             ...commonTokens.Card,
         },
         Input: {
             ...commonTokens.Input,
-        }
+        },
+
     }
     // Agrega más tokens según sea necesario
 };
+
 
 export const darkThemeTokens = {
     global: {
         ...commonTokens.global,
         colorPrimary: '#1890ff',
         colorBackground: '#141414',
+        bodyBackground: "#fff",  // Color de fondo del cuerpo
         colorText: '#ffffff',
         fontSizeBase: 14,
     },
@@ -67,12 +79,15 @@ export const darkThemeTokens = {
         Button: {
             ...commonTokens.Button,
         },
+
         Card: {
             ...commonTokens.Card,
         },
         Input: {
             ...commonTokens.Input,
-        }
+        },
+
+
     }
     // Agrega más tokens según sea necesario
 };

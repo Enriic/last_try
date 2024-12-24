@@ -5,6 +5,10 @@ import { createRoot } from 'react-dom/client';
 import ReactDOM from 'react-dom';
 import App from './App';
 import { ThemeProvider } from './context/ThemeContext';
+import './i18n'; // Importa la configuración de i18n
+import { I18nextProvider } from 'react-i18next';
+import i18n from './i18n';
+import { AuthProvider } from './auth';
 
 
 // Asegurándonos de que el contenedor tiene un tipo correcto
@@ -13,8 +17,12 @@ const root = createRoot(rootElement);
 
 root.render(
   <StrictMode>
-    <ThemeProvider>
-      <App />
-    </ThemeProvider>
+    <I18nextProvider i18n={i18n}>
+      <ThemeProvider>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </ThemeProvider>
+    </I18nextProvider>
   </StrictMode>
 );

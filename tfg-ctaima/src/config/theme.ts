@@ -15,12 +15,14 @@ export const getTheme = (isDarkMode: boolean): ThemeConfig => {
             Button: {
                 ...tokens.components?.Button,
             },
+
             Card: {
                 ...tokens.components?.Card,
             },
             Input: {
                 ...tokens.components?.Input,
-            }
+            },
+
             // ... otros componentes
         },
     };
