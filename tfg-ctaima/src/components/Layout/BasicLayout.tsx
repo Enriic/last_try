@@ -3,37 +3,57 @@ import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { ProLayout, ProSettings } from '@ant-design/pro-layout';
 import { CustomMenuDataItem } from './menu/types'; // Importamos los tipos de menú
 import menuItems from './menu'; // Importamos los menús definidos
-import { Typography, Select } from 'antd';
+import { Typography, Select, message, Modal } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../../auth';
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { useAuth } from '../../context/AuthContext';
+import { LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import './styles/Sidebar.less'
 
 const { Text } = Typography;
 const { Option } = Select;
+const { confirm } = Modal;
 
 interface BasicLayoutProps {
     children?: ReactNode;
 }
 
-// Importamos las imágenes del logo (asegúrate de que las rutas sean correctas)
-// import imgLogo from '../../assets/logo.png';
-// import imgLogoCollapsed from '../../assets/logo-collapsed.png';
 
 const BasicLayout: React.FC<BasicLayoutProps> = () => {
     const navigate = useNavigate();
     const [pathname, setPathname] = useState<string>('/');
     const { t, i18n } = useTranslation();
-    //const user = useAuth();
-    //use mock user
-    const user = {
-        roles: ['admin'],
+    const { logout, user } = useAuth();
 
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            message.success('Sesión cerrada correctamente');
+            navigate('/login'); // Redirigir al login u otra página
+        } catch (error) {
+            console.error('Error al cerrar sesión:', error);
+            message.error('Error al cerrar sesión');
+        }
     };
 
+    const showLogoutConfirm = () => {
+        confirm({
+            title: 'Confirmar cierre de sesión',
+            content: '¿Estás seguro de que deseas cerrar sesión?',
+            okText: 'Sí',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk() {
+                handleLogout();
+            },
+            onCancel() {
+                console.log('Cierre de sesión cancelado');
+            },
+        });
+    };
 
-    const userRoles = user.roles as string[];
+    const userRoles = user?.roles as string[] || [];
 
     const location = useLocation();
 
@@ -78,7 +98,17 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
                 return newItem;
             });
 
-    const finalMenuItems = filterMenuItemsByRoles(menuItems);
+    // eslint-disable-next-line prefer-const
+    let finalMenuItems = filterMenuItemsByRoles(menuItems);
+
+    if (user) {
+        finalMenuItems.push({
+            path: '/logout',
+            key: 'logout',
+            name: 'menu.logout',
+            icon: React.createElement(LogoutOutlined),
+        });
+    }
 
     // Traducimos los nombres del menú
     const menuDataRender = (menuData: CustomMenuDataItem[]): CustomMenuDataItem[] =>
@@ -95,17 +125,26 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
     const menuItemRender = (
         item: CustomMenuDataItem & { isUrl: boolean; onClick: () => void },
         defaultDom: React.ReactNode,
-    ): React.ReactNode => (
-        <div
-            onClick={() => {
+    ): React.ReactNode => {
+        const handleMenuItemClick = () => {
+            if (item.key === 'logout') {
+                // Manejar el logout
+                showLogoutConfirm();
+            } else {
                 setPathname(item.path || '/');
                 navigate(item.path || '/');
-            }}
-            style={{ cursor: 'pointer' }}
-        >
-            <Text ellipsis>{defaultDom}</Text>
-        </div>
-    );
+            }
+        };
+
+        return (
+            <div
+                onClick={handleMenuItemClick}
+                style={{ cursor: 'pointer' }}
+            >
+                <Text ellipsis>{defaultDom}</Text>
+            </div>
+        );
+    };
 
     // Botón para colapsar y expandir el menú
     const toggleMenu = (
@@ -143,6 +182,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
     };
 
     return (
+        
         <ProLayout
             {...settings}
             collapsed={collapsed}
@@ -178,9 +218,9 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
                 {toggleMenu}
                 <div style={{ flex: 1 }} />
                 {languageSelector}
+                
             </div>
             <Outlet />
-            {/* <div style={{ padding: 16 }}></div> */}
 
         </ProLayout>
     );

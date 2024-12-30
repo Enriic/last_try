@@ -8,7 +8,8 @@ const dashboardMenu: CustomMenuDataItem[] = [
         path: '/dashboard',
         key: 'dashboard',
         name: 'menu.dashboard',
-        icon: React.createElement(PieChartOutlined)
+        icon: React.createElement(PieChartOutlined),
+        roles: ['admin', 'staff', 'active'],
     },
 ];
 

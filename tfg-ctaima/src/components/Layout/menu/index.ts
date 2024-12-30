@@ -6,6 +6,7 @@ import usersMenu from './upload';
 import settingsMenu from './history';
 import uploadMenu from './upload';
 import historyMenu from './history';
+import logoutMenu from './logout';
 
 const menuItems: CustomMenuDataItem[] = [
     ...dashboardMenu,

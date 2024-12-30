@@ -1,10 +1,6 @@
 
 // src/config/tokens.ts
 
-import Menu, { PageContainer } from "@ant-design/pro-layout";
-
-
-
 const commonTokens = {
     global: {
         fontFamily: "'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
@@ -28,8 +24,9 @@ const commonTokens = {
     Input: {
         borderRadius: 16,
     },
-
-    
+    Select: {
+        borderRadius: 16,
+    }
 }
 
 
@@ -47,7 +44,7 @@ export const lightThemeTokens = {
         borderColorBase: "#d9d9d9",  // Color base de los bordes
         borderColorSplit: "#f0f0f0",  // Color de los bordes de separación
         boxShadowBase: "0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05)",  // Sombra base
-        
+        colorBgBase: "#f5f5f5",  // Color de fondo base
     },
     components: {
         Button: {
@@ -60,6 +57,10 @@ export const lightThemeTokens = {
         Input: {
             ...commonTokens.Input,
         },
+        Select: {
+            ...commonTokens.Select,
+            selectorBg: "fff",
+        }
 
     }
     // Agrega más tokens según sea necesario
@@ -86,7 +87,9 @@ export const darkThemeTokens = {
         Input: {
             ...commonTokens.Input,
         },
-
+        Select: {
+            ...commonTokens.Select,
+        }
 
     }
     // Agrega más tokens según sea necesario

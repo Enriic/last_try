@@ -5,15 +5,15 @@
     padding: 0;
 }
 
-.ant-menu-item {
+.ant-layout-sider:not(.ant-layout-sider-collapsed) .ant-menu-item {
     min-width: 228px;
     width: 100%;
     border-radius: 0px !important;
     position: relative;
     padding-left: 16px !important;
     margin-left: 0px !important;
-    border-right: 3.5px solid @primary-color !important;
 }
+
 
 .ant-menu-item:hover {
     background-color: @hover-color !important;
@@ -21,6 +21,7 @@
 
 .ant-menu-item-selected {
     background-color: @hover-color !important;
+    border-right: 3.5px solid @primary-color !important;
 }
 
 .ant-layout-sider-children {

@@ -5,7 +5,9 @@
         "users": "Users",
         "usersList": "User List",
         "usersCreate": "Create User",
-        "settings": "Settings"
+        "settings": "Settings",
+        "login": "Login",
+        "logout": "Logout"
     },
     "upload": {
         "successMessage": "File uploaded successfully",

@@ -3,14 +3,24 @@
 @import './variables.less';
 @import './global.less';
 
-.ant-spin.layout-loader {
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.ant-spin {
+    text-align: center !important;
+    border-radius: 4px !important;
+    width: 100% !important;
 }
 
-.page-container{
+.ant-spin-dot-item {
+    background-color: @primary-color !important;
+}
+
+div.ant-spin {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 500px;
+}
+
+.page-container {
     background-color: @body-background;
     padding: 0px;
     margin: 15px;

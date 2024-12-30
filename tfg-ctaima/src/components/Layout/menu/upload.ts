@@ -9,6 +9,7 @@ const uploadMenu: CustomMenuDataItem[] = [
         key: 'upload',
         name: 'menu.upload',
         icon: React.createElement(UploadOutlined),
+        roles: ['admin', 'staff', 'active'],
     },
 ];
 

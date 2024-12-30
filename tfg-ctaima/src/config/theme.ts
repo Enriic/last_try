@@ -22,7 +22,9 @@ export const getTheme = (isDarkMode: boolean): ThemeConfig => {
             Input: {
                 ...tokens.components?.Input,
             },
-
+            Select: {
+                ...tokens.components?.Select,
+            }
             // ... otros componentes
         },
     };
