@@ -28,6 +28,7 @@ LOGOUT_REDIRECT_URL = '/'  # Redirige tras cerrar sesión
 
 SESSION_COOKIE_SECURE = True  # Solo sobre HTTPS
 SESSION_COOKIE_SAMESITE = 'Strict'  # Evita que se envíe con solicitudes de otros orígenes
+CSRF_COOKIE_SECURE = True
 
 
 
@@ -84,6 +85,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'tfg_ctaima_app',
+    'corsheaders',
 ]
 
 # Habilitar middleware para sesiones
@@ -95,8 +97,19 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',  # Necesario para request.user
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',  # URL de tu frontend
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173',  # URL de tu frontend
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'tfg_ctaima_back.urls'
 

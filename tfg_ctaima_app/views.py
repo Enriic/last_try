@@ -7,7 +7,7 @@ from .models import DocumentType, Document, Validation, Log, EventType
 from .serializers import UserSerializer, DocumentTypeSerializer, DocumentSerializer, ValidationSerializer, LogSerializer
 from tfg_ctaima_app.constants import MOCK_DOCUMENT_URLS
 import random
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -21,11 +21,22 @@ from django.contrib.auth.models import User
 from .models import Log, EventType
 from rest_framework.permissions import AllowAny
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
+from rest_framework.permissions import IsAdminUser
+from django.http import JsonResponse
 
-@csrf_exempt  # Desactiva la protección CSRF para esta vista
-@api_view(['POST'])
+
+
+@ensure_csrf_cookie
+@api_view(['GET'])
 @permission_classes([AllowAny])
+def get_csrf_token(request):
+    return JsonResponse({'detail': 'CSRF cookie set'})
+
+@api_view(['POST'])
+@permission_classes([AllowAny])  # Permitir acceso a cualquiera
 def login_view(request):
+
     # Recibir username y password del cuerpo de la solicitud
     username = request.data.get('username')
     password = request.data.get('password')
@@ -51,12 +62,39 @@ def login_view(request):
     # Si las credenciales no son correctas
     return Response({'error': 'Credenciales inválidas.'}, status=status.HTTP_401_UNAUTHORIZED)
 
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout_view(request):
+    logout(request)
+    return Response({'message': 'Sesión cerrada correctamente.'}, status=status.HTTP_200_OK)
+
+
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    # Custom action to get the current user, detail=False means it's a list endpoint ex: /users/current
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def current(self, request):
+        serializer = self.serializer_class(request.user)
+        user = request.user
+        roles = []
+        if user.is_superuser:
+            roles.append('admin')
+        if user.is_staff:
+            roles.append('staff')
+        if user.is_active:
+            roles.append('active')
+        print("User:",request.user)
+        request_data = serializer.data
+        request_data.pop('password', None)
+        request_data['roles'] = roles
+        return Response(request_data)
     
-    @csrf_exempt  # Desactiva la protección CSRF para esta vista
-    @permission_classes([AllowAny])
+    # @csrf_exempt  # Desactiva la protección CSRF para esta vista
+    @permission_classes([IsAdminUser])
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -69,45 +107,63 @@ class UserViewSet(viewsets.ModelViewSet):
                 is_superuser=serializer.validated_data.get('is_superuser', False)
             )
             user.set_password(serializer.validated_data['password'])  # Cifrar la contraseña
+            try:
+                validate_password(serializer.validated_data['password'], user)
+            except ValidationError as e:
+                return Response({'password': e.messages}, status=status.HTTP_400_BAD_REQUEST)
+                
             user.save()
 
-            user = authenticate(username=user.username, password=serializer.validated_data['password'])
-            if user is not None:
-                login(request, user)  # Inicia la sesión y gestiona cookies automáticamente
-
-                Log.objects.create(
-                user=request.user,
+             # Crear el log de creación de usuario
+            Log.objects.create(
+                user=request.user,  # Usuario administrador que crea el usuario
                 event=EventType.CREATE_USER,
                 details=f"User '{user.username}' has been created."
             )
+
+            # No incluir la contraseña en la respuesta
+            response_data = serializer.data
+            response_data.pop('password', None)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+    @permission_classes([IsAuthenticated])
     def partial_update(self, request, pk=None):
+        # Permitir que los usuarios actualicen su propio perfil
         user = self.get_object()
-        serializer = self.serializer_class(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            if 'password' in serializer.validated_data:
-                user.set_password(serializer.validated_data['password'])
-            if 'is_staff' in serializer.validated_data:
-                user.is_staff = serializer.validated_data['is_staff']
-            if 'is_superuser' in serializer.validated_data:
-                user.is_superuser = serializer.validated_data['is_superuser']
-            serializer.save()
+        if request.user == user or request.user.is_staff:
+            serializer = self.serializer_class(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                if 'password' in serializer.validated_data:
+                    user.set_password(serializer.validated_data['password'])
+                    # Validar la nueva contraseña
+                    try:
+                        validate_password(serializer.validated_data['password'], user)
+                    except ValidationError as e:
+                        return Response({'password': e.messages}, status=status.HTTP_400_BAD_REQUEST)
+                serializer.save()
 
-            Log.objects.create(
-                user=request.user,
-                event=EventType.UPDATE_USER,
-                details=f"User '{serializer.instance.username}' has been updated."
-            )
+                # Crear un log de actualización de usuario
+                Log.objects.create(
+                    user=request.user,
+                    event=EventType.UPDATE_USER,
+                    details=f"User '{serializer.instance.username}' has been updated."
+                )
 
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                # No incluir la contraseña en la respuesta
+                response_data = serializer.data
+                response_data.pop('password', None)
 
-    # Custom action to get all documents from a specific user, detail=True means it's a detail endpoint ex: /user/{userId}/documents
+                return Response(response_data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'detail': 'No autorizado.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    # Custom action to get all documents from a specific user, detail=True means it's a detail endpoint ex: /users/{userId}/documents
+    @permission_classes([IsAuthenticated])
     @action(detail=True, methods=['get'], url_path='documents')
     def documents(self, request, pk=None):
         """Get all documents for a specific user"""
@@ -116,7 +172,8 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = DocumentSerializer(documents, many=True)
         return Response(serializer.data)
 
-    # Custom action to get all validations from a specific user, detail=True means it's a detail endpoint ex: /user/{userId}/validations
+    # Custom action to get all validations from a specific user, detail=True means it's a detail endpoint ex: /users/{userId}/validations
+    @permission_classes([IsAuthenticated])
     @action(detail=True, methods=['get'], url_path='validations')
     def validations(self, request, pk=None):
         """Get all validations for a specific user"""
