@@ -6,7 +6,7 @@ import DashboardKPIs from '../../components/DashboardKPIs/DashboardKPIs';
 import ValidationBarChart from '../../components/ValidationBarChart/ValidationBarChart';
 import ValidationPieChart from '../../components/ValidationPieChart/ValidationPieChart';
 import DocumentTypeAnalysis from '../../components/DocumentTypeAnalysis/DocumentTypeAnalysis';
-import Filters from '../../components/Filters/Filters';
+import Filters from '../../components/Filters/DashboardFilters/Filters';
 import { getValidations } from '../../services/validationService';
 import { useAuth } from '../../context/AuthContext';
 import { Validation } from '../../types';
@@ -50,32 +50,72 @@ const DashboardPage: React.FC = () => {
 
   return (
     <div style={{ padding: 24 }}>
-      <Row align="middle" justify="space-between" style={{ marginBottom: 16 }}>
-        <Col>
-          {/* Mostrar el switch solo si el usuario tiene permisos */}
-            <div>
-              <Switch size="small" checked={showAllValidations} onChange={handleSwitchChange}/>
-              <Text style={{ marginLeft: 8 , fontSize: 12}}>
-                {showAllValidations ? 'Mostrando todas las validaciones' : 'Mostrando mis validaciones'}
-              </Text>
-            </div>
-          
+      <Row className="dashboard-filter-section" align="middle" justify="space-between" style={{ marginBottom: 16 }}>
+        <Col span={5}>
+          <div>
+            <Switch size="small" checked={showAllValidations} onChange={handleSwitchChange} />
+            <Text style={{ marginLeft: 8, fontSize: 13 }}>
+              {showAllValidations ? 'Mostrando todas las validaciones' : 'Mostrando mis validaciones'}
+            </Text>
+          </div>
+        </Col>
+        <Col span={18} style={{ marginTop: 16 }}>
+          <Filters validations={validations} onFilter={handleFilter} />
         </Col>
       </Row>
 
-      <Filters validations={validations} onFilter={handleFilter} />
-      <Row gutter={[16, 16]}>
-        <Col span={24}>
-          <DashboardKPIs validations={filteredValidations} loading={loading} />
+      {/* <Row gutter={[16, 16]} className='dashboard-stats-row-container'>
+        <Col xs={24} lg={12} md={24} sm={24} xl={12} xxl={12}>
+          <Row gutter={[16, 16]} className='dashboard-stats-row'>
+            <Col xs={24} lg={12} md={12} sm={12} xl={12} xxl={8}>
+              <DashboardKPIs validations={filteredValidations} loading={loading} />
+            </Col>
+            <Col xs={24} lg={12} md={12} sm={12} xl={12} xxl={8}>
+              <ValidationPieChart validations={filteredValidations} />
+            </Col>
+          </Row>
         </Col>
-        <Col xs={24} lg={12}>
+        <Col xs={24} lg={12} md={24} sm={24} xl={12} xxl={12}>
           <ValidationBarChart validations={filteredValidations} />
         </Col>
-        <Col xs={24} lg={12}>
-          <ValidationPieChart validations={filteredValidations} />
-        </Col>
+
         <Col span={24}>
           <DocumentTypeAnalysis validations={filteredValidations} />
+        </Col>
+
+      </Row> */}
+      <Row gutter={[16, 16]} className='dashboard-stats-row-container'>
+        {/* Primera Columna: KPIs y Gráfico Circular */}
+        <Col xs={24} md={24} lg={12}>
+          <Row gutter={[16, 16]}>
+            {/* KPIs */}
+            <Col xs={24} sm={12}>
+              <DashboardKPIs
+                validations={filteredValidations}
+                loading={loading}
+              />
+            </Col>
+            {/* Gráfico Circular */}
+            <Col xs={24} sm={12}>
+              <ValidationPieChart
+                validations={filteredValidations}
+              />
+            </Col>
+          </Row>
+        </Col>
+
+        {/* Segunda Columna: Gráfico de Barras */}
+        <Col xs={24} md={24} lg={12}>
+          <ValidationBarChart
+            validations={filteredValidations}
+          />
+        </Col>
+
+        {/* Análisis por Tipo de Documento */}
+        <Col xs={24}>
+          <DocumentTypeAnalysis
+            validations={filteredValidations}
+          />
         </Col>
       </Row>
     </div>

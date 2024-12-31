@@ -11,7 +11,7 @@ import logoutMenu from './logout';
 const menuItems: CustomMenuDataItem[] = [
     ...dashboardMenu,
     ...uploadMenu,
-    // ...historyMenu,
+    ...historyMenu,
     // ...usersMenu,
     // ...settingsMenu
 ];

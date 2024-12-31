@@ -24,7 +24,10 @@ export const getTheme = (isDarkMode: boolean): ThemeConfig => {
             },
             Select: {
                 ...tokens.components?.Select,
-            }
+            },
+            Table: {
+                ...tokens.components?.Table,
+            },
             // ... otros componentes
         },
     };

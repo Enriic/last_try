@@ -5,6 +5,7 @@ import { Card } from 'antd';
 import { Validation } from '../../types';
 import { PieChart, Pie, Tooltip, Cell, ResponsiveContainer, Label } from 'recharts';
 import { calculateValidationDistribution } from '../../utils/chartUtils';
+import './ValidationPieChart.less';
 
 type ValidationStatus = 'success' | 'failure'; // Asegúrate de que este tipo está definido
 
@@ -25,17 +26,18 @@ const ValidationPieChart: React.FC<ValidationPieChartProps> = ({ validations }) 
     };
 
     return (
-        <Card title="Distribución de Resultados">
-            <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
+        <Card title="Distribución de Resultados" className='dashboard-pie-chart'>
+            <ResponsiveContainer width="100%" height={150}>
+                <PieChart >
                     <Pie
+                        
                         data={data}
                         dataKey="value"
                         nameKey="status"
                         cx="50%"
-                        cy="50%"
-                        innerRadius={70}
-                        outerRadius={100}
+                        cy="47%"
+                        innerRadius={50}
+                        outerRadius={70}
                         startAngle={90}
                         endAngle={450}
                     >

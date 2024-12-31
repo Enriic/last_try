@@ -15,6 +15,7 @@ import { pdfjs } from 'react-pdf';
 import BasicLayout from './components/Layout/BasicLayout';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import LoginPage from './pages/Login/LoginPage';
+import ValidationHistoryPage from './pages/ValidationHistory/ValidationHistoryPage';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 
@@ -36,6 +37,7 @@ function App() {
                   <Route path="upload" element={<UploadPage />} />
                   <Route path="dashboard" element={<DashboardPage />} />
                   <Route path="login" element={<LoginPage />} />
+                  <Route path="history" element={<ValidationHistoryPage />} />
                   {/* Puedes agregar más rutas aquí */}
                 </Route>
               </Route>

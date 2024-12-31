@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { DatePicker, Select, Row, Col } from 'antd';
-import { Validation } from '../../types';
-import { getDocumentTypes } from '../../services/documentService';
+import { Validation } from '../../../types';
+import { getDocumentTypes } from '../../../services/documentService';
 import dayjs, { Dayjs } from 'dayjs';
-import { DocumentType } from '../../types';
+import { DocumentType } from '../../../types';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -80,10 +80,10 @@ const Filters: React.FC<FiltersProps> = ({ validations, onFilter }) => {
 
     return (
         <Row gutter={16} style={{ marginBottom: 24 }}>
-            <Col xs={24} sm={12} md={8}>
+            <Col xs={24} sm={12} md={12}>
                 <RangePicker onChange={(dates) => setDateRange(dates)} />
             </Col>
-            <Col xs={24} sm={12} md={8}>
+            <Col xs={24} sm={12} md={12}>
                 <Select
                     placeholder="Tipo de Documento"
                     style={{ width: '100%' }}

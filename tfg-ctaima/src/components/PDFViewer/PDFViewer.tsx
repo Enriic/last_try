@@ -12,7 +12,7 @@ import {
 import { Document, Page } from 'react-pdf';
 //import { SizeType } from 'antd/lib/config-provider/SizeContext';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
-import './styles/PDFViewer.less';
+import './PDFViewer.less';
 import type { PDFDocumentProxy } from "pdfjs-dist";
 // Importa los tipos si utilizas TypeScript
 import { PDFViewerProps } from './PDFViewer.types';

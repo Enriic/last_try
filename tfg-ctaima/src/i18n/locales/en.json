@@ -7,7 +7,8 @@
         "usersCreate": "Create User",
         "settings": "Settings",
         "login": "Login",
-        "logout": "Logout"
+        "logout": "Logout",
+        "history": "History"
     },
     "upload": {
         "successMessage": "File uploaded successfully",

@@ -2,7 +2,7 @@ import React from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import JunoUploadFile from '../../components/JunoUploadFile/JunoUploadFile';
 import { Row, Col } from 'antd';
-import './styles/Upload.less';
+import './Upload.less';
 import PDFViewer from '../../components/PDFViewer/PDFViewer';
 
 function Upload() {

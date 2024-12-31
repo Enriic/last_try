@@ -6,7 +6,7 @@ import { InboxOutlined } from '@ant-design/icons';
 import { UploadFile } from 'antd/lib/upload/interface';
 import { useTranslation } from 'react-i18next';
 
-import './styles/JunoUplaodFile.less';
+import './JunoUplaodFile.less';
 import { documentTypes, validationFields } from './constants';
 import { DocumentType } from './types';
 

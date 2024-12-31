@@ -4,6 +4,7 @@ import React from 'react';
 import { Table } from 'antd';
 import { Validation } from '../../types';
 import { groupByDocumentType } from '../../utils/documentUtils';
+import './DocumentTypeAnalysis.less';
 
 interface DocumentTypeAnalysisProps {
     validations: Validation[];
@@ -42,7 +43,7 @@ const DocumentTypeAnalysis: React.FC<DocumentTypeAnalysisProps> = ({ validations
     ];
 
     return (
-        <Table
+        <Table className='dashboard-table-document-type-analysis'
             columns={columns}
             dataSource={data}
             rowKey="document_type"
