@@ -92,7 +92,7 @@ const ValidationHistoryPage: React.FC = () => {
         // Filtrar por texto de búsqueda en el nombre del documento
         if (searchText) {
             data = data.filter((validation) =>
-                validation.document_name?.toLowerCase().includes(searchText.toLowerCase())
+                validation.document_info.name?.toLowerCase().includes(searchText.toLowerCase())
             );
         }
 
@@ -142,15 +142,14 @@ const ValidationHistoryPage: React.FC = () => {
     return (
         <div style={{ padding: 24 }}>
             <Row align="middle" justify="space-between" style={{ marginBottom: 16 }} className='history-filter-section'>
-                <Col span={5}>
-                    <div>
-                        <Switch checked={showAllValidations} onChange={handleSwitchChange} />
+                <Col span={24}>
+                    <div className="switch-history-filter">
+                        <Switch checked={showAllValidations} onChange={handleSwitchChange} size='small' />
                         <Text style={{ marginLeft: 8 }}>
                             {showAllValidations ? 'Todas las Validaciones' : 'Mis Validaciones'}
                         </Text>
                     </div>
-                </Col>
-                <Col span={18}>
+
                     <ValidationFilters
                         documentTypes={documentTypes}
                         onFiltersChange={handleFiltersChange}

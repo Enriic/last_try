@@ -9,7 +9,7 @@ export interface Validation {
     status: 'success' | 'failure' ;
     validation_details: ValidationDetail[];
     timestamp: string;
-    document_type: string | number; // Agrega este campo si lo tienes
+    document_type: number | null; // Agrega este campo si lo tienes
     validation_time: number; // Tiempo en segundos que tomó la validación
 }
 

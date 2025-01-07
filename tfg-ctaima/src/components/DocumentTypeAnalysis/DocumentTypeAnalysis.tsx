@@ -12,12 +12,14 @@ interface DocumentTypeAnalysisProps {
 
 const DocumentTypeAnalysis: React.FC<DocumentTypeAnalysisProps> = ({ validations }) => {
     const data = groupByDocumentType(validations);
+    console.log(data)
 
     const columns = [
         {
             title: 'Tipo de Documento',
             dataIndex: 'document_type',
             key: 'document_type',
+            
         },
         {
             title: 'Validaciones',

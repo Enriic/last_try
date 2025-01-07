@@ -1,8 +1,9 @@
 // src/components/ValidationFilters/ValidationFilters.tsx
 
-import React, { useState } from 'react';
-import { Row, Col, Input, DatePicker, Select } from 'antd';
-import { Validation, DocumentType } from '../../../types';
+import React, { useState, useEffect } from 'react';
+import { Row, Col, Input, DatePicker, Select, AutoComplete, message } from 'antd';
+import { Validation, DocumentType, Document } from '../../../types';
+import { getDocuments } from '../../../services/documentService'; // Ajusta la ruta según corresponda
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
@@ -19,7 +20,6 @@ type RangeValue = [Dayjs | null, Dayjs | null] | null;
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
-const { Search } = Input;
 
 interface ValidationFiltersProps {
     documentTypes: DocumentType[];
@@ -37,7 +37,34 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ documentTypes, on
     const [documentType, setDocumentType] = useState<number | null>(null);
     const [resultFilter, setResultFilter] = useState<string | null>(null);
 
+    const [documents, setDocuments] = useState<Document[]>([]);
+    const [documentOptions, setDocumentOptions] = useState<{ value: string }[]>([]);
+
+    useEffect(() => {
+        fetchDocuments();
+    }, []);
+
+    const fetchDocuments = async () => {
+        try {
+            const data = await getDocuments();
+            setDocuments(data);
+        } catch (error) {
+            message.error('Error al obtener la lista de documentos');
+        }
+    };
+
     const handleSearch = (value: string) => {
+        const options = documents
+            .filter((doc) =>
+                doc.name.toLowerCase().includes(value.toLowerCase())
+            )
+            .map((doc) => ({ value: doc.name }));
+        setDocumentOptions(options);
+        setSearchText(value);
+        emitFiltersChange({ searchText: value });
+    };
+
+    const handleSelect = (value: string) => {
         setSearchText(value);
         emitFiltersChange({ searchText: value });
     };
@@ -74,44 +101,56 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ documentTypes, on
     };
 
     return (
-        <Row gutter={16} >
-            <Col xs={24} sm={12} md={12} style={{ marginBottom: 16 }}>
-                <Search
-                    placeholder="Buscar por nombre de documento"
-                    onSearch={handleSearch}
-                    allowClear
-                    style={{ width: 200 }}
-                />
-            </Col>
-            <Col xs={24} sm={12} md={12}>
-                <RangePicker onChange={handleDateChange} />
-            </Col>
-            <Col xs={24} sm={12} md={12} className='validation-filters'>
-                <Select
-                    placeholder="Tipo de Documento"
-                    style={{ width: 150 }}
-                    onChange={handleDocumentTypeChange}
-                    allowClear
-                >
-                    {documentTypes.map((type) => (
-                        <Option key={type.id} value={type.id}>
-                            {type.name}
-                        </Option>
-                    ))}
-                </Select>
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-                <Select
-                    placeholder="Resultado"
-                    style={{ width: 120 }}
-                    onChange={handleResultFilterChange}
-                    allowClear
-                >
-                    <Option value="success">Éxito</Option>
-                    <Option value="failure">Fallo</Option>
-                </Select>
-            </Col>
-        </Row>
+        <div className='validation-filters-container'>
+            <Row gutter={16} className='validation-filters-row'>
+                <Col xs={24} sm={24} md={24} lg={24} xl={11} xxl={7} className='validation-filters-col'>
+                    <span>Nombre de documento: </span>
+                    <AutoComplete
+                        style={{ width: 200 }}
+                        options={documentOptions}
+                        onSelect={handleSelect}
+                        onSearch={handleSearch}
+                        placeholder="Buscar por nombre de documento"
+                        allowClear
+                        value={searchText}
+                    >
+                        <Input />
+                    </AutoComplete>
+                </Col>
+                <Col xs={24} sm={24} md={24} lg={24} xl={11} xxl={7} className='validation-filters-col'>
+                    <span>Fecha: </span>
+                    <RangePicker onChange={handleDateChange} />
+                </Col>
+
+                <Col xs={24} sm={24} md={24} lg={24} xl={11} xxl={6} className='validation-filters-col'>
+                    <span>Tipo de Documento: </span>
+                    <Select
+                        placeholder="Tipo de Documento"
+                        style={{ width: 150 }}
+                        onChange={handleDocumentTypeChange}
+                        allowClear
+                    >
+                        {documentTypes.map((type) => (
+                            <Option key={type.id} value={type.id}>
+                                {type.name}
+                            </Option>
+                        ))}
+                    </Select>
+                </Col>
+                <Col xs={24} sm={24} md={24} lg={24} xl={11} xxl={3} className='validation-filters-col'>
+                    <span>Resultado: </span>
+                    <Select
+                        placeholder="Resultado"
+                        style={{ width: 120 }}
+                        onChange={handleResultFilterChange}
+                        allowClear
+                    >
+                        <Option value="success">Éxito</Option>
+                        <Option value="failure">Fallo</Option>
+                    </Select>
+                </Col>
+            </Row>
+        </div>
     );
 };
 

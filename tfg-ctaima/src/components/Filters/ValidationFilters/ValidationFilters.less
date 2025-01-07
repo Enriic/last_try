@@ -1,7 +1,22 @@
 @import '../../../assets/styles/styles.less';
 
-.validation-filters {
-    align-items: center;
+.validation-filters-container{
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.validation-filters-row{
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.validation-filters-col > span{
+    margin-inline: 10px;
+}
+
+.ant-select-item-option-active{
+    background-color: @hover-color !important;
+    color: @text-color !important;
 }
