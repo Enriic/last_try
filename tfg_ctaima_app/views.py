@@ -69,8 +69,6 @@ def logout_view(request):
     logout(request)
     return Response({'message': 'Sesión cerrada correctamente.'}, status=status.HTTP_200_OK)
 
-
-
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -184,9 +182,10 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class DocumentViewSet(viewsets.ModelViewSet):
-    queryset = Document.objects.all()
+    queryset = Document.objects.all().select_related('document_type', 'user')
     serializer_class = DocumentSerializer
-    
+
+
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
         data['url'] = random.choice(MOCK_DOCUMENT_URLS)  # Select a random document URL from mock data
@@ -224,12 +223,14 @@ class DocumentViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+
 class ValidationViewSet(viewsets.ModelViewSet):
-    queryset = Validation.objects.all()
+    queryset = Validation.objects.all().select_related('document__document_type', 'user')
     serializer_class = ValidationSerializer
-    
+   
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
+        # Here api call to OCR will determine the result of the validation
         if serializer.is_valid():
             serializer.save()
             # Create a log when a new validation is created

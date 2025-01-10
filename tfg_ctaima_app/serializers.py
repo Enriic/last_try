@@ -13,14 +13,16 @@ class DocumentTypeSerializer(serializers.ModelSerializer):
         fields = ['id','user', 'name', 'description', 'fields']
 
 class DocumentSerializer(serializers.ModelSerializer):
+    document_type_info = DocumentTypeSerializer(source='document_type', read_only=True)
     class Meta:
         model = Document
-        fields = ['id', 'user', 'document_type', 'name', 'url', 'timestamp']
+        fields = ['id', 'user', 'document_type_info', 'name', 'url', 'timestamp']
 
 class ValidationSerializer(serializers.ModelSerializer):
+    document_info = DocumentSerializer(source='document', read_only=True)
     class Meta:
         model = Validation
-        fields = ['id', 'document', 'user', 'status', 'validation_details', 'timestamp']
+        fields = ['id', 'document', 'user', 'status', 'validation_details', 'document_info', 'timestamp']
 
 class LogSerializer(serializers.ModelSerializer):
     class Meta:
