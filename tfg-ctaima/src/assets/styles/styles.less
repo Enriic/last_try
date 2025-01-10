@@ -13,6 +13,10 @@
     background-color: @primary-color !important;
 }
 
+.ant-tooltip-inner{
+    border-radius: @border-radius-base !important;
+}
+
 div.ant-spin {
     display: flex;
     justify-content: center;
@@ -34,6 +38,44 @@ div.ant-spin {
 
 .mt-15em {
     margin-top: 1.5em;
+}
+
+.ant-tag {
+    border-radius: @border-radius-base ;
+    padding: 2px;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: rgba(26, 48, 55, 0.85);
+    font-size: 14px;
+    font-variant: tabular-nums;
+    line-height: 1.5715;
+    list-style: none;
+    font-feature-settings: 'tnum';
+    display: inline-block;
+    height: auto;
+    margin-right: 8px;
+    padding: 0 7px;
+    font-size: 12px;
+    line-height: 20px;
+    white-space: nowrap;
+    background: #fafafa;
+    border: 1px solid #d9d9d9;
+    border-radius: 16px;
+    opacity: 1;
+    transition: all 0.3s;
+}
+
+.ant-tag-green {
+    color: #00bd74;
+    background: #e6fff0;
+    border-color: #7affba;
+}
+
+.ant-tag-red {
+    color: #ff4d4f;
+    background: #fff1f0;
+    border-color: #ffccc7;
 }
 
 // Others

@@ -1,7 +1,8 @@
 
 // src/config/tokens.ts
 
-import { Table } from "antd";
+import { Modal, Table } from "antd";
+import { title } from "process";
 
 const commonTokens = {
     global: {
@@ -31,6 +32,10 @@ const commonTokens = {
     },
     Table: {
         borderRadius: 16,
+    },
+    Modal: {
+        borderRadius: 16,
+        titleFontSize: 20,
     }
 }
 
@@ -69,7 +74,11 @@ export const lightThemeTokens = {
         Table: {
             ...commonTokens.Table,
             bodySortBg: "#fff",  // Color de fondo del cuerpo
+        },
+        Modal: {
+            ...commonTokens.Modal,
         }
+
 
     }
     // Agrega más tokens según sea necesario
@@ -101,7 +110,10 @@ export const darkThemeTokens = {
         },
         Table: {
             ...commonTokens.Table,
-        }    
+        },
+        Modal: {
+            ...commonTokens.Modal,
+        }
 
     }
     // Agrega más tokens según sea necesario

@@ -1,7 +1,7 @@
 // src/components/Login/LoginComponent.tsx
 
 import React, { useState } from 'react';
-import { Input, Form, message } from 'antd';
+import { Input, Form, notification } from 'antd';
 import JunoButton from '../common/JunoButton/JunoButton';
 import { JunoButtonTypes } from '../common/JunoButton/JunoButton.types';
 import { LoginFormValues } from './Login.types';
@@ -15,18 +15,26 @@ const LoginComponent = () => {
     const { login, user } = useAuth();
     const navigate = useNavigate();
 
-    if (user) return <Navigate to="/" replace />;
-    
+    if (user) return <Navigate to="/upload" replace />;
+
     const onFinish = async (values: LoginFormValues) => {
         setLoading(true);
         try {
             await login(values.username, values.password);
-            message.success('¡Inicio de sesión exitoso!');
+            notification.success({
+                message: 'Upps! Something went wrong',
+                description: 'An error occurred while fetching the validations',
+                duration: 3,
+            });
             navigate('/upload', { replace: true }); // Redirige al home o a la ruta deseada
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error('Error al iniciar sesión:', error);
-            message.error(error.response?.data?.error || 'Error al iniciar sesión.');
+            notification.error({
+                message: 'Upps! Something went wrong',
+                description: 'An error occurred while logging in',
+                duration: 3,
+            });
         } finally {
             setLoading(false);
         }
@@ -34,7 +42,11 @@ const LoginComponent = () => {
 
     const onFinishFailed = (errorInfo: ValidateErrorEntity<LoginFormValues>) => {
         console.log('Error:', errorInfo);
-        message.error('Por favor, verifica los campos del formulario e inténtalo de nuevo.');
+        notification.error({
+            message: 'Upps! Something went wrong',
+            description: 'Some fields are missing or have errors',
+            duration: 3,
+        });
     };
 
     return (

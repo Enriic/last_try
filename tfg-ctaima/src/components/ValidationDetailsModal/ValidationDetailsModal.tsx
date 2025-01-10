@@ -3,6 +3,7 @@
 import React from 'react';
 import { Modal, Table } from 'antd';
 import { Validation } from '../../types';
+import './ValidationDetailsModal.less';
 
 interface ValidationDetailsModalProps {
     visible: boolean;
@@ -23,9 +24,9 @@ const ValidationDetailsModal: React.FC<ValidationDetailsModalProps> = ({ visible
             key: 'result',
             render: (result: string) =>
                 result === 'Success' ? (
-                    <span style={{ color: 'green' }}>Correcto</span>
+                    <span className='ant-tag ant-tag-green'>Correcto</span>
                 ) : (
-                    <span style={{ color: 'red' }}>Incorrecto</span>
+                    <span className='ant-tag ant-tag-red 'style={{ color: 'red' }}>Incorrecto</span>
                 ),
         },
     ];
@@ -33,7 +34,7 @@ const ValidationDetailsModal: React.FC<ValidationDetailsModalProps> = ({ visible
     return (
         <Modal
             visible={visible}
-            title={`Detalles de Validación - ${validation.document_name}`}
+            title={`Detalles de Validación Requirement - ${validation.id}`} // Aqui iria el id del requirement seguramente, o el del trade como mucho, pero mejor el de requirement.
             onCancel={onClose}
             footer={null}
         >

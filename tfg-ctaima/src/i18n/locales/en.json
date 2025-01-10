@@ -35,6 +35,7 @@
         "fileError": "Please upload a file",
         "uploadPrompt": "Click or drag a file to this area to upload",
         "selectedFile": "Selected file",
-        "submitButton": "Submit"
+        "submitButton": "Submit",
+        "validateButton": "Validate"
     }
 }

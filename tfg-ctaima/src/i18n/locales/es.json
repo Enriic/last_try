@@ -35,6 +35,7 @@
         "fileError": "Por favor sube un archivo",
         "uploadPrompt": "Haz clic o arrastra un archivo a esta área para subirlo",
         "selectedFile": "Archivo seleccionado",
-        "submitButton": "Enviar"
+        "submitButton": "Enviar",
+        "validateButton": "Validar"
     }
 }

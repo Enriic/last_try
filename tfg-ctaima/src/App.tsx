@@ -17,33 +17,32 @@ import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import LoginPage from './pages/Login/LoginPage';
 import ValidationHistoryPage from './pages/ValidationHistory/ValidationHistoryPage';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+import { App as AntdApp } from 'antd'; // Importa el componente App de Ant Design
 
 
 function App() {
   const { isDarkMode } = useTheme();
   const themeConfig = getTheme(isDarkMode);
 
-
   return (
     <I18nextProvider i18n={i18n}>
       <AuthProvider>
         <ConfigProvider theme={themeConfig} locale={es_ES}>
-          <Router>
-            <Routes>
-              <Route path="/login" element={<LoginPage />} />
-              <Route element={<PrivateRoute />}>
-                <Route path="/" element={<BasicLayout />}>
-                  {/* Rutas anidadas */}
-                  <Route path="upload" element={<UploadPage />} />
-                  <Route path="dashboard" element={<DashboardPage />} />
-                  <Route path="login" element={<LoginPage />} />
-                  <Route path="history" element={<ValidationHistoryPage />} />
-                  {/* Puedes agregar más rutas aquí */}
+          <AntdApp> {/* Añade este contenedor */}
+            <Router>
+              <Routes>
+                <Route path="/login" element={<LoginPage />} />
+                <Route element={<PrivateRoute />}>
+                  <Route path="/" element={<BasicLayout />}>
+                    <Route path="upload" element={<UploadPage />} />
+                    <Route path="dashboard" element={<DashboardPage />} />
+                    <Route path="history" element={<ValidationHistoryPage />} />
+                  </Route>
                 </Route>
-              </Route>
-              <Route path="*" element={<Navigate to="/login" replace />} />
-            </Routes>
-          </Router>
+                <Route path="*" element={<Navigate to="/login" replace />} />
+              </Routes>
+            </Router>
+          </AntdApp> {/* Cierra el contenedor */}
         </ConfigProvider>
       </AuthProvider>
     </I18nextProvider>

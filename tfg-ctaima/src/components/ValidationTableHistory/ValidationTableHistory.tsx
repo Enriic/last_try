@@ -19,18 +19,21 @@ const ValidationTableHistory: React.FC<ValidationTableHistoryProps> = ({ validat
             dataIndex: 'timestamp',
             key: 'timestamp',
             render: (text: string) => new Date(text).toLocaleDateString('es-ES'),
+            sorter: (a: Validation, b: Validation) =>
+                new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+            defaultSortOrder: 'descend' as const,
         },
         {
             title: 'Nombre del Documento',
-            dataIndex: 'document_info', // Asegúrate de pasar el campo correcto
-            key: 'document_name',
-            render: (document_info: Document) => document_info?.name, // Accede a la propiedad del objeto
+            dataIndex: 'document_info', 
+            key: 'document_id',
+            render: (document_info: Document) => document_info?.name, 
         },
         {
             title: 'Tipo de Documento',
             dataIndex: 'document_info',
             key: 'document_type',
-            render: (document_info: Document) => document_info?.document_type_name,
+            render: (document_info: Document) => document_info?.document_type_info.name,
         },
         {
             title: 'Resultado',
@@ -38,9 +41,9 @@ const ValidationTableHistory: React.FC<ValidationTableHistoryProps> = ({ validat
             key: 'status',
             render: (status: string) =>
                 status === 'success' ? (
-                    <span style={{ color: 'green' }}>Éxito</span>
+                    <span className='ant-tag ant-tag-green' >Éxito</span>
                 ) : (
-                    <span style={{ color: 'red' }}>Fallo</span>
+                    <span className='ant-tag ant-tag-red'>Fallo</span>
                 ),
         },
         {
@@ -56,7 +59,7 @@ const ValidationTableHistory: React.FC<ValidationTableHistoryProps> = ({ validat
     ];
 
     return (
-        <Table 
+        <Table
             className='history-validation-table'
             dataSource={validations}
             columns={columns}

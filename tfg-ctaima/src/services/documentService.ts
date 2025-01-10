@@ -1,9 +1,12 @@
 // src/services/documentService.ts
 
 import axios from 'axios';
+import { DocumentType } from '../types';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 
 export const getDocumentTypes = async () => {
-    const API_URL = 'http://localhost:8000'; // Ajusta la URL según corresponda
     const response = await axios.get(`${API_URL}/api/documentTypes/`, {
         withCredentials: true,
     });
@@ -11,10 +14,35 @@ export const getDocumentTypes = async () => {
 };
 
 export const getDocuments = async () => {
-    const API_URL = 'http://localhost:8000'; // Ajusta la URL según corresponda
     const response = await axios.get(`${API_URL}/api/document/`, {
         withCredentials: true,
     });
-    console.log(response.data);
     return response.data;
+};
+
+export const getDocument = async (documentId: string) => {
+    const response = await axios.get(`${API_URL}/api/document/${documentId}/`, {
+        withCredentials: true,
+    });
+    return response.data;
+};
+
+
+export const uploadDocument = async (
+    filename: string,
+    user: string,
+    documentType: DocumentType,
+) => {
+    const formData = new FormData();
+    formData.append('user', user);
+    formData.append('name', filename);
+    formData.append('document_type', documentType.id.toString());
+
+    const response = await axios.post(`${API_URL}/api/document/`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+
+    return response.data; 
 };

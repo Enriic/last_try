@@ -28,6 +28,9 @@ export const getTheme = (isDarkMode: boolean): ThemeConfig => {
             Table: {
                 ...tokens.components?.Table,
             },
+            Modal: {
+                ...tokens.components?.Modal,
+            }
             // ... otros componentes
         },
     };

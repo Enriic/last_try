@@ -9,8 +9,8 @@ import historyMenu from './history';
 import logoutMenu from './logout';
 
 const menuItems: CustomMenuDataItem[] = [
-    ...dashboardMenu,
     ...uploadMenu,
+    ...dashboardMenu,
     ...historyMenu,
     // ...usersMenu,
     // ...settingsMenu

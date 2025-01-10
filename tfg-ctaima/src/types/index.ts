@@ -18,21 +18,40 @@ export interface ValidationDetail {
     result: string;
 }
 
+export interface Field {
+    name: string; // Nombre del campo
+    value?: string | number | boolean // Tipo del campo, puedes agregar más valores según los tipos permitidos
+}
+
 export interface DocumentType {
     id: number;
-    name: string;
+    name: string; // Nombre del tipo de documento
+    description: string; // Descripción del documento
+    user: number; // ID del usuario relacionado con el documento
+    fields: Field[]; // Array de campos asociados con el documento
 }
 
 export interface Document {
-    id: number;
+    id: string;
     name: string;
-    document_type: number;
+    document_type_info: DocumentType;
     document_type_name: string | null;
     timestamp: string;
     url: string;
     user: number;
 }
 
+export interface User {
+    id: number;
+    username: string;
+    email: string;
+    first_name: string;
+    last_name?: string;
+    is_active?: boolean;
+    is_superuser: boolean;
+    is_staff: boolean;
+    timestamp?: string;
+}
 
 
 // Agrega otros tipos si es necesario

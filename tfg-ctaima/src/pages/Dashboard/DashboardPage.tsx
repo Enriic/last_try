@@ -107,7 +107,7 @@
 // //  export default DashboardPage;
 
 import React, { useState, useEffect } from 'react';
-import { Row, Col, message, Switch, Typography } from 'antd';
+import { Row, Col, message, Switch, Typography, notification} from 'antd';
 import DashboardKPIs from '../../components/DashboardKPIs/DashboardKPIs';
 import ValidationBarChart from '../../components/ValidationBarChart/ValidationBarChart';
 import ValidationPieChart from '../../components/ValidationPieChart/ValidationPieChart';
@@ -125,7 +125,7 @@ const DashboardPage: React.FC = () => {
   const [filteredValidations, setFilteredValidations] = useState<Validation[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const { user } = useAuth();
-  const [showAllValidations, setShowAllValidations] = useState<boolean>(false);
+  const [showAllValidations, setShowAllValidations] = useState<boolean>(true);
 
   useEffect(() => {
     fetchValidations()
@@ -137,9 +137,14 @@ const DashboardPage: React.FC = () => {
       setLoading(true);
       const data = await getValidations(showAllValidations, user);
       setValidations(data);
+      console.log(data)
       setFilteredValidations(data); // Inicializa los datos filtrados
     } catch (error) {
-      message.error('Error al obtener las validaciones');
+      notification.error({
+        message: 'Upps! Something went wrong',
+        description: 'An error occurred while fetching the validations',
+        duration: 3,
+      });
     } finally {
       setLoading(false);
     }
@@ -167,8 +172,8 @@ const DashboardPage: React.FC = () => {
             checked={showAllValidations}
             onChange={handleSwitchChange}
           />
-          <Text style={{ marginLeft: 8, fontSize: 13 }}>
-            {showAllValidations ? 'Mostrando todas las validaciones' : 'Mostrando mis validaciones'}
+          <Text style={{ marginLeft: 8}}>
+            {showAllValidations ? 'Todas las validaciones' : 'Mis validaciones'}
           </Text>
         </Col>
         <Col span={18} style={{ marginTop: 16 }}>

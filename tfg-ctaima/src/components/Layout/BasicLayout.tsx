@@ -3,7 +3,7 @@ import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { ProLayout, ProSettings } from '@ant-design/pro-layout';
 import { CustomMenuDataItem } from './menu/types'; // Importamos los tipos de menú
 import menuItems from './menu'; // Importamos los menús definidos
-import { Typography, Select, message, Modal } from 'antd';
+import { Typography, Select, message, Modal, notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
@@ -29,11 +29,19 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
     const handleLogout = async () => {
         try {
             await logout();
-            message.success('Sesión cerrada correctamente');
+            notification.success({
+                message: 'Logout successful',
+                description: 'You have been logged out successfully',
+                duration: 3,
+            });
             navigate('/login'); // Redirigir al login u otra página
         } catch (error) {
             console.error('Error al cerrar sesión:', error);
-            message.error('Error al cerrar sesión');
+            notification.error({
+                message: 'Upps! Something went wrong',
+                description: 'An error occurred while logging out',
+                duration: 3,
+            });
         }
     };
 
@@ -187,7 +195,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
             {...settings}
             collapsed={collapsed}
             route={{
-                path: '/',
+                path: '/upload',
                 routes: finalMenuItems,
             }}
             onCollapse={(value: boolean) => setCollapsed(value)}
