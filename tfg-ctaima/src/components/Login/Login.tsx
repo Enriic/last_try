@@ -21,11 +21,6 @@ const LoginComponent = () => {
         setLoading(true);
         try {
             await login(values.username, values.password);
-            notification.success({
-                message: 'Upps! Something went wrong',
-                description: 'An error occurred while fetching the validations',
-                duration: 3,
-            });
             navigate('/upload', { replace: true }); // Redirige al home o a la ruta deseada
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {

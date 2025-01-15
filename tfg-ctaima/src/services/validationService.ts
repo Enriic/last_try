@@ -19,25 +19,6 @@ export const getValidations = async (
         withCredentials: true,
     });
 
-    // // Usa Promise.all para esperar todas las solicitudes asincrónicas de documentos
-    // const validationsWithDocumentInfo = await Promise.all(response.data.map(async (validation) => {
-    //     const documentResponse = await axios.get(`${API_URL}/api/document/${validation.document}/`, {
-    //         withCredentials: true,
-    //     });
-
-        
-    //     const documentTypeResponse = await axios.get(`${API_URL}/api/documentTypes/${documentResponse.data.document_type}/`, {
-    //         withCredentials: true,
-    //     });
-
-    //     // Agregar la información del documento a la validación
-    //     validation.document_info = documentResponse.data;
-    //     validation.document_info.document_type_name = documentTypeResponse.data.name;
-
-    //     return validation; // Devolver la validación con la información del documento
-    // }));
-
-    //return validationsWithDocumentInfo; // Devolver las validaciones con toda la información
     return response.data;
 };
 

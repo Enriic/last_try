@@ -1,19 +1,20 @@
 // src/components/Upload/JunoUploadFile.tsx
 
 import React, { useState, useEffect } from 'react';
-import { Form, Select, Checkbox, Upload, Button, message, Steps, notification } from 'antd';
+import { Form, Select, Checkbox, Upload, Button, notification, Steps, SelectProps } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { UploadFile } from 'antd/lib/upload/interface';
 import { useTranslation } from 'react-i18next';
 import { getDocumentTypes, uploadDocument } from '../../services/documentService';
-import { DocumentType, Document, Field, Validation } from '../../types';
+import { getResources } from '../../services/resourceService'; // Importamos getResources
+import { DocumentType, Document, Field, Validation, Resource, VehicleDetails, EmployeeDetails } from '../../types'; // Importamos Resource
 import './JunoUplaodFile.less';
 import { useAuth } from '../../context/AuthContext';
 import { createValidation } from '../../services/validationService';
 import ValidationResultModal from '../ValidationResultModal/ValidationResultModal';
 
 const { Dragger } = Upload;
-const { Option } = Select;
+const { Option, OptGroup } = Select;
 const { Step } = Steps;
 
 const JunoUploadFile: React.FC = () => {
@@ -25,16 +26,38 @@ const JunoUploadFile: React.FC = () => {
     const [uploading, setUploading] = useState<boolean>(false);
 
     const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
-    const [documentType, setDocumentType] = useState<DocumentType>();
+    const [documentType, setDocumentType] = useState<DocumentType | undefined>(undefined);
+    const [resources, setResources] = useState<Resource[]>([]);
+    const [filteredResources, setFilteredResources] = useState<Resource[]>([]);
+    const [selectedResource, setSelectedResource] = useState<Resource | undefined>(undefined);
     const [selectedFields, setSelectedFields] = useState<string[]>([]);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
-    const [uploadedDocument, setUploadedDocument] = useState<Document | null>(null); // Para almacenar el documento subido
-    const [validationResult, setValidationResult] = useState<Validation | null>(null); // Para almacenar la respuesta de la validación
+    const [uploadedDocument, setUploadedDocument] = useState<Document | null>(null);
+    const [validationResult, setValidationResult] = useState<Validation | null>(null);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+
 
     useEffect(() => {
         fetchDocumentTypes();
+        fetchResources();
     }, []);
+
+
+
+    const fetchResources = async () => {
+        try {
+            const data = await getResources();
+            setResources(data);
+            setFilteredResources(data); // Inicialmente, muestra todos los recursos
+            console.log('Resources:', data);
+        } catch (error) {
+            notification.error({
+                message: '¡Ups! Algo salió mal',
+                description: 'Ocurrió un error al obtener los recursos',
+                duration: 3,
+            });
+        }
+    };
 
     const fetchDocumentTypes = async () => {
         try {
@@ -43,11 +66,37 @@ const JunoUploadFile: React.FC = () => {
             console.log('Document types:', data);
         } catch (error) {
             notification.error({
-                message: 'Upps! Something went wrong',
-                description: 'An error occurred while fetching the document types',
+                message: '¡Ups! Algo salió mal',
+                description: 'Ocurrió un error al obtener los tipos de documento',
                 duration: 3,
             });
         }
+    };
+
+    const handleSearchResource = (value: string) => {
+
+        const lowerCaseValue = value.toLowerCase();
+        const filtered = resources.filter((res) => {
+
+            if (res.resource_type === 'vehicle') {
+                const vehicle = res.resource_details as VehicleDetails;
+                return (
+                    vehicle.name.toLowerCase().includes(lowerCaseValue) ||
+                    vehicle.registration_id.toLowerCase().includes(lowerCaseValue)
+                );
+            } else if (res.resource_type === 'employee') {
+                const employee = res.resource_details as EmployeeDetails;
+                const fullName = `${employee.first_name} ${employee.last_name}`.toLowerCase();
+                return (
+                    fullName.includes(lowerCaseValue) ||
+                    employee.number_id.toLowerCase().includes(lowerCaseValue)
+                );
+            }
+
+            return false;
+        });
+
+        setFilteredResources(filtered);
     };
 
     // Maneja el cambio en la selección del tipo de documento
@@ -58,6 +107,15 @@ const JunoUploadFile: React.FC = () => {
             form.resetFields(['validationFields']);
         } else {
             setDocumentType(undefined);
+        }
+    };
+
+    const handleResourceChange = (value: string) => {
+        const selectedRes = resources.find((res) => res.id === value);
+        if (selectedRes) {
+            setSelectedResource(selectedRes);
+        } else {
+            setSelectedResource(undefined);
         }
     };
 
@@ -87,40 +145,37 @@ const JunoUploadFile: React.FC = () => {
     const handleNext = async () => {
         if (currentStep === 0) {
             try {
-                await form.validateFields(['documentType', 'file']);
+                await form.validateFields(['documentType', 'resource', 'file']);
                 setUploading(true);
 
                 // Enviar el archivo al backend
-                if (fileList[0] && documentType) {
+                if (fileList[0] && documentType && selectedResource) {
                     const file = fileList[0] as UploadFile<unknown>;
-                    //const formDataFile = file.originFileObj as File; // Se va a usar para subir el documento al Blob Container
 
                     // Llamar a la función uploadDocument del servicio
                     const response = await uploadDocument(
                         file.name,
                         user?.id || 'undefined',
                         documentType,
+                        selectedResource,
                     );
 
                     console.log('Respuesta del backend:', response);
 
                     // Almacenar la información del documento subido
                     setUploadedDocument(response);
-                    console.log(uploadedDocument);
 
-                    //message.success(t('upload.successMessage', 'Archivo subido correctamente'));
                     notification.success({
-                        message: 'Document has been uploaded successfully',
-                        description: 'The document has been uploaded successfully',
+                        message: 'Documento subido exitosamente',
+                        description: 'El documento ha sido subido correctamente',
                         duration: 3,
                     });
                     setCurrentStep(currentStep + 1);
                     setUploading(false);
-
                 } else {
                     notification.error({
-                        message: 'Upps! Something went wrong',
-                        description: 'An error occurred while uploading the document',
+                        message: '¡Ups! Algo salió mal',
+                        description: 'Ocurrió un error al subir el documento',
                         duration: 3,
                     });
                     setUploading(false);
@@ -128,8 +183,8 @@ const JunoUploadFile: React.FC = () => {
             } catch (error) {
                 console.log('Error al subir el archivo:', error);
                 notification.error({
-                    message: 'Upps! Something went wrong',
-                    description: 'An error occurred while uploading the document',
+                    message: '¡Ups! Algo salió mal',
+                    description: 'Ocurrió un error al subir el documento',
                     duration: 3,
                 });
                 setUploading(false);
@@ -145,15 +200,11 @@ const JunoUploadFile: React.FC = () => {
                     // Preparar los datos para createValidation
                     const documentId = uploadedDocument.id;
                     const userId = user.id.toString();
-                    const status = 'pending'; // Puedes ajustar el estado según sea necesario
-
-                    // Asumimos que validation_details es un array de objetos Field
-                    // Necesitamos construir el array de validation_details basado en selectedFields
+                    const status = 'pending';
 
                     const validationDetails: Field[] = selectedFields.map((fieldName) => ({
                         name: fieldName,
-                        value: 'pending'
-                        // Value sera asignado en el backend
+                        value: 'pending',
                     }));
 
                     // Llamar a createValidation
@@ -168,22 +219,19 @@ const JunoUploadFile: React.FC = () => {
 
                     setIsModalVisible(true);
 
-                    // Aquí manejarás la creación de la validación en el backend (aún no implementado)
                     console.log('Respuesta de createValidation:', validationResponse);
 
                     notification.success({
-                        message: 'Validation has been created successfully',
-                        description: 'The validation has been created successfully',
+                        message: 'Validación creada exitosamente',
+                        description: 'La validación ha sido creada correctamente',
                         duration: 3,
                     });
-                    // Puedes resetear el formulario o realizar otra acción aquí
-
                 }
             } catch (error) {
                 console.log('Error al crear la validación:', error);
                 notification.error({
-                    message: 'Upps! Something went wrong',
-                    description: 'An error occurred while creating the validation',
+                    message: '¡Ups! Algo salió mal',
+                    description: 'Ocurrió un error al crear la validación',
                     duration: 3,
                 });
             }
@@ -191,7 +239,6 @@ const JunoUploadFile: React.FC = () => {
     };
 
     // Manejar el cierre del modal
-
     const handleModalClose = () => {
         setIsModalVisible(false);
         // Resetear el formulario y estados
@@ -199,6 +246,7 @@ const JunoUploadFile: React.FC = () => {
         setFileList([]);
         setSelectedFields([]);
         setDocumentType(undefined);
+        setSelectedResource(undefined);
         setUploadedDocument(null);
         setCurrentStep(0);
         setUploading(false);
@@ -214,7 +262,7 @@ const JunoUploadFile: React.FC = () => {
             <Form form={form} layout="vertical" className="form-upload-file">
                 {currentStep === 0 && (
                     <>
-                        {/* Paso 1: Selección del tipo de documento y carga del archivo */}
+                        {/* Paso 1: Selección del tipo de documento y recurso, y carga del archivo */}
                         <Form.Item
                             label={t('upload.documentTypeLabel', 'Tipo de Documento')}
                             name="documentType"
@@ -231,8 +279,45 @@ const JunoUploadFile: React.FC = () => {
                             >
                                 {documentTypes.map((doc) => (
                                     <Option key={doc.id} value={doc.id}>
-                                        {t(`upload.documentType.${doc.name}`, doc.name)}
+                                        {doc.name}
                                     </Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+
+                        <Form.Item
+                            label="Recurso"
+                            name="resource"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Por favor selecciona un recurso',
+                                },
+                            ]}
+                        >
+                            <Select
+                                placeholder="Selecciona un recurso"
+                                onChange={handleResourceChange}
+                                showSearch
+                                filterOption={false}
+                                onSearch={handleSearchResource}
+                                notFoundContent={null}
+                            >
+                                {[
+                                    { type: 'vehicle', label: 'Vehículos', resources: filteredResources.filter(res => res.resource_type === 'vehicle') },
+                                    { type: 'employee', label: 'Empleados', resources: filteredResources.filter(res => res.resource_type === 'employee') },
+                                ].map(group => (
+                                    group.resources.length > 0 && (
+                                        <OptGroup key={group.type} label={group.label}>
+                                            {group.resources.map(res => (
+                                                <Option key={res.id} value={res.id}>
+                                                    {res.resource_type === 'vehicle' ?
+                                                        `${(res.resource_details as VehicleDetails).name} - ${(res.resource_details as VehicleDetails).registration_id}` :
+                                                        `${(res.resource_details as EmployeeDetails).first_name} ${(res.resource_details as EmployeeDetails).last_name} - ${(res.resource_details as EmployeeDetails).number_id}`}
+                                                </Option>
+                                            ))}
+                                        </OptGroup>
+                                    )
                                 ))}
                             </Select>
                         </Form.Item>
@@ -240,7 +325,9 @@ const JunoUploadFile: React.FC = () => {
                         <Form.Item
                             label={t('upload.fileLabel', 'Archivo')}
                             name="file"
-                            rules={[{ required: true, message: t('upload.fileError', 'Por favor sube un archivo') }]}
+                            rules={[
+                                { required: true, message: t('upload.fileError', 'Por favor sube un archivo') },
+                            ]}
                         >
                             <Dragger {...uploadProps} maxCount={1} className="upload-dragger">
                                 <p className="ant-upload-drag-icon">
@@ -248,11 +335,15 @@ const JunoUploadFile: React.FC = () => {
                                 </p>
                                 {fileList.length === 0 ? (
                                     <p className="ant-upload-text">
-                                        {t('upload.uploadPrompt', 'Haz clic o arrastra un archivo a esta área para subirlo')}
+                                        {t(
+                                            'upload.uploadPrompt',
+                                            'Haz clic o arrastra un archivo a esta área para subirlo'
+                                        )}
                                     </p>
                                 ) : (
                                     <p className="ant-upload-text">
-                                        {t('upload.selectedFile', 'Archivo seleccionado')}: <strong>{fileList[0].name}</strong>
+                                        {t('upload.selectedFile', 'Archivo seleccionado')}:{' '}
+                                        <strong>{fileList[0].name}</strong>
                                     </p>
                                 )}
                             </Dragger>
@@ -260,7 +351,9 @@ const JunoUploadFile: React.FC = () => {
 
                         <Form.Item>
                             <Button type="primary" onClick={handleNext} disabled={uploading}>
-                                {uploading ? t('upload.uploading', 'Subiendo...') : t('upload.uploadButton', 'Subir Documento')}
+                                {uploading
+                                    ? t('upload.uploading', 'Subiendo...')
+                                    : t('upload.uploadButton', 'Subir Documento')}
                             </Button>
                         </Form.Item>
                     </>
@@ -274,7 +367,14 @@ const JunoUploadFile: React.FC = () => {
                                 {t('upload.summary.documentType', 'Tipo de Documento')}: <strong>{documentType?.name}</strong>
                             </p>
                             <p>
-                                {t('upload.summary.fileName', 'Nombre de Archivo')}: <strong>{uploadedDocument?.name}</strong>
+                                Recurso:{' '}
+                                <strong>
+                                    {selectedResource && selectedResource.resource_type === 'vehicle'
+                                        ? (selectedResource.resource_details as VehicleDetails).name
+                                        : selectedResource && selectedResource.resource_type === 'employee'
+                                            ? `${(selectedResource.resource_details as EmployeeDetails).first_name} ${(selectedResource.resource_details as EmployeeDetails).last_name}`
+                                            : ''}
+                                </strong>
                             </p>
                         </div>
 
@@ -284,17 +384,17 @@ const JunoUploadFile: React.FC = () => {
                             rules={[
                                 {
                                     required: true,
-                                    message: t('upload.validationFieldsError', 'Por favor selecciona al menos un campo'),
+                                    message: t(
+                                        'upload.validationFieldsError',
+                                        'Por favor selecciona al menos un campo'
+                                    ),
                                 },
                             ]}
                         >
                             <Checkbox.Group
                                 options={
                                     documentType?.fields?.map((field) => ({
-                                        label: `${t(
-                                            `upload.validationFields.${field.name}`,
-                                            field.name.charAt(0).toUpperCase() + field.name.slice(1)
-                                        )}`,
+                                        label: `${field.name.charAt(0).toUpperCase() + field.name.slice(1)}`,
                                         value: field.name,
                                     })) || []
                                 }
