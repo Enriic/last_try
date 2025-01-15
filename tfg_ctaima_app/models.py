@@ -23,6 +23,67 @@ class EventType(Enum):
 def default_document_type():
     return DocumentType.objects.get_or_create(name="Default")[0].id
 
+def default_resource():
+    return Resource.objects.get_or_create(resource_type='employee')[0].id
+
+class Company(models.Model):
+    type_choices = (
+        ('customer', 'Customer'),
+        ('supplier', 'Supplier'),
+    )
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    tax_id = models.CharField(max_length=50, unique=True)
+    type = models.CharField(max_length=50, choices=type_choices, default='customer')
+    company_name = models.CharField(max_length=255)
+    industry = models.CharField(max_length=255)
+    email = models.EmailField()
+    location = models.CharField(max_length=255)
+    phone = models.CharField(max_length=20)
+    language = models.CharField(max_length=50)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.company_name
+
+# Modelo para Resource (Puede ser un Employee o un Vehicle)
+class Resource(models.Model):
+    type_choices = (
+        ('employee', 'Employee'),
+        ('vehicle', 'Vehicle'),
+    )
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    resource_type = models.CharField(max_length=50, choices=type_choices, default='employee')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        abstract = False  # No es una clase abstracta, por lo que Django creará una tabla para esta clase.
+
+class Vehicle(Resource):
+    
+    name = models.CharField(max_length=255)
+    registration_id = models.CharField(max_length=50)
+    manufacturer = models.CharField(max_length=100)
+    model = models.CharField(max_length=100)
+    weight = models.FloatField()
+
+    def __str__(self):
+        return self.name
+
+
+class Employee(Resource):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+    country = models.CharField(max_length=100)
+    number_id = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
 
 class DocumentType(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
@@ -36,6 +97,7 @@ class DocumentType(models.Model):
 
 class Document(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)  # Usar el modelo User de Django
     document_type = models.ForeignKey(DocumentType, on_delete=models.SET_DEFAULT, default=default_document_type)
     name = models.CharField(max_length=255)

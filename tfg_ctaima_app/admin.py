@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import User  # Importar el modelo User de Django
 from django.contrib.auth.admin import UserAdmin  # Importar el administrador del modelo User de Django
-from .models import Document, DocumentType, Log, Validation
+from .models import Document, DocumentType, Log, Validation, Company, Resource, Vehicle, Employee
 
 # Comentamos el registro del modelo de usuario personalizado existente
 # @admin.register(Users)
@@ -20,7 +20,7 @@ class DocumentTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'document_type', 'user', 'timestamp']
+    list_display = ['id', 'name', 'document_type','resource', 'user', 'timestamp']
     readonly_fields = ['id', 'timestamp']
     search_fields = ['name', 'document_type__name']
     list_filter = ['document_type', 'timestamp']
@@ -38,3 +38,24 @@ class LogAdmin(admin.ModelAdmin):
     readonly_fields = ['timestamp']
     list_filter = ['timestamp', 'user']
     search_fields = ['event', 'details', 'user__username']
+
+@admin.register(Company)
+class CompanyAdmin(admin.ModelAdmin):
+    list_display = ['id', 'tax_id', 'company_name', 'industry', 'email', 'location', 'phone', 'language', 'timestamp']
+    search_fields = ['company_name', 'industry', 'email', 'location', 'phone', 'language']
+    list_filter = ['industry', 'timestamp']
+
+@admin.register(Resource)
+class ResourceAdmin(admin.ModelAdmin):
+    list_display = ['id', 'resource_type', 'company', 'timestamp']
+
+
+@admin.register(Vehicle)
+class VehicleAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'registration_id', 'manufacturer', 'model', 'weight']
+
+
+@admin.register(Employee)  
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'first_name', 'last_name', 'email', 'phone', 'country', 'number_id']
+

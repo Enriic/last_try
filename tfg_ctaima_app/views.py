@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.contrib.auth.models import User  # Importar el modelo User de Django
-from .models import DocumentType, Document, Validation, Log, EventType
-from .serializers import UserSerializer, DocumentTypeSerializer, DocumentSerializer, ValidationSerializer, LogSerializer
+from .models import Company, Resource, Vehicle, Employee, DocumentType, Document, Validation, Log, EventType
+from .serializers import UserSerializer,CompanySerializer, ResourceSerializer, VehicleSerializer, EmployeeSerializer, DocumentTypeSerializer, DocumentSerializer, ValidationSerializer, LogSerializer
 from tfg_ctaima_app.constants import MOCK_DOCUMENT_URLS
 import random
 from django.contrib.auth import authenticate, login, logout
@@ -182,25 +182,24 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class DocumentViewSet(viewsets.ModelViewSet):
-    queryset = Document.objects.all().select_related('document_type', 'user')
+    queryset = Document.objects.all().select_related('document_type', 'user', 'resource')
     serializer_class = DocumentSerializer
-
 
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
         data['url'] = random.choice(MOCK_DOCUMENT_URLS)  # Select a random document URL from mock data
         serializer = self.serializer_class(data=data)
         print("User creating document:",request.user)
-
+        print("Data:",data)
         if serializer.is_valid():
             serializer.save()
+            print("request resource ID:",request.data['resource'])
             # Create a log when a new document is created
             Log.objects.create(
                 user=request.user,
                 event=EventType.CREATE_DOCUMENT,
                 details=f"Document '{serializer.instance.name}' created."
             )
-
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -289,6 +288,30 @@ class DocumentTypeViewSet(viewsets.ModelViewSet):
         documents = Document.objects.filter(document_type=document_type)
         serializer = DocumentSerializer(documents, many=True)
         return Response(serializer.data)
+
+# ViewSet para Company
+class CompanyViewSet(viewsets.ModelViewSet):
+    queryset = Company.objects.all()
+    serializer_class = CompanySerializer
+
+
+# ViewSet para Resource
+class ResourceViewSet(viewsets.ModelViewSet):
+    queryset = Resource.objects.select_related('company')
+    serializer_class = ResourceSerializer
+
+
+# ViewSet para Vehicle
+class VehicleViewSet(viewsets.ModelViewSet):
+    queryset = Vehicle.objects.all()
+    serializer_class = VehicleSerializer
+
+
+# ViewSet para Employee
+class EmployeeViewSet(viewsets.ModelViewSet):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+
 
 class LogViewSet(viewsets.ModelViewSet):
     queryset = Log.objects.all()
