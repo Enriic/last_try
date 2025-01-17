@@ -46,7 +46,7 @@ const ResourceSelect: React.FC<ResourceSelectProps> = ({ value, onChange, placeh
             const fullName = `${employee.first_name} ${employee.last_name}`.toLowerCase();
             return (
                 fullName.includes(lowerCaseValue) ||
-                employee.number_id.toLowerCase().includes(lowerCaseValue)
+                employee.worker_id.toLowerCase().includes(lowerCaseValue)
             );
         }
         return false;
@@ -58,7 +58,7 @@ const ResourceSelect: React.FC<ResourceSelectProps> = ({ value, onChange, placeh
             return `${vehicle.name} - ${vehicle.registration_id}`;
         } else if (item.resource_type === 'employee') {
             const employee = item.resource_details as EmployeeDetails;
-            return `${employee.first_name} ${employee.last_name} - ${employee.number_id}`;
+            return `${employee.first_name} ${employee.last_name} - ${employee.worker_id}`;
         }
         return 'Recurso desconocido';
     };

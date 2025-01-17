@@ -1,7 +1,7 @@
 // src/services/documentService.ts
 
 import axios from 'axios';
-import { DocumentType, Resource } from '../types';
+import { DocumentType } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 

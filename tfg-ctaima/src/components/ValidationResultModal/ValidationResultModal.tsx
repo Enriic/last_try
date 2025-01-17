@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Modal, Descriptions, List } from 'antd';
-import { Field } from '../../types';
+import { FieldToExtract, FieldToValidate } from '../../types';
 import dayjs from 'dayjs';
 import './ValidationResultModel.less';
 
@@ -13,7 +13,8 @@ interface ValidationResultModalProps {
     documentType: string;
     validationResult: string;
     timestamp: string;
-    fields: Field[];
+    fields_to_validate: FieldToValidate[];
+    fields_to_extract: FieldToExtract[];
 }
 
 const ValidationResultModal: React.FC<ValidationResultModalProps> = ({
@@ -23,7 +24,8 @@ const ValidationResultModal: React.FC<ValidationResultModalProps> = ({
     documentType,
     validationResult,
     timestamp,
-    fields,
+    fields_to_validate,
+    fields_to_extract
 }) => {
     return (
         <Modal
@@ -45,13 +47,28 @@ const ValidationResultModal: React.FC<ValidationResultModalProps> = ({
 
             <h3 style={{ marginTop: '16px', fontSize: 20 }}>Detalles de los Campos</h3>
             <List
-                dataSource={fields}
+                dataSource={fields_to_validate}
                 renderItem={(item) => (
                     <List.Item className='modal-list-item'>
                         <List.Item.Meta
                             title={<span className="item-title">{item.name.toUpperCase()}</span>}
                             description={
                                 <span className={`ant-tag ${item.value==='success' ? 'ant-tag-green' : 'ant-tag-red'}`}>
+                                    {item.value || 'Pendiente'}
+                                </span>
+                            }
+                        />
+                    </List.Item>
+                )}
+            />
+            <List
+                dataSource={fields_to_extract}
+                renderItem={(item) => (
+                    <List.Item className='modal-list-item'>
+                        <List.Item.Meta
+                            title={<span className="item-title">{item.name.toUpperCase()}</span>}
+                            description={
+                                <span className={`ant-tag ${item.value === 'success' ? 'ant-tag-green' : 'ant-tag-red'}`}>
                                     {item.value || 'Pendiente'}
                                 </span>
                             }

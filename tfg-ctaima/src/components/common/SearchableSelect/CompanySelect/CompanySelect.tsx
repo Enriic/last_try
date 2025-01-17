@@ -37,11 +37,11 @@ const CompanySelect: React.FC<CompanySelectProps> = ({ value, onChange, placehol
         const lowerCaseValue = input.toLowerCase();
         return (
             option.company_name.toLowerCase().includes(lowerCaseValue) ||
-            option.tax_id.toLowerCase().includes(lowerCaseValue)
+            option.company_id.toLowerCase().includes(lowerCaseValue)
         );
     };
 
-    const renderOption = (item: Company) => `${item.company_name} - ${item.tax_id}`;
+    const renderOption = (item: Company) => `${item.company_name} - ${item.company_id}`;
 
     const keySelector = (item: Company) => item.id;
 

@@ -1,7 +1,7 @@
 // src/services/validationService.ts
 
 import axios from 'axios';
-import { Field, Validation } from '../types';
+import { Validation, ValidationRequest } from '../types';
 import { User } from '../context/AuthContext';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -24,7 +24,7 @@ export const createValidation = async (
     documentId: string,
     user: string,
     status: string,
-    validation_details: Field[],
+    validation_details: ValidationRequest | undefined,
 ) => {
 
     const formData = new FormData();

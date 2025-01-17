@@ -7,7 +7,8 @@ import { UploadFile } from 'antd/lib/upload/interface';
 import { useTranslation } from 'react-i18next';
 import { getDocumentTypes, uploadDocument } from '../../services/documentService';
 import { getResources } from '../../services/resourceService'; // Importamos getResources
-import { DocumentType, Document, Field, Validation, Resource, VehicleDetails, EmployeeDetails } from '../../types'; // Importamos Resource
+import { getFields } from '../../services/fieldService'; // Importamos getFields
+import { DocumentType, Document, FieldToValidate, FieldToExtract,  Validation, ValidationResult, Resource, VehicleDetails, EmployeeDetails } from '../../types'; // Importamos Resource
 import './JunoUplaodFile.less';
 import { useAuth } from '../../context/AuthContext';
 import { createValidation } from '../../services/validationService';
@@ -29,12 +30,13 @@ const JunoUploadFile: React.FC = () => {
     const [documentType, setDocumentType] = useState<DocumentType | undefined>(undefined);
     const [resources, setResources] = useState<Resource[]>([]);
     const [resource, setResource] = useState<Resource | null>(null); // Cambiamos selectedResource por resource
-    const [filteredResources, setFilteredResources] = useState<Resource[]>([]);
     const [selectedResource, setSelectedResource] = useState<string | null>(null);
-    const [selectedFields, setSelectedFields] = useState<string[]>([]);
+    const [selectedFieldsToValidate, setSelectedFieldsToValidate] = useState<string[]>([]);
+    const [selectedFieldsToExtract, setSelectedFieldsToExtract] = useState<string[]>([]);
+
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [uploadedDocument, setUploadedDocument] = useState<Document | null>(null);
-    const [validationResult, setValidationResult] = useState<Validation | null>(null);
+    const [validation, setValidationResult] = useState<Validation | null>(null);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
 
@@ -45,11 +47,13 @@ const JunoUploadFile: React.FC = () => {
 
 
 
+
+
     const fetchResources = async () => {
         try {
             const data = await getResources();
             setResources(data);
-            setFilteredResources(data); // Inicialmente, muestra todos los recursos
+            //setFilteredResources(data); // Inicialmente, muestra todos los recursos
             console.log('Resources:', data);
         } catch (error) {
             notification.error({
@@ -76,7 +80,6 @@ const JunoUploadFile: React.FC = () => {
         }
     };
 
-
     // Maneja el cambio en la selección del tipo de documento
     const handleDocumentTypeChange = (value: number) => {
         const selectedDocType = documentTypes.find((doc) => doc.id === value);
@@ -100,8 +103,13 @@ const JunoUploadFile: React.FC = () => {
     };
 
     // Maneja el cambio en los checkboxes de campos a validar
-    const handleFieldsChange = (checkedValues: string[]) => {
-        setSelectedFields(checkedValues);
+    const handleFieldsToValidateChange = (checkedValues: string[]) => {
+        setSelectedFieldsToValidate(checkedValues);
+    };
+
+    // Maneja el cambio en los checkboxes de campos a extraer
+    const handleFieldsToExtractChange = (checkedValues: string[]) => {
+        setSelectedFieldsToExtract(checkedValues);
     };
 
     // Configuración de las propiedades del componente Upload
@@ -145,6 +153,8 @@ const JunoUploadFile: React.FC = () => {
                     // Almacenar la información del documento subido
                     setUploadedDocument(response);
 
+
+
                     notification.success({
                         message: 'Documento subido exitosamente',
                         description: 'El documento ha sido subido correctamente',
@@ -181,25 +191,31 @@ const JunoUploadFile: React.FC = () => {
                     const documentId = uploadedDocument.id;
                     const userId = user.id.toString();
                     const status = 'pending';
-
-                    const validationDetails: Field[] = selectedFields.map((fieldName) => ({
-                        name: fieldName,
-                        value: 'pending',
-                    }));
+                    const validationRequest = {
+                        fields_to_validate: documentType?.fields_to_validate.map((field) => ({
+                            id:field.id,
+                            name: field.name,
+                            description: field.description || '',
+                            value: 'pending',
+                        })),
+                        fields_to_extract: documentType?.fields_to_extract.map((field) => ({
+                            id:field.id,
+                            name: field.name,
+                            description: field.description || '',
+                            value: 'pending',
+                        })),
+                    };
 
                     // Llamar a createValidation
-                    const validationResponse = await createValidation(
+                    const validation = await createValidation(
                         documentId,
                         userId,
                         status,
-                        validationDetails
+                        validationRequest
                     );
 
-                    setValidationResult(validationResponse);
-
+                    setValidationResult(validation);
                     setIsModalVisible(true);
-
-                    console.log('Respuesta de createValidation:', validationResponse);
 
                     notification.success({
                         message: 'Validación creada exitosamente',
@@ -224,7 +240,8 @@ const JunoUploadFile: React.FC = () => {
         form.resetFields();
         setFileList([]);
         setResources([]);
-        setSelectedFields([]);
+        setSelectedFieldsToExtract([]);
+        setSelectedFieldsToValidate([]);
         setDocumentType(undefined);
         setSelectedResource(null);
         setUploadedDocument(null);
@@ -282,7 +299,7 @@ const JunoUploadFile: React.FC = () => {
                                 onChange={handleResourceChange}
                                 placeholder="Selecciona un recurso"
                             />
-                            
+
                         </Form.Item>
 
                         <Form.Item
@@ -355,12 +372,41 @@ const JunoUploadFile: React.FC = () => {
                         >
                             <Checkbox.Group
                                 options={
-                                    documentType?.fields?.map((field) => ({
+                                    documentType?.fields_to_validate?.map((field) => ({
                                         label: `${field.name.charAt(0).toUpperCase() + field.name.slice(1)}`,
-                                        value: field.name,
+                                        value: field.id.toString(),
                                     })) || []
                                 }
-                                onChange={handleFieldsChange}
+                                onChange={handleFieldsToValidateChange}
+                                value={selectedFieldsToValidate}
+                                style={{ display: 'flex', flexDirection: 'column', gap: '0.3em' }}
+                            />
+
+                            
+                        </Form.Item>
+
+                        <Form.Item
+                            label={'Campos a Extraer'}
+                            name="extractionFields"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: t(
+                                        'upload.validationFieldsError',
+                                        'Por favor selecciona al menos un campo'
+                                    ),
+                                },
+                            ]}
+                        >
+                            <Checkbox.Group
+                                options={
+                                    documentType?.fields_to_extract?.map((field) => ({
+                                        label: `${field.name.charAt(0).toUpperCase() + field.name.slice(1)}`,
+                                        value: field.id.toString(),
+                                    })) || []
+                                }
+                                onChange={handleFieldsToExtractChange}
+                                value={selectedFieldsToExtract}
                                 style={{ display: 'flex', flexDirection: 'column', gap: '0.3em' }}
                             />
                         </Form.Item>
@@ -374,15 +420,16 @@ const JunoUploadFile: React.FC = () => {
                 )}
             </Form>
 
-            {validationResult && uploadedDocument && (
+            {validation && uploadedDocument && (
                 <ValidationResultModal
                     visible={isModalVisible}
                     onClose={handleModalClose}
                     documentName={uploadedDocument.name}
                     documentType={documentType?.name || ''}
-                    validationResult={validationResult.status}
-                    timestamp={validationResult.timestamp}
-                    fields={validationResult.validation_details}
+                    validationResult={validation.status}
+                    timestamp={validation.timestamp}
+                    fields_to_validate={validation.validation_details.fields_to_validate}
+                    fields_to_extract={validation.validation_details.fields_to_extract}
                 />
             )}
         </>
