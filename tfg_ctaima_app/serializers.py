@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User  # Importar el modelo User de Django
-from .models import Company, Resource, Vehicle, Employee, DocumentType, Document, Validation, Log
+from .models import Company, Resource, Vehicle, Employee, DocumentType, FieldToExtract,FieldToValidate, Document, Validation, Log
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
-        fields = ['id', 'tax_id', 'company_name', 'industry', 'email', 'location', 'phone', 'language', 'timestamp']
+        fields = ['id', 'company_id', 'company_name', 'industry', 'email', 'location', 'phone', 'language', 'timestamp']
 
 
 class ResourceSerializer(serializers.ModelSerializer):
@@ -47,7 +47,7 @@ class EmployeeDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = [
-            'first_name', 'last_name', 'email', 'phone', 'country', 'number_id'
+            'first_name', 'last_name', 'email', 'phone', 'country', 'worker_id'
         ]
 
 
@@ -65,15 +65,69 @@ class EmployeeSerializer(ResourceSerializer):
     class Meta(ResourceSerializer.Meta):
         model = Employee
         fields =ResourceSerializer.Meta.fields + [
-            'first_name', 'last_name', 'email', 'phone', 'country', 'number_id'
+            'first_name', 'last_name', 'email', 'phone', 'country', 'worker_id'
         ]
 
 
 class DocumentTypeSerializer(serializers.ModelSerializer):
+    fields_to_validate = serializers.SerializerMethodField()
+    fields_to_extract = serializers.SerializerMethodField()
+
     class Meta:
         model = DocumentType
-        fields = ['id','user', 'name', 'description', 'fields']
-        
+        fields = ['id', 'user', 'name', 'description', 'fields_to_validate', 'fields_to_extract']
+
+    def get_fields_to_validate(self, obj):
+        """
+        Organizar los datos de validación en el formato esperado.
+        """
+        fields = obj.fields_to_validate.all()
+        serializer = FieldToValidateOutputSerializer(fields, many=True)
+        # Aseguramos que los datos sean una lista de objetos con las claves id, name, description y value
+        return [
+            {
+                'id': field['id'],
+                'name': field['name'],
+                'description': field['description'],
+                'value': field.get('value', None)
+            }
+            for field in serializer.data
+        ]
+
+    def get_fields_to_extract(self, obj):
+        """
+        Organizar los datos de extracción en el formato esperado.
+        """
+        fields = obj.fields_to_extract.all()
+        serializer = FieldToExtractOutputSerializer(fields, many=True)
+        # Aseguramos que los datos sean una lista de objetos con las claves id, name, description y value
+        return [
+            {
+                'id': field['id'],
+                'name': field['name'],
+                'description': field['description'],
+                'value': field.get('value', None)
+            }
+            for field in serializer.data
+        ]
+
+
+class FieldToValidateOutputSerializer(serializers.ModelSerializer):
+    """
+    Serializador para producir la salida requerida en fields_to_validate.
+    """
+    class Meta:
+        model = FieldToValidate
+        fields = ['id', 'name', 'value', 'description']
+
+
+class FieldToExtractOutputSerializer(serializers.ModelSerializer):
+    """
+    Serializador para producir la salida requerida en fields_to_extract.
+    """
+    class Meta:
+        model = FieldToExtract
+        fields = ['id', 'name', 'description']
 
 class DocumentSerializer(serializers.ModelSerializer):
     document_type_info = DocumentTypeSerializer(source='document_type', read_only=True)

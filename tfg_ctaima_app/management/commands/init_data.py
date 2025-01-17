@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from tfg_ctaima_app.models import Company, Resource, Vehicle, Employee, Document, Validation, DocumentType
+from tfg_ctaima_app.models import Company, Resource, Vehicle, Employee, Document, Validation, DocumentType, FieldToValidate, FieldToExtract
 import random
 import uuid
 
@@ -87,6 +87,70 @@ def create_documents():
             )
     print("Documentos creados.")
 
+from tfg_ctaima_app.models import DocumentType, FieldToValidate
+
+def create_field_to_validate():
+    try:
+        # Obtener varios DocumentTypes (hardcoded), por ejemplo "ID Card" y "Passport"
+        document_type_1 = DocumentType.objects.get(id=2)  # Usamos ID 2 como ejemplo
+        document_type_2 = DocumentType.objects.get(id=3)  # Usamos ID 3 como ejemplo
+        # Crear el FieldToValidate
+        field_to_validate_1 = FieldToValidate.objects.create(
+            name="worker_id",  # Nombre del campo
+            description="DNI, NIE, permiso de residencia, pasaporte u otro similar",  # Descripción del campo
+            treshold=80,  # Umbral de validación (ajustable)
+        )
+        # Crear el FieldToValidate
+        field_to_validate_2 = FieldToValidate.objects.create(
+            name="company_id",  # Nombre del campo
+            description="cif nif de la empresa",  # Descripción del campo
+            treshold=80,  # Umbral de validación (ajustable)
+        )
+
+        # Crear el FieldToValidate
+        field_to_validate_3 = FieldToValidate.objects.create(
+            name="company_name",  # Nombre del campo
+            description="el nombre o razón social de la empresa",  # Descripción del campo
+            treshold=80,  # Umbral de validación (ajustable)
+        )
+
+
+        # Asociar el FieldToValidate con varios DocumentTypes (relación Many-to-Many)
+        field_to_validate_1.document_types.add(document_type_1)
+        field_to_validate_2.document_types.add(document_type_2)
+        field_to_validate_3.document_types.add(document_type_2)
+
+        return "fields created"  # Retornar el objeto creado
+    except DocumentType.DoesNotExist:
+        print("Error: No se encuentran los DocumentTypes especificados.")
+        return None
+    except Exception as e:
+        print(f"Error inesperado al crear el FieldToValidate: {str(e)}")
+        return None
+
+def create_field_to_extract():
+    try:
+        # Obtener varios DocumentTypes (hardcoded), por ejemplo "ID Card" y "Passport"
+        document_type_2 = DocumentType.objects.get(id=2)  # Usamos ID 1 como ejemplo
+        document_type_3 = DocumentType.objects.get(id=3)  # Usamos ID 2 como ejemplo
+
+        # Crear el FieldToExtract
+        field_to_extract = FieldToExtract.objects.create(
+            name="issue_date",  # Nombre del campo
+            description="Fecha de emisión",  # Descripción del campo
+        )
+
+        # Asociar el FieldToExtract con varios DocumentTypes (relación Many-to-Many)
+        field_to_extract.document_types.add(document_type_2, document_type_3)
+
+        return field_to_extract  # Retornar el objeto creado
+    except DocumentType.DoesNotExist:
+        print("Error: No se encuentran los DocumentTypes especificados.")
+        return None
+    except Exception as e:
+        print(f"Error inesperado al crear el FieldToExtract: {str(e)}")
+        return None
+
 # Crear Validations asociadas a Documentos
 def create_validations():
     documents = Document.objects.all()
@@ -113,14 +177,16 @@ class Command(BaseCommand):
         # Resource.objects.all().delete()
         # Vehicle.objects.all().delete()
         # Employee.objects.all().delete()
-        Document.objects.all().delete()
-        Validation.objects.all().delete()
+        # Document.objects.all().delete()
+        # Validation.objects.all().delete()
 
         print("Initializing sample data...")
         #companies = create_companies()
         #create_resources(companies)
-        create_documents()
-        create_validations()
+        # create_documents()
+        # create_validations()
+        create_field_to_validate()
+        create_field_to_extract()
         print("Sample data initialization completed.")
 
 

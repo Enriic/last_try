@@ -33,7 +33,7 @@ class Company(models.Model):
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    tax_id = models.CharField(max_length=50, unique=True)
+    company_id = models.CharField(max_length=50, unique=True)
     type = models.CharField(max_length=50, choices=type_choices, default='customer')
     company_name = models.CharField(max_length=255)
     industry = models.CharField(max_length=255)
@@ -79,7 +79,7 @@ class Employee(Resource):
     email = models.EmailField()
     phone = models.CharField(max_length=20)
     country = models.CharField(max_length=100)
-    number_id = models.CharField(max_length=50)
+    worker_id = models.CharField(max_length=50)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -90,7 +90,26 @@ class DocumentType(models.Model):
     name = models.CharField(max_length=100, unique=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)  # Usar el modelo User de Django
     description = models.TextField(blank=True, null=True)
-    fields = models.JSONField(default=list)  # Example: [{'name': 'ID', 'type': 'Number'}, {'name': 'Name', 'type': 'Text'}]
+
+    def __str__(self):
+        return self.name
+
+class FieldToValidate(models.Model):
+    id = models.AutoField(primary_key=True, unique=True)
+    name = models.CharField(max_length=100,null=False)
+    description = models.TextField(blank=True, null=True)
+    value = models.CharField(max_length=100,null=False, default='')
+    treshold = models.FloatField(blank=True, null=True, default=80)
+    document_types = models.ManyToManyField(DocumentType, related_name="fields_to_validate")  # Relación many-to-many
+
+    def __str__(self):
+        return self.name
+
+class FieldToExtract(models.Model):
+    id = models.AutoField(primary_key=True, unique=True)
+    name = models.CharField(max_length=100,null=False)
+    description = models.TextField(blank=True, null=True)
+    document_types = models.ManyToManyField(DocumentType, related_name="fields_to_extract")  # Relación many-to-many
 
     def __str__(self):
         return self.name

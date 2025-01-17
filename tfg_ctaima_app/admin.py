@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import User  # Importar el modelo User de Django
 from django.contrib.auth.admin import UserAdmin  # Importar el administrador del modelo User de Django
-from .models import Document, DocumentType, Log, Validation, Company, Resource, Vehicle, Employee
+from .models import Document, DocumentType, Log, Validation, Company, Resource, Vehicle, Employee, FieldToExtract, FieldToValidate
 
 # Comentamos el registro del modelo de usuario personalizado existente
 # @admin.register(Users)
@@ -41,7 +41,7 @@ class LogAdmin(admin.ModelAdmin):
 
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = ['id', 'tax_id', 'company_name', 'industry', 'email', 'location', 'phone', 'language', 'timestamp']
+    list_display = ['id', 'company_id', 'company_name', 'industry', 'email', 'location', 'phone', 'language', 'timestamp']
     search_fields = ['company_name', 'industry', 'email', 'location', 'phone', 'language']
     list_filter = ['industry', 'timestamp']
 
@@ -57,5 +57,15 @@ class VehicleAdmin(admin.ModelAdmin):
 
 @admin.register(Employee)  
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'first_name', 'last_name', 'email', 'phone', 'country', 'number_id']
+    list_display = ['id', 'first_name', 'last_name', 'email', 'phone', 'country', 'worker_id']
+
+@admin.register(FieldToExtract)
+class FieldToExtractAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'description']
+
+@admin.register(FieldToValidate)
+class FieldToValidateAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'description', 'treshold']
+
+
 

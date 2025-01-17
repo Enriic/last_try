@@ -229,6 +229,7 @@ class ValidationViewSet(viewsets.ModelViewSet):
    
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
+        
         # Here api call to OCR will determine the result of the validation
         if serializer.is_valid():
             serializer.save()
@@ -288,6 +289,49 @@ class DocumentTypeViewSet(viewsets.ModelViewSet):
         documents = Document.objects.filter(document_type=document_type)
         serializer = DocumentSerializer(documents, many=True)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['get'], url_path='fields')
+    def get_fields(self, request, document_type_id=None):
+        """
+        Endpoint para obtener las fields asociadas a un DocumentType.
+        Devuelve los fields_to_validate y fields_to_extract en el formato especificado.
+        """
+        # Obtener el DocumentType
+        document_type = get_object_or_404(DocumentType, id=document_type_id)
+
+        # Obtener los fields_to_validate
+        fields_to_validate = FieldToValidate.objects.filter(document_types=document_type)
+        fields_to_validate_data = [
+            {
+                "id": field.id,
+                "name": field.name,
+                "description": field.description,
+                "value": field.value if field.value is not None else "",  # Asignar valor vacío si no existe
+            }
+            for field in fields_to_validate
+        ]
+
+        # Obtener los fields_to_extract
+        fields_to_extract = FieldToExtract.objects.filter(document_types=document_type)
+        fields_to_extract_data = [
+            {
+                "id": field.id,
+                "name": field.name,
+                "description": field.description,
+                "value": field.value if field.value is not None else "",  # Asignar valor vacío si no existe
+            }
+            for field in fields_to_extract
+        ]
+
+        # Organizar los datos en la respuesta final
+        response_data = {
+            "fields_to_validate": fields_to_validate_data,
+            "fields_to_extract": fields_to_extract_data,
+        }
+
+        print("Response data:",response_data)
+
+        return Response(response_data)
 
 # ViewSet para Company
 class CompanyViewSet(viewsets.ModelViewSet):
