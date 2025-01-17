@@ -1,6 +1,6 @@
 // src/components/ValidationTable/ValidationTable.tsx
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, Button } from 'antd';
 import { Validation } from '../../types';
 import { Document } from '../../types';
@@ -13,6 +13,11 @@ interface ValidationTableHistoryProps {
 }
 
 const ValidationTableHistory: React.FC<ValidationTableHistoryProps> = ({ validations, loading, onViewDetails }) => {
+
+    const [pageSize, setPageSize] = useState(10); // Tamaño de página inicial
+    const [currentPage, setCurrentPage] = useState(1); // Página actual
+
+
     const columns = [
         {
             title: 'Fecha',
@@ -29,6 +34,13 @@ const ValidationTableHistory: React.FC<ValidationTableHistoryProps> = ({ validat
             key: 'document_id',
             render: (document_info: Document) => document_info?.name, 
         },
+        // Add this column with resource, look how to that looking first the resource_type
+        // {
+        //     title: 'Recursos',
+        //     dataIndex: 'document_info',
+        //     key: 'document_type',
+        //     render: (document_info: Document) => document_info?.document_type_info.name,
+        // },
         {
             title: 'Tipo de Documento',
             dataIndex: 'document_info',
@@ -60,12 +72,23 @@ const ValidationTableHistory: React.FC<ValidationTableHistoryProps> = ({ validat
 
     return (
         <Table
+            size='middle'
             className='history-validation-table'
             dataSource={validations}
             columns={columns}
             rowKey="id"
             loading={loading}
-            pagination={{ pageSize: 10 }}
+            pagination={{
+                current: currentPage, // Página actual
+                pageSize: pageSize,
+                onChange: (page, size) => {
+                    setCurrentPage(page); // Actualiza la página actual
+                    setPageSize(size || pageSize); // Actualiza el tamaño de página
+                },
+                showSizeChanger: true, // Muestra el selector de tamaño
+                pageSizeOptions: ["10", "20", "50"], // Opciones para cambiar el tamaño de página
+
+            }}
         />
     );
 };

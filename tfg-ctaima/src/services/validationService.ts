@@ -11,10 +11,8 @@ export const getValidations = async (
     all: boolean,
     user: User | null,   
 ): Promise<Validation[]> => {
-
-
+    
     const endpoint = all ? `${API_URL}/api/validation/` : `${API_URL}/api/users/${user?.id}/validations/`;
-
     const response = await axios.get<Validation[]>(endpoint, {
         withCredentials: true,
     });

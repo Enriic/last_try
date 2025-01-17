@@ -33,13 +33,13 @@ export const uploadDocument = async (
   filename: string,
   user: string,
   documentType: DocumentType,
-  resource: Resource
+  resource: string
 ) => {
   const formData = new FormData();
   formData.append('user', user);
   formData.append('name', filename);
   formData.append('document_type', documentType.id.toString());
-  formData.append('resource', resource.id);
+  formData.append('resource', resource);
 //   formData.append('resource_type', resource.resource_type);
 
   const response = await axios.post(`${API_URL}/api/document/`, formData, {

@@ -1,10 +1,9 @@
 // src/types/index.ts
 
 export interface Validation {
-    document_info: Document;
     id: string;
     document: string;
-    document_name: string | null;
+    document_info: Document;
     user: number;
     status: 'success' | 'failure';
     validation_details: ValidationDetail[];
@@ -15,6 +14,8 @@ export interface Validation {
 
 export interface ValidationDetail {
     name: string;
+    expected_value?: string;
+    obtained_value?: string;
     result: string;
 }
 
@@ -37,6 +38,8 @@ export interface Document {
     name: string;
     document_type_info: DocumentType;
     document_type_name: string | null;
+    resource: string;
+    resource_info: Resource;
     timestamp: string;
     url: string;
     user: number;
@@ -55,7 +58,7 @@ export interface User {
 }
 
 export interface Company {
-    id: number;
+    id: string;
     tax_id: string;
     company_name: string;
     industry: string;
@@ -65,7 +68,6 @@ export interface Company {
     language: string;
     timestamp: string;
 }
-
 
 export interface Resource {
     id: string;

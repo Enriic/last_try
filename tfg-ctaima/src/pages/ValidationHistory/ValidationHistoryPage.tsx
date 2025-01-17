@@ -65,35 +65,54 @@ const ValidationHistoryPage: React.FC = () => {
     };
 
     const handleFiltersChange = useCallback((filters: {
-        searchTextValId: string;
-        searchTextDocName: string;
+        searchTextValId: string | null;
+        searchTextDocName: string | null;
         dateRange: RangeValue;
         documentType: number | null;
         resultFilter: string | null;
+        company: string | null;
+        resource: string | null;
     }) => {
         applyFilters(filters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [validations]);
 
     const applyFilters = (filters: {
-        searchTextDocName: string;
-        searchTextValId: string;
+        searchTextDocName: string | null;
+        searchTextValId: string | null;
         dateRange: RangeValue;
         documentType: number | null;
         resultFilter: string | null;
+        company: string | null;
+        resource: string | null;
     }) => {
-        const { searchTextDocName, searchTextValId, dateRange, documentType, resultFilter } = filters;
+        const { searchTextDocName, searchTextValId, dateRange, documentType, resultFilter, company, resource } = filters;
         let data = [...validations];
 
         console.log('Applying filters');
+
         if (searchTextDocName) {
+            console.log('Filtering by document name: ', searchTextDocName);
             data = data.filter((validation) =>
-                validation.document_info?.name?.toLowerCase().includes(searchTextDocName.toLowerCase())
+                validation.document.toLowerCase().includes(searchTextDocName.toLowerCase())
             );
         }
 
         if (searchTextValId) {
             data = data.filter((validation) =>
                 validation.id.toLowerCase().includes(searchTextValId.toLowerCase())
+            );
+        }
+
+        if (company) {
+            data = data.filter((validation) =>
+                validation.document_info.resource_info.company.toLowerCase().includes(company.toLowerCase())
+            );
+        }
+
+        if (resource) {
+            data = data.filter((validation) =>
+                validation.document_info.resource.toLowerCase().includes(resource.toLowerCase())
             );
         }
 

@@ -1,7 +1,7 @@
 // src/components/Upload/JunoUploadFile.tsx
 
 import React, { useState, useEffect } from 'react';
-import { Form, Select, Checkbox, Upload, Button, notification, Steps, SelectProps } from 'antd';
+import { Form, Select, Checkbox, Upload, Button, notification, Steps } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { UploadFile } from 'antd/lib/upload/interface';
 import { useTranslation } from 'react-i18next';
@@ -12,9 +12,9 @@ import './JunoUplaodFile.less';
 import { useAuth } from '../../context/AuthContext';
 import { createValidation } from '../../services/validationService';
 import ValidationResultModal from '../ValidationResultModal/ValidationResultModal';
-
+import ResourceSelect from '../common/SearchableSelect/ResourceSelect/ResourceSelect'; // Importamos ResourceSelect
 const { Dragger } = Upload;
-const { Option, OptGroup } = Select;
+const { Option } = Select;
 const { Step } = Steps;
 
 const JunoUploadFile: React.FC = () => {
@@ -28,8 +28,9 @@ const JunoUploadFile: React.FC = () => {
     const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
     const [documentType, setDocumentType] = useState<DocumentType | undefined>(undefined);
     const [resources, setResources] = useState<Resource[]>([]);
+    const [resource, setResource] = useState<Resource | null>(null); // Cambiamos selectedResource por resource
     const [filteredResources, setFilteredResources] = useState<Resource[]>([]);
-    const [selectedResource, setSelectedResource] = useState<Resource | undefined>(undefined);
+    const [selectedResource, setSelectedResource] = useState<string | null>(null);
     const [selectedFields, setSelectedFields] = useState<string[]>([]);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [uploadedDocument, setUploadedDocument] = useState<Document | null>(null);
@@ -56,6 +57,7 @@ const JunoUploadFile: React.FC = () => {
                 description: 'Ocurrió un error al obtener los recursos',
                 duration: 3,
             });
+            console.log(error);
         }
     };
 
@@ -70,34 +72,10 @@ const JunoUploadFile: React.FC = () => {
                 description: 'Ocurrió un error al obtener los tipos de documento',
                 duration: 3,
             });
+            console.log(error)
         }
     };
 
-    const handleSearchResource = (value: string) => {
-
-        const lowerCaseValue = value.toLowerCase();
-        const filtered = resources.filter((res) => {
-
-            if (res.resource_type === 'vehicle') {
-                const vehicle = res.resource_details as VehicleDetails;
-                return (
-                    vehicle.name.toLowerCase().includes(lowerCaseValue) ||
-                    vehicle.registration_id.toLowerCase().includes(lowerCaseValue)
-                );
-            } else if (res.resource_type === 'employee') {
-                const employee = res.resource_details as EmployeeDetails;
-                const fullName = `${employee.first_name} ${employee.last_name}`.toLowerCase();
-                return (
-                    fullName.includes(lowerCaseValue) ||
-                    employee.number_id.toLowerCase().includes(lowerCaseValue)
-                );
-            }
-
-            return false;
-        });
-
-        setFilteredResources(filtered);
-    };
 
     // Maneja el cambio en la selección del tipo de documento
     const handleDocumentTypeChange = (value: number) => {
@@ -110,12 +88,14 @@ const JunoUploadFile: React.FC = () => {
         }
     };
 
-    const handleResourceChange = (value: string) => {
+    const handleResourceChange = (value: string | null) => {
         const selectedRes = resources.find((res) => res.id === value);
         if (selectedRes) {
-            setSelectedResource(selectedRes);
+            setSelectedResource(value);
+            setResource(selectedRes); 
         } else {
-            setSelectedResource(undefined);
+            setSelectedResource(null);
+            setResource(null); 
         }
     };
 
@@ -241,12 +221,12 @@ const JunoUploadFile: React.FC = () => {
     // Manejar el cierre del modal
     const handleModalClose = () => {
         setIsModalVisible(false);
-        // Resetear el formulario y estados
         form.resetFields();
         setFileList([]);
+        setResources([]);
         setSelectedFields([]);
         setDocumentType(undefined);
-        setSelectedResource(undefined);
+        setSelectedResource(null);
         setUploadedDocument(null);
         setCurrentStep(0);
         setUploading(false);
@@ -274,6 +254,7 @@ const JunoUploadFile: React.FC = () => {
                             ]}
                         >
                             <Select
+                                allowClear
                                 placeholder={t('upload.documentTypePlaceholder', 'Selecciona el tipo de documento')}
                                 onChange={handleDocumentTypeChange}
                             >
@@ -295,31 +276,13 @@ const JunoUploadFile: React.FC = () => {
                                 },
                             ]}
                         >
-                            <Select
-                                placeholder="Selecciona un recurso"
+
+                            <ResourceSelect
+                                value={selectedResource}
                                 onChange={handleResourceChange}
-                                showSearch
-                                filterOption={false}
-                                onSearch={handleSearchResource}
-                                notFoundContent={null}
-                            >
-                                {[
-                                    { type: 'vehicle', label: 'Vehículos', resources: filteredResources.filter(res => res.resource_type === 'vehicle') },
-                                    { type: 'employee', label: 'Empleados', resources: filteredResources.filter(res => res.resource_type === 'employee') },
-                                ].map(group => (
-                                    group.resources.length > 0 && (
-                                        <OptGroup key={group.type} label={group.label}>
-                                            {group.resources.map(res => (
-                                                <Option key={res.id} value={res.id}>
-                                                    {res.resource_type === 'vehicle' ?
-                                                        `${(res.resource_details as VehicleDetails).name} - ${(res.resource_details as VehicleDetails).registration_id}` :
-                                                        `${(res.resource_details as EmployeeDetails).first_name} ${(res.resource_details as EmployeeDetails).last_name} - ${(res.resource_details as EmployeeDetails).number_id}`}
-                                                </Option>
-                                            ))}
-                                        </OptGroup>
-                                    )
-                                ))}
-                            </Select>
+                                placeholder="Selecciona un recurso"
+                            />
+                            
                         </Form.Item>
 
                         <Form.Item
@@ -369,11 +332,10 @@ const JunoUploadFile: React.FC = () => {
                             <p>
                                 Recurso:{' '}
                                 <strong>
-                                    {selectedResource && selectedResource.resource_type === 'vehicle'
-                                        ? (selectedResource.resource_details as VehicleDetails).name
-                                        : selectedResource && selectedResource.resource_type === 'employee'
-                                            ? `${(selectedResource.resource_details as EmployeeDetails).first_name} ${(selectedResource.resource_details as EmployeeDetails).last_name}`
-                                            : ''}
+                                    
+                                    {resource && resource.resource_type === 'vehicle'
+                                        ? (resource.resource_details as VehicleDetails).name : resource && resource.resource_type === 'employee'
+                                            ? `${(resource.resource_details as EmployeeDetails).first_name} ${(resource.resource_details as EmployeeDetails).last_name}` : ''}
                                 </strong>
                             </p>
                         </div>

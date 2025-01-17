@@ -9,6 +9,10 @@ import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import DocumentSelect from '../../common/SearchableSelect/DocumentSelect/DocumentSelect.tsx';
+import CompanySelect from '../../common/SearchableSelect/CompanySelect/CompanySelect.tsx';
+import ValidationSelect from '../../common/SearchableSelect/ValidationSelect/ValidationSelect.tsx';
+import ResourceSelect from '../../common/SearchableSelect/ResourceSelect/ResourceSelect.tsx';
 import './ValidationFilters.less';
 
 dayjs.extend(isSameOrBefore);
@@ -23,23 +27,26 @@ const { Option } = Select;
 interface ValidationFiltersProps {
     documentTypes: DocumentType[];
     onFiltersChange: (filters: {
-        searchTextDocName: string;
-        searchTextValId: string;
+        searchTextDocName: string | null;
+        searchTextValId: string | null;
         dateRange: RangeValue;
         documentType: number | null;
         resultFilter: string | null;
+        company: string | null;
+        resource: string | null;
     }) => void;
 }
 
 const ValidationFilters: React.FC<ValidationFiltersProps> = ({ documentTypes, onFiltersChange }) => {
-    const [searchTextDocName, setSearchTextDocName] = useState<string>('');
-    const [searchTextValId, setSearchTextValId] = useState<string>('');
+    const [searchTextDocName, setSearchTextDocName] = useState<string | null>(null);
+    const [searchTextValId, setSearchTextValId] = useState<string | null>(null);
     const [dateRange, setDateRange] = useState<RangeValue>(null);
     const [documentType, setDocumentType] = useState<number | null>(null);
     const [resultFilter, setResultFilter] = useState<string | null>(null);
     const [validations, setValidations] = useState<Validation[]>([]);
-    const [documentNameOptions, setDocumentNameOptions] = useState<{ value: string }[]>([]);
-    const [validationIdOptions, setValidationIdOptions] = useState<{ value: string }[]>([]);
+    const [company, setCompany] = useState<string | null>(null);
+    const [resource, setResource] = useState<string | null>(null);
+
 
     const { user } = useAuth();
 
@@ -58,43 +65,26 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ documentTypes, on
                 description: 'An error occurred while fetching the validations',
                 duration: 3,
             });
+            console.log(error)
         }
     };
 
-    const handleSearchDocName = (value: string) => {
-        const uniqueOptions = validations
-            .filter(
-                (val, index, self) =>
-                    val.document_info?.name.toLowerCase().includes(value.toLowerCase()) &&
-                    index === self.findIndex((t) => t.document_info?.name === val.document_info?.name)
-            )
-            .map((val) => ({ value: val.document_info?.name }));
-        setDocumentNameOptions(uniqueOptions);
+    const handleSelectDocName = (value: string | null) => {
         setSearchTextDocName(value);
         emitFiltersChange({ searchTextDocName: value });
     };
 
-    const handleSelectDocName = (value: string) => {
-        setSearchTextDocName(value);
-        emitFiltersChange({ searchTextDocName: value });
+    const handleCompanyChange = (selectedCompany: string | null) => {
+        setCompany(selectedCompany);
+        emitFiltersChange({ company: selectedCompany });
     };
 
-
-    const handleSearchValId = (value: string) => {
-        const uniqueOptions = validations
-            .filter(
-                (val, index, self) =>
-                    val.id.toLowerCase().includes(value.toLowerCase()) &&
-                    index === self.findIndex((t) => t.id === val.id)
-            )
-            .map((val) => ({ value: val.id }));
-
-        setValidationIdOptions(uniqueOptions);
-        setSearchTextValId(value);
-        emitFiltersChange({ searchTextValId: value });
+    const handleResourceChange = (selectedResource: string | null) => {
+        setResource(selectedResource);
+        emitFiltersChange({ resource: selectedResource });
     };
 
-    const handleSelectValId = (value: string) => {
+    const handleSelectValId = (value: string | null) => {
         setSearchTextValId(value);
         emitFiltersChange({ searchTextValId: value });
     };
@@ -115,11 +105,13 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ documentTypes, on
     };
 
     const emitFiltersChange = (changedFilter: Partial<{
-        searchTextDocName: string;
-        searchTextValId: string;
+        searchTextDocName: string | null;
+        searchTextValId: string | null;
         dateRange: RangeValue;
         documentType: number | null;
         resultFilter: string | null;
+        company: string | null;
+        resource: string | null;
     }>) => {
         const filters = {
             searchTextDocName,
@@ -127,6 +119,8 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ documentTypes, on
             dateRange,
             documentType,
             resultFilter,
+            company,
+            resource, 
             ...changedFilter,
         };
         onFiltersChange(filters);
@@ -136,18 +130,14 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ documentTypes, on
         <div className='validation-filters-container'>
             <Row gutter={16} className='validation-filters-row'>
                 <Col xs={24} sm={24} md={24} lg={24} xl={7} xxl={6} className='validation-filters-col'>
-                    <span>Nombre de documento: </span>
-                    <AutoComplete
-                        style={{ width: 250 }}
-                        options={documentNameOptions}
-                        onSelect={handleSelectDocName}
-                        onSearch={handleSearchDocName}
-                        placeholder="Buscar por nombre de documento"
-                        allowClear
+                    <span>Nombre Documento: </span>
+                    <DocumentSelect
                         value={searchTextDocName}
-                    >
-                        <Input />
-                    </AutoComplete>
+                        onChange={handleSelectDocName}
+                        placeholder="Selecciona una compañía"
+                        style={{ width: 250 }}
+                    />
+
                 </Col>
 
                 <Col xs={24} sm={24} md={24} lg={24} xl={7} xxl={6} className='validation-filters-col'>
@@ -190,33 +180,34 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ documentTypes, on
 
 
                 <Col xs={24} sm={24} md={24} lg={24} xl={7} xxl={6} className='validation-filters-col'>
-                    <span>Id de validación: </span>
-                    <AutoComplete
-                        style={{ width: 250 }}
-                        options={validationIdOptions}
-                        onSelect={handleSelectValId}
-                        onSearch={handleSearchValId}
-                        placeholder="Buscar por id de validación"
-                        allowClear
+                    <span>Validacion id: </span>
+                    <ValidationSelect
                         value={searchTextValId}
-                    >
-                        <Input />
-                    </AutoComplete>
+                        onChange={handleSelectValId}
+                        placeholder="Selecciona una compañía"
+                        style={{ width: 250 }}
+                    />
                 </Col>
 
                 <Col xs={24} sm={24} md={24} lg={24} xl={7} xxl={6} className='validation-filters-col'>
-                    <span>Requierment id: </span>
-                    <Input style={{ width: 250 }} placeholder='No functional' />
+                    <span>Resource id: </span>
+                    <ResourceSelect
+                        value={resource}
+                        onChange={handleResourceChange}
+                        placeholder="Selecciona una compañía"
+                        style={{ width: 250 }}
+                    />
                 </Col>
 
-                <Col xs={24} sm={24} md={24} lg={24} xl={7} xxl={6} className='validation-filters-col'>
-                    <span>Supplier id: </span>
-                    <Input style={{ width: 250 }} placeholder='No functional' />
-                </Col>
 
                 <Col xs={24} sm={24} md={24} lg={24} xl={7} xxl={6} className='validation-filters-col'>
-                    <span>Customer id: </span>
-                    <Input style={{ width: 250 }} placeholder='No functional' />
+                    <span>Company id: </span>
+                    <CompanySelect
+                        value={company}
+                        onChange={handleCompanyChange}
+                        placeholder="Selecciona una compañía"
+                        style={{ width: 250 }}
+                    />
                 </Col>
             </Row>
         </div>
