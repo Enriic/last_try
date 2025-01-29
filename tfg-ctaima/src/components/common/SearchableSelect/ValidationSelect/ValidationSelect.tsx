@@ -1,14 +1,13 @@
 // src/components/Validation
-//Select/Validation
-//Select.tsx
+
 
 import React, { useEffect, useState } from 'react';
-import { notification } from 'antd';
-import { getValidations } from '../../../../services/validationService';
-import { Validation
-
- } from '../../../../types';
+import { notification, Spin } from 'antd';
+import { getValidationsForSelect } from '../../../../services/validationService';
+import { Validation } from '../../../../types';
 import SearchableSelect from '../SearchableSelect';
+import { debounce } from 'lodash';
+
 
 interface ValidationSelectProps {
     value?: string | null;
@@ -18,44 +17,99 @@ interface ValidationSelectProps {
 }
 
 const ValidationSelect: React.FC<ValidationSelectProps> = ({ value, onChange, placeholder, style }) => {
-    const [Validations, setValidations] = useState<Validation[]>([]);
+    const [validations, setValidations] = useState<Validation[]>([]);
+    const [page, setPage] = useState<number>(1);
+    const [pageSize] = useState<number>(10);
+    const [totalItems, setTotalItems] = useState<number>(0);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+    const [searchValue, setSearchValue] = useState<string>('');
 
     useEffect(() => {
-        fetchValidations();
-    }, []);
+        fetchValidations(page, searchValue);
+    }, [searchValue]);
 
-    const fetchValidations = async () => {
+
+    const fetchValidations = async (pageNumber: number, search: string) => {
         try {
-            const data = await getValidations(true, null);
-            setValidations(data);
+            if (pageNumber === 1) {
+                setLoading(true);
+            } else {
+                setIsLoadingMore(true);
+            }
+            const data = await getValidationsForSelect(pageNumber, pageSize, search);
+            const { results, count } = data;
+            console.log('validaciones cargadas: ', data.results)
+
+            if (pageNumber === 1) {
+                setValidations(results);
+            } else {
+                setValidations((prevValidations) => [...prevValidations, ...results]);
+            }
+            setTotalItems(count);
+            setPage(pageNumber);
+
         } catch (error) {
             notification.error({
                 message: '¡Ups! Algo salió mal',
-                description: 'Ocurrió un error al obtener los Validationos',
+                description: 'Ocurrió un error al obtener las compañías',
                 duration: 3,
             });
+        } finally {
+            if (pageNumber === 1) {
+                setLoading(false);
+            } else {
+                setIsLoadingMore(false);
+            }
         }
     };
 
-    const filterOption = (input: string, option: Validation) => {
-        const lowerCaseValue = input.toLowerCase();
-        return option.id.toLowerCase().includes(lowerCaseValue);
+    const handleLoadMore = () => {
+        if (isLoadingMore || validations.length >= totalItems) {
+            return;
+        }
+        const nextPage = page + 1;
+        fetchValidations(nextPage, searchValue);
     };
 
-    const renderOption = (item: Validation ) => item.id;
+    const debouncedHandleSearch = debounce((value: string) => {
+        setSearchValue(value);
+        setPage(1);
+    }, 600);
 
-    const keySelector = (item: Validation ) => item.id;
+    const handleSelectChange = (value: string | null) => {
+        if (onChange) {
+            onChange(value);
+        }
+        if (!value) {
+            setSearchValue('');
+            setPage(1);
+        }
+    };
+
+
+    const renderOption = (item: Validation) => item.id;
+
+    const keySelector = (item: Validation) => item.id;
+
+    const hasMore = validations.length < totalItems;
+
 
     return (
+
         <SearchableSelect<Validation>
-            data={Validations}
+            data={validations}
             value={value}
-            onChange={onChange}
+            onChange={handleSelectChange}
             placeholder={placeholder}
             style={style}
-            filterOption={filterOption}
+            loading={loading}
+            onLoadMore={handleLoadMore}
             renderOption={renderOption}
             keySelector={keySelector}
+            hasMore={hasMore}
+            isLoadingMore={isLoadingMore}
+            onSearch={debouncedHandleSearch} 
         />
     );
 };

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Modal, Descriptions, List } from 'antd';
-import { FieldToExtract, FieldToValidate } from '../../types';
+import { FieldToExtract, ValidationResultField } from '../../types';
 import dayjs from 'dayjs';
 import './ValidationResultModel.less';
 
@@ -13,7 +13,7 @@ interface ValidationResultModalProps {
     documentType: string;
     validationResult: string;
     timestamp: string;
-    fields_to_validate: FieldToValidate[];
+    fields_to_validate: ValidationResultField[];
     fields_to_extract: FieldToExtract[];
 }
 
@@ -38,7 +38,7 @@ const ValidationResultModal: React.FC<ValidationResultModalProps> = ({
                 <Descriptions.Item className='modal-description-item' label="Nombre del Documento" labelStyle={{ color: 'black', fontSize: 15 }}>{documentName}</Descriptions.Item>
                 <Descriptions.Item className='modal-description-item' label="Tipo de Documento" labelStyle={{ color: 'black', fontSize: 15 }}>{documentType}</Descriptions.Item>
                 <Descriptions.Item className='modal-description-item' label="Resultado de la Validación" labelStyle={{ color: 'black', fontSize: 15 }}>
-                    <span className={`ant-tag ${validationResult === 'Success' ? 'ant-tag-green' : 'ant-tag-red'}`}>
+                    <span className={`ant-tag ${validationResult === 'success' ? 'ant-tag-green' : 'ant-tag-red'}`}>
                         {validationResult}
                     </span>
                 </Descriptions.Item>
@@ -53,8 +53,8 @@ const ValidationResultModal: React.FC<ValidationResultModalProps> = ({
                         <List.Item.Meta
                             title={<span className="item-title">{item.name.toUpperCase()}</span>}
                             description={
-                                <span className={`ant-tag ${item.value==='success' ? 'ant-tag-green' : 'ant-tag-red'}`}>
-                                    {item.value || 'Pendiente'}
+                                <span className={`ant-tag ${item.result==='success' ? 'ant-tag-green' : 'ant-tag-red'}`}>
+                                    {item.result || 'Pendiente'}
                                 </span>
                             }
                         />

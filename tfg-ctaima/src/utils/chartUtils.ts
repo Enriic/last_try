@@ -1,6 +1,6 @@
 // src/utils/chartUtils.ts
 
-import { Validation } from '../types';
+import { Validation, ValidationStatus } from '../types';
 import moment from 'moment';
 
 
@@ -25,6 +25,7 @@ export const groupValidationsByMonth = (validations: Validation[]) => {
 
 
 export const calculateValidationDistribution = (validations: Validation[]): DistributionEntry[] => {
+    console.log('Calculating validation distribution with validations:', validations);
     const distribution = validations.reduce(
         (acc, val) => {
             if (val.status === 'success') {
@@ -40,8 +41,8 @@ export const calculateValidationDistribution = (validations: Validation[]): Dist
 
     // Preparar los datos para el gráfico
     const data: DistributionEntry[] = [
-        { status: 'success', value: distribution.success },
-        { status: 'failure', value: distribution.failed },
+        { status: ValidationStatus.SUCCESS, value: distribution.success },
+        { status: ValidationStatus.FAILURE  , value: distribution.failed },
         // Agrega otros estados si es necesario
     ];
 

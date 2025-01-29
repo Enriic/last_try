@@ -1,21 +1,20 @@
-// src/components/Upload/JunoUploadFile.tsx
-
-import React, { useState, useEffect } from 'react';
-import { Form, Select, Checkbox, Upload, Button, notification, Steps } from 'antd';
+import React, { useState } from 'react';
+import { Form, Checkbox, Upload, Button, notification, Steps } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { UploadFile } from 'antd/lib/upload/interface';
 import { useTranslation } from 'react-i18next';
-import { getDocumentTypes, uploadDocument } from '../../services/documentService';
-import { getResources } from '../../services/resourceService'; // Importamos getResources
-import { getFields } from '../../services/fieldService'; // Importamos getFields
-import { DocumentType, Document, FieldToValidate, FieldToExtract,  Validation, ValidationResult, Resource, VehicleDetails, EmployeeDetails } from '../../types'; // Importamos Resource
+import { uploadDocument, getDocument, getDocumentTypeById } from '../../services/documentService';
+import { getResourceById } from '../../services/resourceService';
+import { FieldToValidate, FieldToExtract, Validation, Resource, VehicleDetails, EmployeeDetails, DocumentType } from '../../types';
 import './JunoUplaodFile.less';
 import { useAuth } from '../../context/AuthContext';
 import { createValidation } from '../../services/validationService';
 import ValidationResultModal from '../ValidationResultModal/ValidationResultModal';
-import ResourceSelect from '../common/SearchableSelect/ResourceSelect/ResourceSelect'; // Importamos ResourceSelect
+import ResourceSelect from '../common/SearchableSelect/ResourceSelect/ResourceSelect';
+import DocumentSelect from '../common/SearchableSelect/DocumentSelect/DocumentSelect';
+import DocumentTypeSelect from '../common/SearchableSelect/DocumentTypeSelect/DocumentTypeSelect';
+
 const { Dragger } = Upload;
-const { Option } = Select;
 const { Step } = Steps;
 
 const JunoUploadFile: React.FC = () => {
@@ -26,143 +25,129 @@ const JunoUploadFile: React.FC = () => {
     const [currentStep, setCurrentStep] = useState<number>(0);
     const [uploading, setUploading] = useState<boolean>(false);
 
-    const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
-    const [documentType, setDocumentType] = useState<DocumentType | undefined>(undefined);
-    const [resources, setResources] = useState<Resource[]>([]);
-    const [resource, setResource] = useState<Resource | null>(null); // Cambiamos selectedResource por resource
-    const [selectedResource, setSelectedResource] = useState<string | null>(null);
+    const [documentType, setDocumentType] = useState<number | string | null>(null);
+    const [selectedDocType, setSelectedDocType] = useState<DocumentType | null>(null);
+
+    const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
+
+    const [resource, setResource] = useState<string | null>(null);
     const [selectedFieldsToValidate, setSelectedFieldsToValidate] = useState<string[]>([]);
     const [selectedFieldsToExtract, setSelectedFieldsToExtract] = useState<string[]>([]);
 
     const [fileList, setFileList] = useState<UploadFile[]>([]);
-    const [uploadedDocument, setUploadedDocument] = useState<Document | null>(null);
+    const [uploadedDocument, setUploadedDocument] = useState<string | null>(null);
     const [validation, setValidationResult] = useState<Validation | null>(null);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
-
-    useEffect(() => {
-        fetchDocumentTypes();
-        fetchResources();
-    }, []);
+    const [useExistingDocument, setUseExistingDocument] = useState<boolean>(false);
 
 
+    const handleDocumentTypeChange = async (value: number | string | null) => {
+        setDocumentType(value);
+        const selectedDocType = await getDocumentTypeById(value);
+        setSelectedDocType(selectedDocType);
+    };
 
+    const handleResourceChange = async (value: string | null) => {
+        setResource(value);
+        const selectedResource = await getResourceById(value);
+        setSelectedResource(selectedResource);
+    };
 
+    const handleExistingDocumentChange = async (value: string | null) => {
+        const selectedDoc = value;
+        if (selectedDoc) {
+            setUploadedDocument(selectedDoc);
 
-    const fetchResources = async () => {
-        try {
-            const data = await getResources();
-            setResources(data);
-            //setFilteredResources(data); // Inicialmente, muestra todos los recursos
-            console.log('Resources:', data);
-        } catch (error) {
-            notification.error({
-                message: '¡Ups! Algo salió mal',
-                description: 'Ocurrió un error al obtener los recursos',
-                duration: 3,
-            });
-            console.log(error);
+            try {
+                const docDetails = await getDocument(selectedDoc);
+                const docTypeDetails = await getDocumentTypeById(docDetails.document_type.toString());
+                setSelectedDocType(docTypeDetails);
+                setDocumentType(docDetails.document_type.toString());
+                handleResourceChange(docDetails.resource);
+
+            } catch (error) {
+                notification.error({
+                    message: 'Error',
+                    description: 'No se pudieron obtener los detalles del documento seleccionado.',
+                    duration: 3,
+                });
+            }
         }
     };
 
-    const fetchDocumentTypes = async () => {
-        try {
-            const data = await getDocumentTypes();
-            setDocumentTypes(data);
-            console.log('Document types:', data);
-        } catch (error) {
-            notification.error({
-                message: '¡Ups! Algo salió mal',
-                description: 'Ocurrió un error al obtener los tipos de documento',
-                duration: 3,
-            });
-            console.log(error)
-        }
-    };
-
-    // Maneja el cambio en la selección del tipo de documento
-    const handleDocumentTypeChange = (value: number) => {
-        const selectedDocType = documentTypes.find((doc) => doc.id === value);
-        if (selectedDocType) {
-            setDocumentType(selectedDocType);
-            form.resetFields(['validationFields']);
-        } else {
-            setDocumentType(undefined);
-        }
-    };
-
-    const handleResourceChange = (value: string | null) => {
-        const selectedRes = resources.find((res) => res.id === value);
-        if (selectedRes) {
-            setSelectedResource(value);
-            setResource(selectedRes); 
-        } else {
-            setSelectedResource(null);
-            setResource(null); 
-        }
-    };
-
-    // Maneja el cambio en los checkboxes de campos a validar
     const handleFieldsToValidateChange = (checkedValues: string[]) => {
         setSelectedFieldsToValidate(checkedValues);
     };
 
-    // Maneja el cambio en los checkboxes de campos a extraer
     const handleFieldsToExtractChange = (checkedValues: string[]) => {
         setSelectedFieldsToExtract(checkedValues);
     };
 
-    // Configuración de las propiedades del componente Upload
     const uploadProps = {
         fileList,
         beforeUpload: (file: UploadFile) => {
-            // Solo permitimos un archivo
             setFileList([file]);
-            // Cancelamos la carga automática
             return false;
         },
         onRemove: () => {
             setFileList([]);
         },
         onChange: (info: { fileList: UploadFile[] }) => {
-            setFileList(info.fileList.slice(-1)); // Limita a un archivo
+            setFileList(info.fileList.slice(-1));
         },
     };
 
-    // Maneja el avance entre pasos
     const handleNext = async () => {
         if (currentStep === 0) {
-            try {
-                await form.validateFields(['documentType', 'resource', 'file']);
-                setUploading(true);
-
-                // Enviar el archivo al backend
-                if (fileList[0] && documentType && selectedResource) {
-                    const file = fileList[0] as UploadFile<unknown>;
-
-                    // Llamar a la función uploadDocument del servicio
-                    const response = await uploadDocument(
-                        file.name,
-                        user?.id || 'undefined',
-                        documentType,
-                        selectedResource,
-                    );
-
-                    console.log('Respuesta del backend:', response);
-
-                    // Almacenar la información del documento subido
-                    setUploadedDocument(response);
-
-
-
-                    notification.success({
-                        message: 'Documento subido exitosamente',
-                        description: 'El documento ha sido subido correctamente',
+            if (useExistingDocument) {
+                try {
+                    await form.validateFields(['existingDocument']);
+                    setCurrentStep(currentStep + 1);
+                } catch (error) {
+                    console.log('Error al seleccionar el documento existente:', error);
+                    notification.error({
+                        message: '¡Ups! Algo salió mal',
+                        description: 'Ocurrió un error al seleccionar el documento existente',
                         duration: 3,
                     });
-                    setCurrentStep(currentStep + 1);
-                    setUploading(false);
-                } else {
+                }
+            } else {
+                try {
+                    await form.validateFields(['documentType', 'resource', 'file']);
+                    setUploading(true);
+
+                    if (fileList[0] && documentType && resource) {
+                        const file = fileList[0] as UploadFile<unknown>;
+
+                        const response = await uploadDocument(
+                            file.name,
+                            user?.id || 'undefined',
+                            documentType,
+                            resource,
+                        );
+
+                        console.log('Respuesta del backend:', response);
+
+                        setUploadedDocument(response.id);
+
+                        notification.success({
+                            message: 'Documento subido exitosamente',
+                            description: 'El documento ha sido subido correctamente',
+                            duration: 3,
+                        });
+                        setCurrentStep(currentStep + 1);
+                        setUploading(false);
+                    } else {
+                        notification.error({
+                            message: '¡Ups! Algo salió mal',
+                            description: 'Ocurrió un error al subir el documento',
+                            duration: 3,
+                        });
+                        setUploading(false);
+                    }
+                } catch (error) {
+                    console.log('Error al subir el archivo:', error);
                     notification.error({
                         message: '¡Ups! Algo salió mal',
                         description: 'Ocurrió un error al subir el documento',
@@ -170,49 +155,44 @@ const JunoUploadFile: React.FC = () => {
                     });
                     setUploading(false);
                 }
-            } catch (error) {
-                console.log('Error al subir el archivo:', error);
-                notification.error({
-                    message: '¡Ups! Algo salió mal',
-                    description: 'Ocurrió un error al subir el documento',
-                    duration: 3,
-                });
-                setUploading(false);
             }
         } else if (currentStep === 1) {
             try {
-                const values = await form.validateFields(['validationFields']);
+                const values = await form.validateFields(['validationFields', 'extractionFields']);
 
                 console.log('Valores del formulario:', values);
                 console.log('Documento subido:', uploadedDocument);
 
                 if (uploadedDocument && user) {
-                    // Preparar los datos para createValidation
-                    const documentId = uploadedDocument.id;
                     const userId = user.id.toString();
-                    const status = 'pending';
+                    const status = 'success';
                     const validationRequest = {
-                        fields_to_validate: documentType?.fields_to_validate.map((field) => ({
-                            id:field.id,
-                            name: field.name,
-                            description: field.description || '',
-                            value: 'pending',
-                        })),
-                        fields_to_extract: documentType?.fields_to_extract.map((field) => ({
-                            id:field.id,
-                            name: field.name,
-                            description: field.description || '',
-                            value: 'pending',
-                        })),
+                        fields_to_validate: selectedDocType?.fields_to_validate
+                            .filter((field: FieldToValidate) => selectedFieldsToValidate.includes(field.id.toString()))
+                            .map((field: FieldToValidate) => ({
+                                id: field.id,
+                                name: field.name,
+                                description: field.description || '',
+                                expected_value: '48276956W',
+                                obtained_value: 'pending_to_obtain'
+                            })),
+                        fields_to_extract: selectedDocType?.fields_to_extract
+                            .filter((field: FieldToExtract) => selectedFieldsToExtract.includes(field.id.toString()))
+                            .map((field: FieldToExtract) => ({
+                                id: field.id,
+                                name: field.name,
+                                description: field.description || '',
+                                value: 'pending_to_extract',
+                            })),
                     };
 
-                    // Llamar a createValidation
                     const validation = await createValidation(
-                        documentId,
+                        uploadedDocument,
                         userId,
                         status,
                         validationRequest
                     );
+
 
                     setValidationResult(validation);
                     setIsModalVisible(true);
@@ -234,19 +214,23 @@ const JunoUploadFile: React.FC = () => {
         }
     };
 
-    // Manejar el cierre del modal
+    const handlePrev = () => {
+        setCurrentStep(currentStep - 1);
+    };
+
     const handleModalClose = () => {
         setIsModalVisible(false);
         form.resetFields();
         setFileList([]);
-        setResources([]);
+        setResource(null);
         setSelectedFieldsToExtract([]);
         setSelectedFieldsToValidate([]);
-        setDocumentType(undefined);
-        setSelectedResource(null);
+        setDocumentType(null);
+        setResource(null);
         setUploadedDocument(null);
         setCurrentStep(0);
         setUploading(false);
+        setUseExistingDocument(false);
     };
 
     return (
@@ -259,100 +243,130 @@ const JunoUploadFile: React.FC = () => {
             <Form form={form} layout="vertical" className="form-upload-file">
                 {currentStep === 0 && (
                     <>
-                        {/* Paso 1: Selección del tipo de documento y recurso, y carga del archivo */}
                         <Form.Item
-                            label={t('upload.documentTypeLabel', 'Tipo de Documento')}
-                            name="documentType"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: t('upload.documentTypeError', 'Por favor selecciona el tipo de documento'),
-                                },
-                            ]}
+                            label="Usar Documento Existente"
+                            name="useExistingDocument"
+                            valuePropName="checked"
                         >
-                            <Select
-                                allowClear
-                                placeholder={t('upload.documentTypePlaceholder', 'Selecciona el tipo de documento')}
-                                onChange={handleDocumentTypeChange}
+                            <Checkbox onChange={(e) => setUseExistingDocument(e.target.checked)}>
+                                Usar Documento Existente
+                            </Checkbox>
+                        </Form.Item>
+
+                        {useExistingDocument ? (
+                            <Form.Item
+                                label="Documento Existente"
+                                name="existingDocument"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Por favor selecciona un documento existente',
+                                    },
+                                ]}
                             >
-                                {documentTypes.map((doc) => (
-                                    <Option key={doc.id} value={doc.id}>
-                                        {doc.name}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
+                                <DocumentSelect
+                                    value={uploadedDocument || null}
+                                    placeholder="Selecciona un documento existente"
+                                    onChange={handleExistingDocumentChange}
+                                />
 
-                        <Form.Item
-                            label="Recurso"
-                            name="resource"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Por favor selecciona un recurso',
-                                },
-                            ]}
-                        >
+                            </Form.Item>
+                        ) : (
+                            <>
+                                <Form.Item
+                                    label={t('upload.documentTypeLabel', 'Tipo de Documento')}
+                                    name="documentType"
+                                    rules={[
+                                        {
+                                            required: !useExistingDocument,
+                                            message: t('upload.documentTypeError', 'Por favor selecciona el tipo de documento'),
+                                        },
+                                    ]}
+                                >
+                                    <DocumentTypeSelect
+                                        value={documentType?.toString()}
+                                        onChange={handleDocumentTypeChange}
+                                        placeholder={t('upload.documentTypePlaceholder', 'Selecciona un tipo de documento')}
+                                        disabled={useExistingDocument}
+                                    />
+                                </Form.Item>
 
-                            <ResourceSelect
-                                value={selectedResource}
-                                onChange={handleResourceChange}
-                                placeholder="Selecciona un recurso"
-                            />
+                                <Form.Item
+                                    label="Recurso"
+                                    name="resource"
+                                    rules={[
+                                        {
+                                            required: !useExistingDocument,
+                                            message: 'Por favor selecciona un recurso',
+                                        },
+                                    ]}
+                                >
+                                    <ResourceSelect
+                                        value={resource}
+                                        onChange={handleResourceChange}
+                                        placeholder="Selecciona un recurso"
+                                        disabled={useExistingDocument}
+                                    />
+                                </Form.Item>
 
-                        </Form.Item>
-
-                        <Form.Item
-                            label={t('upload.fileLabel', 'Archivo')}
-                            name="file"
-                            rules={[
-                                { required: true, message: t('upload.fileError', 'Por favor sube un archivo') },
-                            ]}
-                        >
-                            <Dragger {...uploadProps} maxCount={1} className="upload-dragger">
-                                <p className="ant-upload-drag-icon">
-                                    <InboxOutlined />
-                                </p>
-                                {fileList.length === 0 ? (
-                                    <p className="ant-upload-text">
-                                        {t(
-                                            'upload.uploadPrompt',
-                                            'Haz clic o arrastra un archivo a esta área para subirlo'
+                                <Form.Item
+                                    label={t('upload.fileLabel', 'Archivo')}
+                                    name="file"
+                                    rules={[
+                                        { required: !useExistingDocument, message: t('upload.fileError', 'Por favor sube un archivo') },
+                                    ]}
+                                >
+                                    <Dragger {...uploadProps} maxCount={1} className="upload-dragger" disabled={useExistingDocument}>
+                                        <p className="ant-upload-drag-icon">
+                                            <InboxOutlined />
+                                        </p>
+                                        {fileList.length === 0 ? (
+                                            <p className="ant-upload-text">
+                                                {t(
+                                                    'upload.uploadPrompt',
+                                                    'Haz clic o arrastra un archivo a esta área para subirlo'
+                                                )}
+                                            </p>
+                                        ) : (
+                                            <p className="ant-upload-text">
+                                                {t('upload.selectedFile', 'Archivo seleccionado')}:{' '}
+                                                <strong>{fileList[0].name}</strong>
+                                            </p>
                                         )}
-                                    </p>
-                                ) : (
-                                    <p className="ant-upload-text">
-                                        {t('upload.selectedFile', 'Archivo seleccionado')}:{' '}
-                                        <strong>{fileList[0].name}</strong>
-                                    </p>
-                                )}
-                            </Dragger>
-                        </Form.Item>
+                                    </Dragger>
+                                </Form.Item>
+                            </>
+                        )}
 
                         <Form.Item>
-                            <Button type="primary" onClick={handleNext} disabled={uploading}>
-                                {uploading
-                                    ? t('upload.uploading', 'Subiendo...')
-                                    : t('upload.uploadButton', 'Subir Documento')}
+                            <Button
+                                type="primary"
+                                onClick={handleNext}
+                            >
+                                {useExistingDocument
+                                    ? 'Continuar'
+                                    : uploading
+                                        ? t('upload.uploading', 'Subiendo...')
+                                        : t('upload.uploadButton', 'Subir Documento')}
                             </Button>
                         </Form.Item>
                     </>
                 )}
+
 
                 {currentStep === 1 && (
                     <>
                         {/* Paso 2: Mostrar resumen y seleccionar campos a validar */}
                         <div className="step-summary">
                             <p>
-                                {t('upload.summary.documentType', 'Tipo de Documento')}: <strong>{documentType?.name}</strong>
+                                {t('upload.summary.documentType', 'Tipo de Documento')}: <strong>{selectedDocType?.name}</strong>
                             </p>
                             <p>
-                                Recurso:{' '}
+                                Recurso: {' '}
                                 <strong>
-                                    
-                                    {resource && resource.resource_type === 'vehicle'
-                                        ? (resource.resource_details as VehicleDetails).name : resource && resource.resource_type === 'employee'
-                                            ? `${(resource.resource_details as EmployeeDetails).first_name} ${(resource.resource_details as EmployeeDetails).last_name}` : ''}
+                                    {selectedResource && selectedResource.resource_type === 'vehicle'
+                                        ? (selectedResource.resource_details as VehicleDetails).name : selectedResource && selectedResource.resource_type === 'employee'
+                                            ? `${(selectedResource.resource_details as EmployeeDetails).first_name} ${(selectedResource.resource_details as EmployeeDetails).last_name}` : ''}
                                 </strong>
                             </p>
                         </div>
@@ -362,7 +376,7 @@ const JunoUploadFile: React.FC = () => {
                             name="validationFields"
                             rules={[
                                 {
-                                    required: true,
+                                    required: false,
                                     message: t(
                                         'upload.validationFieldsError',
                                         'Por favor selecciona al menos un campo'
@@ -372,7 +386,7 @@ const JunoUploadFile: React.FC = () => {
                         >
                             <Checkbox.Group
                                 options={
-                                    documentType?.fields_to_validate?.map((field) => ({
+                                    selectedDocType?.fields_to_validate?.map((field) => ({
                                         label: `${field.name.charAt(0).toUpperCase() + field.name.slice(1)}`,
                                         value: field.id.toString(),
                                     })) || []
@@ -382,7 +396,7 @@ const JunoUploadFile: React.FC = () => {
                                 style={{ display: 'flex', flexDirection: 'column', gap: '0.3em' }}
                             />
 
-                            
+
                         </Form.Item>
 
                         <Form.Item
@@ -390,7 +404,7 @@ const JunoUploadFile: React.FC = () => {
                             name="extractionFields"
                             rules={[
                                 {
-                                    required: true,
+                                    required: false,
                                     message: t(
                                         'upload.validationFieldsError',
                                         'Por favor selecciona al menos un campo'
@@ -400,7 +414,7 @@ const JunoUploadFile: React.FC = () => {
                         >
                             <Checkbox.Group
                                 options={
-                                    documentType?.fields_to_extract?.map((field) => ({
+                                    selectedDocType?.fields_to_extract?.map((field) => ({
                                         label: `${field.name.charAt(0).toUpperCase() + field.name.slice(1)}`,
                                         value: field.id.toString(),
                                     })) || []
@@ -412,8 +426,11 @@ const JunoUploadFile: React.FC = () => {
                         </Form.Item>
 
                         <Form.Item>
-                            <Button type="primary" onClick={handleNext}>
+                            <Button type="primary" onClick={handleNext} style={{ marginRight: '8px' }}>
                                 {t('upload.validateButton', 'Validar')}
+                            </Button>
+                            <Button onClick={handlePrev}>
+                                {t('upload.backButton', 'Paso Anterior')}
                             </Button>
                         </Form.Item>
                     </>
@@ -424,8 +441,8 @@ const JunoUploadFile: React.FC = () => {
                 <ValidationResultModal
                     visible={isModalVisible}
                     onClose={handleModalClose}
-                    documentName={uploadedDocument.name}
-                    documentType={documentType?.name || ''}
+                    documentName={validation.document_name}
+                    documentType={selectedDocType?.name || ''}
                     validationResult={validation.status}
                     timestamp={validation.timestamp}
                     fields_to_validate={validation.validation_details.fields_to_validate}

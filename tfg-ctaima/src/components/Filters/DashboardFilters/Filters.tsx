@@ -1,236 +1,81 @@
-// // // src/components/Filters/Filters.tsx
+// src/components/Filters/Filters.tsx
 
-// import React, { useState, useEffect } from 'react';
-// import { DatePicker, Select, Row, Col } from 'antd';
-// import { Validation } from '../../../types';
-// import { getDocumentTypes } from '../../../services/documentService';
-// import dayjs, { Dayjs } from 'dayjs';
-// import { DocumentType } from '../../../types';
-// import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-// import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
-// import customParseFormat from 'dayjs/plugin/customParseFormat';
-// import './Filters.less'
-// import JunoButton from '../../common/JunoButton';
-// import { JunoButtonTypes } from '../../common/JunoButton/JunoButton.types';
-// import { start } from 'repl';
-
-
-// type RangeValue = [Dayjs | null, Dayjs | null] | null;
-
-// // Add plugins to dayjs
-// dayjs.extend(isSameOrBefore);
-// dayjs.extend(isSameOrAfter);
-// dayjs.extend(customParseFormat);
-
-// interface FiltersProps {
-//     validations: Validation[];
-//     onFilter: (filteredData: Validation[]) => void;
-// }
-
-// const { RangePicker } = DatePicker;
-// const { Option } = Select;
-
-// // const Filters: React.FC<FiltersProps> = ({ validations, onFilter }) => {
-// //     const [dateRange, setDateRange] = useState<RangeValue>(null);
-// //     const [documentType, setDocumentType] = useState<number | null>(null);
-// //     const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
-// //     const [shouldApplyFilters, setShouldApplyFilters] = useState(false);
-
-
-// //     useEffect(() => {
-// //         fetchDocumentTypes();
-// //     }, []);
-
-// //     useEffect(() => {
-// //         applyFilters();
-// //     }, [dateRange, documentType]);
-
-// //     const resetFilters = () => {
-// //         setDateRange(null);
-// //         setDocumentType(null);
-// //         applyFilters();
-// //     };
-
-// //     const fetchDocumentTypes = async () => {
-// //         const data = await getDocumentTypes();
-// //         data.unshift({ id: 0, name: 'Todos' });
-// //         setDocumentTypes(data);
-// //     };
-
-// //     const applyFilters = () => {
-// //         let filteredData = [...validations];
-
-// //         if (dateRange) {
-// //             const [start, end] = dateRange;
-
-// //             if (start && end) {
-// //                 filteredData = filteredData.filter((v) => {
-// //                     const validationTimestamp = dayjs(v.timestamp);
-// //                     if (!validationTimestamp.isValid()) {
-// //                         // Handle invalid dates if necessary
-// //                         return false;
-// //                     }
-// //                     return (
-// //                         start.isSameOrBefore(validationTimestamp, 'day') &&
-// //                         end.isSameOrAfter(validationTimestamp, 'day')
-// //                     );
-// //                 });
-// //             }
-// //         }
-
-// //         if (documentType) {
-// //             if (documentType === 0) {
-// //                 onFilter(filteredData);
-// //                 return;
-// //             }
-// //             filteredData = filteredData.filter((v) => v.document_info.document_type=== documentType);
-// //         }
-
-// //         onFilter(filteredData);
-// //     };
-
-
-// //     return (
-// //         <Row gutter={16} style={{ marginBottom: 24 }}>
-// //             <Col xs={24} sm={9} md={9}>
-// //                 <RangePicker onChange={(dates) => setDateRange(dates)} value={dateRange} />
-// //             </Col>
-// //             <Col xs={24} sm={9} md={9}>
-// //                 <Select
-// //                     placeholder="Tipo de Documento"
-// //                     style={{ width: '100%' }}
-// //                     value={documentType}
-// //                     onChange={(key) => setDocumentType(key)}
-// //                 >
-// //                     {documentTypes.map((type) => (
-// //                         <Option key={type.id} value={type.id}>
-// //                             {type.name}
-// //                         </Option>
-// //                     ))}
-// //                 </Select>
-// //             </Col>
-// //             <Col xs={24} sm={6} md={6} className='filters-buttons-container'>
-// //                 <JunoButton
-// //                     className='filters-reset-button'
-// //                     buttonType={JunoButtonTypes.Cancel}
-// //                     onClick={resetFilters}>
-// //                     Reset
-// //                 </JunoButton>
-// //             </Col>
-// //         </Row>
-// //     );
-// // };
-
-// // export default Filters;
-
-
-import React, { useState, useEffect } from 'react';
-import { DatePicker, Select, Row, Col } from 'antd';
-import { Validation } from '../../../types';
-import { getDocumentTypes } from '../../../services/documentService';
+import React, { useState } from 'react';
+import { DatePicker, Row, Col } from 'antd';
+import { Validation, ValidationFilterOptions } from '../../../types';
 import dayjs, { Dayjs } from 'dayjs';
-import { DocumentType } from '../../../types';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import './Filters.less';
 import JunoButton from '../../common/JunoButton';
 import { JunoButtonTypes } from '../../common/JunoButton/JunoButton.types';
+import DocumentTypeSelect from '../../common/SearchableSelect/DocumentTypeSelect/DocumentTypeSelect';
 
 type RangeValue = [Dayjs | null, Dayjs | null] | null;
 
-// Add plugins to dayjs
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 dayjs.extend(customParseFormat);
 
 interface FiltersProps {
     validations: Validation[];
-    onFilter: (filteredData: Validation[]) => void;
-    showAllValidations: boolean;
+    onApplyFilters: (filters: ValidationFilterOptions) => void;
+    onClearFilters: () => void;
 }
 
 const { RangePicker } = DatePicker;
-const { Option } = Select;
-
-const Filters: React.FC<FiltersProps> = ({ validations, onFilter, showAllValidations }) => {
-    const [dateRange, setDateRange] = useState<RangeValue>(null);
-    const [documentType, setDocumentType] = useState<number | null>(null);
-    const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    
-
-    useEffect(() => {
-        fetchDocumentTypes();
-    }, []);
-
-    useEffect(() => {
-        applyFilters();
-    }, [validations, dateRange, documentType]); // Dependiendo del cambio en los filtros y el switch
 
 
-    const fetchDocumentTypes = async () => {
-        const data = await getDocumentTypes();
-        data.unshift({ id: 0, name: 'Todos' });
-        setDocumentTypes(data);
-    };   
+const Filters: React.FC<FiltersProps> = ({ onApplyFilters, onClearFilters }) => {
+    const [dateRange, setDateRange] = useState<RangeValue | null>(null);
+    const [documentType, setDocumentType] = useState<string |number | null>(null);
 
-    const resetFilters = () => {
+
+    const handleDateChange = (dates: RangeValue | null) => {
+        setDateRange(dates);
+    };
+
+    const clearFilters = () => {
         setDateRange(null);
         setDocumentType(null);
+
+        onClearFilters();
+    };
+
+    const handleDocumentTypeChange = (value: string | number | null) => {
+        setDocumentType(value);
     };
 
     const applyFilters = () => {
-        let filteredData = [...validations];
-
-        if (dateRange) {
-            const [start, end] = dateRange;
-            if (start && end) {
-                filteredData = filteredData.filter((v) => {
-                    const validationTimestamp = dayjs(v.timestamp);
-                    return (
-                        validationTimestamp.isValid() &&
-                        start.isSameOrBefore(validationTimestamp, 'day') &&
-                        end.isSameOrAfter(validationTimestamp, 'day')
-                    );
-                });
-            }
-        }
-
-        if (documentType && documentType !== 0) {
-            filteredData = filteredData.filter(
-                (v) => v.document_info.document_type === documentType
-            );
-        }
-
-        onFilter(filteredData);
+        const filters: ValidationFilterOptions = {
+            start_date: dateRange && dateRange[0] ? dateRange[0].format('YYYY-MM-DD') : null,
+            end_date: dateRange && dateRange[1] ? dateRange[1].format('YYYY-MM-DD') : null,
+            document_type: documentType,
+        };
+        onApplyFilters(filters); 
     };
 
     return (
-        <Row gutter={16} style={{ marginBottom: 24 }}>
-            <Col xs={24} sm={9} md={9}>
+        <Row gutter={16} style={{ marginBottom: 24}} align={'middle'}>
+            <Col xs={24} sm={24} md={12} lg={8} xl={8} xxl={8}>
                 <RangePicker
                     value={dateRange}
-                    onChange={(dates) => setDateRange(dates)}
+                    onChange={handleDateChange}
                 />
             </Col>
-            <Col xs={24} sm={9} md={9}>
-                <Select
-                    placeholder="Tipo de Documento"
-                    value={documentType}
-                    onChange={(key) => setDocumentType(key)}
-                    style={{ width: '100%' }}
-                >
-                    {documentTypes.map((type) => (
-                        <Option key={type.id} value={type.id}>
-                            {type.name}
-                        </Option>
-                    ))}
-                </Select>
+            <Col xs={24} sm={24} md={12} lg={8} xl={8} xxl={8}>
+                <DocumentTypeSelect
+                    value={documentType?.toString() || null}
+                    onChange={handleDocumentTypeChange}
+                    placeholder="Selecciona un tipo de documento"
+                    style={{ width: 250 }}
+                />
             </Col>
-            <Col xs={24} sm={6} md={6}>
 
-                <JunoButton onClick={resetFilters} type='default' buttonType={JunoButtonTypes.Cancel}>Reset</JunoButton>
+            <Col xs={24} sm={24} md={12} lg={8} xl={8} xxl={8} style={{ display:'flex', gap: 10 }}>
+                <JunoButton buttonType={JunoButtonTypes.Ok} type='primary' onClick={applyFilters}>Aplicar</JunoButton>
+                <JunoButton buttonType={JunoButtonTypes.Cancel} type='default' onClick={clearFilters}>Limpiar</JunoButton>
             </Col>
         </Row>
     );

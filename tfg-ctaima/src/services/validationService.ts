@@ -1,24 +1,46 @@
 // src/services/validationService.ts
 
 import axios from 'axios';
-import { Validation, ValidationRequest } from '../types';
-import { User } from '../context/AuthContext';
+import { Validation, ValidationRequest, ValidationFilterOptions, ValidationResponse } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
+export const getValidations = async (filters: ValidationFilterOptions | null, page: number | null, pageSize: number | null): Promise<ValidationResponse> => {
+    const params: { [key: string ]: string | number | null} = {
+        page: page || 1,
+        page_size: pageSize || 10,
+        ...filters
+    };
 
-export const getValidations = async (
-    all: boolean,
-    user: User | null,   
-): Promise<Validation[]> => {
-    
-    const endpoint = all ? `${API_URL}/api/validation/` : `${API_URL}/api/users/${user?.id}/validations/`;
-    const response = await axios.get<Validation[]>(endpoint, {
-        withCredentials: true,
-    });
-
+    const response = await axios.get<ValidationResponse>(`${API_URL}/api/validation/`, { params });
     return response.data;
 };
+
+export const getValidationsForSelect = async (page = 1, pageSize = 10, search = '') => {
+    const response = await axios.get(`${API_URL}/api/validation/`, {
+        params: { page, page_size: pageSize, search },
+        withCredentials: true,
+    });
+    return response.data;
+};
+
+export const getAllValidations = async (filters: ValidationFilterOptions | null): Promise<Validation[]> => {
+    const response = await axios.get<Validation[]>(`${API_URL}/api/validation/allValidations/`, {
+        params: filters,
+        withCredentials: true,
+    });
+    return response.data;
+}
+
+
+export const getValidationById = async (query: string): Promise<Validation[]> => {
+    const response = await axios.get<Validation[]>(`${API_URL}/api/validation/search/`, {
+        params: { query },
+        withCredentials: true,
+    });
+    return response.data;
+}
+
 
 export const createValidation = async (
     documentId: string,
@@ -33,7 +55,7 @@ export const createValidation = async (
     formData.append('status', status);
     formData.append('validation_details', JSON.stringify(validation_details));
 
-    const response = await axios.post(`${API_URL}/api/validation/`, formData,{
+    const response = await axios.post(`${API_URL}/api/validation/`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },

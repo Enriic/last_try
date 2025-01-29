@@ -1,22 +1,23 @@
-// src/components/ResourceSelect/ResourceSelect.tsx
+// src/components/DocumentTypeSelect/DocumentTypeSelect.tsx
 
 import React, { useEffect, useState } from 'react';
-import { debounce } from 'lodash';
 import { notification } from 'antd';
-import { getResourcesBySearch } from '../../../../services/resourceService';
-import { Resource, EmployeeDetails, VehicleDetails } from '../../../../types';
-import SearchableSelect from '../../SearchableSelect/SearchableSelect';
+import { getDocumentTypes } from '../../../../services/documentService';
+import { DocumentType } from '../../../../types';
+import SearchableSelect from '../SearchableSelect';
+import { debounce } from 'lodash';
 
-interface ResourceSelectProps {
+interface DocumentTypeSelectProps {
     value?: string | null;
-    onChange?: (value: string | null) => void;
+    onChange?: (value: string | null | number) => void;
     placeholder?: string;
-    disabled?: boolean;
     style?: React.CSSProperties;
+    disabled?: boolean;
+
 }
 
-const ResourceSelect: React.FC<ResourceSelectProps> = ({ value, onChange, placeholder, style, disabled }) => {
-    const [resources, setResources] = useState<Resource[]>([]);
+const DocumentTypeSelect: React.FC<DocumentTypeSelectProps> = ({ value, onChange, disabled, placeholder, style }) => {
+    const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
     const [page, setPage] = useState<number>(1);
     const [pageSize] = useState<number>(10);
     const [totalItems, setTotalItems] = useState<number>(0);
@@ -25,24 +26,23 @@ const ResourceSelect: React.FC<ResourceSelectProps> = ({ value, onChange, placeh
     const [searchValue, setSearchValue] = useState<string>('');
 
     useEffect(() => {
-        fetchResources(1, searchValue);
+        fetchDocumentTypes(1, searchValue);
     }, [searchValue]);
 
-
-    const fetchResources = async (pageNumber: number, search: string) => {
+    const fetchDocumentTypes = async (pageNumber: number, search: string) => {
         try {
             if (pageNumber === 1) {
                 setLoading(true);
             } else {
                 setIsLoadingMore(true);
             }
-            const data = await getResourcesBySearch(pageNumber, pageSize, search);
+            const data = await getDocumentTypes(pageNumber, pageSize, search);
             const { results, count } = data;
 
             if (pageNumber === 1) {
-                setResources(results);
+                setDocumentTypes(results);
             } else {
-                setResources((prevResources) => [...prevResources, ...results]);
+                setDocumentTypes((prevDocumentTypes) => [...prevDocumentTypes, ...results]);
             }
             setTotalItems(count);
             setPage(pageNumber);
@@ -63,11 +63,11 @@ const ResourceSelect: React.FC<ResourceSelectProps> = ({ value, onChange, placeh
     };
 
     const handleLoadMore = () => {
-        if (isLoadingMore || resources.length >= totalItems) {
+        if (isLoadingMore || documentTypes.length >= totalItems) {
             return;
         }
         const nextPage = page + 1;
-        fetchResources(nextPage, searchValue);
+        fetchDocumentTypes(nextPage, searchValue);
     };
 
     const debouncedHandleSearch = debounce((value: string) => {
@@ -85,40 +85,30 @@ const ResourceSelect: React.FC<ResourceSelectProps> = ({ value, onChange, placeh
         }
     };
 
+    const renderOption = (item: DocumentType) => item.name;
 
-    const renderOption = (item: Resource) => {
-        if (item.resource_type === 'vehicle') {
-            const vehicle = item.resource_details as VehicleDetails;
-            return `${vehicle.name} - ${vehicle.registration_id}`;
-        } else if (item.resource_type === 'employee') {
-            const employee = item.resource_details as EmployeeDetails;
-            return `${employee.first_name} ${employee.last_name} - ${employee.worker_id}`;
-        }
-        return 'Recurso desconocido';
-    };
+    const keySelector = (item: DocumentType) => item.id.toString();
 
-    const keySelector = (item: Resource) => item.id;
-
-    const hasMore = resources.length < totalItems;
+    const hasMore = documentTypes.length < totalItems;
 
 
     return (
-        <SearchableSelect<Resource>
-            data={resources}
+        <SearchableSelect<DocumentType>
+            data={documentTypes}
             value={value}
             onChange={handleSelectChange}
             placeholder={placeholder}
-            disabled={disabled}
+            style={style}
             renderOption={renderOption}
             keySelector={keySelector}
             onLoadMore={handleLoadMore}
             loading={loading}
             hasMore={hasMore}
             isLoadingMore={isLoadingMore}
-            style={style}
             onSearch={debouncedHandleSearch}
+            disabled={disabled}
         />
     );
 };
 
-export default ResourceSelect;
+export default DocumentTypeSelect;

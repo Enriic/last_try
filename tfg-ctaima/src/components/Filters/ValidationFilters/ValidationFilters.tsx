@@ -1,10 +1,8 @@
 // src/components/ValidationFilters/ValidationFilters.tsx
 
-import React, { useState, useEffect } from 'react';
-import { Row, Col, Input, DatePicker, Select, AutoComplete, notification } from 'antd';
-import { Validation, DocumentType } from '../../../types';
-import { getValidations } from '../../../services/validationService';
-import { useAuth } from '../../../context/AuthContext';
+import React, { useState } from 'react';
+import { Row, Col, DatePicker, Select } from 'antd';
+import { Validation } from '../../../types';
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
@@ -13,7 +11,11 @@ import DocumentSelect from '../../common/SearchableSelect/DocumentSelect/Documen
 import CompanySelect from '../../common/SearchableSelect/CompanySelect/CompanySelect.tsx';
 import ValidationSelect from '../../common/SearchableSelect/ValidationSelect/ValidationSelect.tsx';
 import ResourceSelect from '../../common/SearchableSelect/ResourceSelect/ResourceSelect.tsx';
+import JunoButton from '../../common/JunoButton/JunoButton.tsx';
+import { JunoButtonTypes } from '../../common/JunoButton/JunoButton.types';
 import './ValidationFilters.less';
+import { ValidationFilterOptions } from '../../../types';
+import DocumentTypeSelect from '../../common/SearchableSelect/DocumentTypeSelect/DocumentTypeSelect.tsx';
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
@@ -25,193 +27,159 @@ const { RangePicker } = DatePicker;
 const { Option } = Select;
 
 interface ValidationFiltersProps {
-    documentTypes: DocumentType[];
-    onFiltersChange: (filters: {
-        searchTextDocName: string | null;
-        searchTextValId: string | null;
-        dateRange: RangeValue;
-        documentType: number | null;
-        resultFilter: string | null;
-        company: string | null;
-        resource: string | null;
-    }) => void;
+    validations: Validation[];
+    onApplyFilters: (filters: ValidationFilterOptions) => void;
+    onClearFilters: () => void;
 }
 
-const ValidationFilters: React.FC<ValidationFiltersProps> = ({ documentTypes, onFiltersChange }) => {
-    const [searchTextDocName, setSearchTextDocName] = useState<string | null>(null);
-    const [searchTextValId, setSearchTextValId] = useState<string | null>(null);
+const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, onClearFilters }) => {
+    const [DocumentId, setDocumentId] = useState<string | null>(null);
+    const [validationId, setValidationId] = useState<string | null>(null);
     const [dateRange, setDateRange] = useState<RangeValue>(null);
-    const [documentType, setDocumentType] = useState<number | null>(null);
-    const [resultFilter, setResultFilter] = useState<string | null>(null);
-    const [validations, setValidations] = useState<Validation[]>([]);
-    const [company, setCompany] = useState<string | null>(null);
-    const [resource, setResource] = useState<string | null>(null);
+    const [documentType, setDocumentType] = useState<number | string | null>(null);
+    const [status, setStatus] = useState<string | null>(null);
+    const [companyId, setCompanyId] = useState<string | null>(null);
+    const [resourceId, setResourceId] = useState<string | null>(null);
 
 
-    const { user } = useAuth();
+    const applyFilters = () => {
+        const filters: ValidationFilterOptions = {
+            document_id: DocumentId,
+            validation_id: validationId,
+            start_date: dateRange && dateRange[0] ? dateRange[0].format('YYYY-MM-DD') : null,
+            end_date: dateRange && dateRange[1] ? dateRange[1].format('YYYY-MM-DD') : null,
+            document_type: documentType,
+            status: status,
+            company_id: companyId,
+            resource_id: resourceId,
 
-    useEffect(() => {
-        fetchDocumentsWithValidations();
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-    const fetchDocumentsWithValidations = async () => {
-        try {
-            const data = await getValidations(true, user);
-            setValidations(data);
-            console.log(documentTypes);
-        } catch (error) {
-            notification.error({
-                message: 'Upps! Something went wrong',
-                description: 'An error occurred while fetching the validations',
-                duration: 3,
-            });
-            console.log(error)
-        }
+        };
+        onApplyFilters(filters);
     };
 
-    const handleSelectDocName = (value: string | null) => {
-        setSearchTextDocName(value);
-        emitFiltersChange({ searchTextDocName: value });
+    const clearFilters = () => {
+        setDocumentId(null);
+        setValidationId(null);
+        setDateRange(null);
+        setDocumentType(null);
+        setStatus(null);
+        setCompanyId(null);
+        setResourceId(null);
+
+        onClearFilters();
     };
 
-    const handleCompanyChange = (selectedCompany: string | null) => {
-        setCompany(selectedCompany);
-        emitFiltersChange({ company: selectedCompany });
+    const handleDocumentIdChange = (value: string | null) => {
+        setDocumentId(value);
     };
 
-    const handleResourceChange = (selectedResource: string | null) => {
-        setResource(selectedResource);
-        emitFiltersChange({ resource: selectedResource });
-    };
-
-    const handleSelectValId = (value: string | null) => {
-        setSearchTextValId(value);
-        emitFiltersChange({ searchTextValId: value });
+    const handleValidationIdChange = (value: string | null) => {
+        setValidationId(value);
     };
 
     const handleDateChange = (dates: RangeValue) => {
         setDateRange(dates);
-        emitFiltersChange({ dateRange: dates });
     };
 
-    const handleDocumentTypeChange = (value: number | null) => {
+    const handleDocumentTypeChange = (value: number | string | null) => {
         setDocumentType(value);
-        emitFiltersChange({ documentType: value });
+        console.log("Filter value for document typw:", value);
     };
 
-    const handleResultFilterChange = (value: string | null) => {
-        setResultFilter(value);
-        emitFiltersChange({ resultFilter: value });
+    const handleStatusChange = (value: string | null) => {
+        setStatus(value);
     };
 
-    const emitFiltersChange = (changedFilter: Partial<{
-        searchTextDocName: string | null;
-        searchTextValId: string | null;
-        dateRange: RangeValue;
-        documentType: number | null;
-        resultFilter: string | null;
-        company: string | null;
-        resource: string | null;
-    }>) => {
-        const filters = {
-            searchTextDocName,
-            searchTextValId,
-            dateRange,
-            documentType,
-            resultFilter,
-            company,
-            resource, 
-            ...changedFilter,
-        };
-        onFiltersChange(filters);
+    const handleCompanyChange = (value: string | null) => {
+        setCompanyId(value);
     };
+
+    const handleResourceChange = (value: string | null) => {
+        setResourceId(value);
+    };
+
 
     return (
         <div className='validation-filters-container'>
-            <Row gutter={16} className='validation-filters-row'>
-                <Col xs={24} sm={24} md={24} lg={24} xl={7} xxl={6} className='validation-filters-col'>
-                    <span>Nombre Documento: </span>
+            <Row gutter={16} className='validation-filters-row' align={'middle'} justify={'start'}>
+                <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
+                    <span style={{ whiteSpace: 'nowrap' }}>Documento: </span>
                     <DocumentSelect
-                        value={searchTextDocName}
-                        onChange={handleSelectDocName}
-                        placeholder="Selecciona una compañía"
+                        value={DocumentId}
+                        onChange={handleDocumentIdChange}
+                        placeholder="Selecciona un documento"
                         style={{ width: 250 }}
                     />
-
                 </Col>
 
-                <Col xs={24} sm={24} md={24} lg={24} xl={7} xxl={6} className='validation-filters-col'>
-                    <span>Fecha: </span>
+                <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
+                    <span style={{ whiteSpace: 'nowrap' }}>Validación: </span>
+                    <ValidationSelect
+                        value={validationId}
+                        onChange={handleValidationIdChange}
+                        placeholder="Selecciona una validación"
+                        style={{ width: 250 }}
+                    />
+                </Col>
+
+                <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
+                    <span style={{ whiteSpace: 'nowrap' }}>Fecha: </span>
                     <RangePicker
                         onChange={handleDateChange}
                         style={{ width: 250 }}
                     />
                 </Col>
 
-                <Col xs={24} sm={24} md={24} lg={24} xl={7} xxl={6} className='validation-filters-col'>
-                    <span>Tipo de Documento: </span>
-                    <Select
-                        placeholder="Tipo de Documento"
-                        style={{ width: 250 }}
+                <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
+                    <span style={{ whiteSpace: 'nowrap' }}>Tipo Documento: </span>
+                    <DocumentTypeSelect
+                        value={documentType?.toString() || null}
                         onChange={handleDocumentTypeChange}
-                        allowClear
-                    >
-                        {documentTypes.map((type) => (
-                            <Option key={type.id} value={type.id}>
-                                {type.name}
-                            </Option>
-                        ))}
-                    </Select>
+                        placeholder="Selecciona un tipo de documento"
+                        style={{ width: 250 }}
+                    />
                 </Col>
 
-                <Col xs={24} sm={24} md={24} lg={24} xl={7} xxl={6} className='validation-filters-col'>
-                    <span>Resultado: </span>
+                <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
+                    <span style={{ whiteSpace: 'nowrap' }}>Resultado: </span>
                     <Select
                         placeholder="Resultado"
                         style={{ width: 250 }}
-                        onChange={handleResultFilterChange}
+                        onChange={handleStatusChange}
                         allowClear
+                        value={status || undefined}
                     >
                         <Option value="success">Éxito</Option>
                         <Option value="failure">Fallo</Option>
-                        <Option value="pending">Pendiente</Option>
                     </Select>
                 </Col>
 
-
-                <Col xs={24} sm={24} md={24} lg={24} xl={7} xxl={6} className='validation-filters-col'>
-                    <span>Validacion id: </span>
-                    <ValidationSelect
-                        value={searchTextValId}
-                        onChange={handleSelectValId}
-                        placeholder="Selecciona una compañía"
-                        style={{ width: 250 }}
-                    />
-                </Col>
-
-                <Col xs={24} sm={24} md={24} lg={24} xl={7} xxl={6} className='validation-filters-col'>
-                    <span>Resource id: </span>
+                <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
+                    <span style={{ whiteSpace: 'nowrap' }}>Recurso: </span>
                     <ResourceSelect
-                        value={resource}
+                        value={resourceId}
                         onChange={handleResourceChange}
-                        placeholder="Selecciona una compañía"
+                        placeholder="Selecciona un recurso"
                         style={{ width: 250 }}
                     />
                 </Col>
 
-
-                <Col xs={24} sm={24} md={24} lg={24} xl={7} xxl={6} className='validation-filters-col'>
-                    <span>Company id: </span>
+                <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
+                    <span style={{ whiteSpace: 'nowrap' }}>Company: </span>
                     <CompanySelect
-                        value={company}
+                        value={companyId}
                         onChange={handleCompanyChange}
                         placeholder="Selecciona una compañía"
                         style={{ width: 250 }}
                     />
                 </Col>
             </Row>
-        </div>
 
+            <Col xs={24} sm={24} md={24} lg={24} xl={24} xxl={24} style={{ display: 'flex', justifyContent: 'end', marginTop: 16, gap: 10 }}>
+                <JunoButton buttonType={JunoButtonTypes.Ok} type='primary' onClick={applyFilters}>Aplicar</JunoButton>
+                <JunoButton buttonType={JunoButtonTypes.Cancel} type='default' onClick={clearFilters}>Limpiar</JunoButton>
+            </Col>
+        </div>
     );
 
 };

@@ -71,15 +71,6 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
     // Obtenemos solo xs de useBreakpoint
     const { xs } = useBreakpoint();
 
-    // Efecto para ajustar el logo según el breakpoint xs
-    // useLayoutEffect(() => {
-    //     if (xs && !logoImg) {
-    //         setLogoImg(imgLogoCollapsed);
-    //     } else if (!xs && !logoImg) {
-    //         setLogoImg(imgLogo);
-    //     }
-    // }, [xs, logoImg]);
-
     // Ajustamos el colapso del menú en xs
     useEffect(() => {
         if (xs) {
@@ -106,8 +97,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
                 return newItem;
             });
 
-    // eslint-disable-next-line prefer-const
-    let finalMenuItems = filterMenuItemsByRoles(menuItems);
+    const finalMenuItems = filterMenuItemsByRoles(menuItems);
 
     if (user) {
         finalMenuItems.push({
@@ -136,7 +126,6 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
     ): React.ReactNode => {
         const handleMenuItemClick = () => {
             if (item.key === 'logout') {
-                // Manejar el logout
                 showLogoutConfirm();
             } else {
                 setPathname(item.path || '/');
@@ -203,7 +192,6 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
             menuItemRender={menuItemRender}
             location={location}
             title="Mi Aplicación"
-            //logo={<img src={logoImg} alt="Logo" style={{ height: 32 }} />}
             siderWidth={228}
             headerRender={() => null}
             collapsedButtonRender={() => null}
@@ -212,7 +200,6 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
                 navigate('/');
             }}
             breakpoint="xs"
-        //collapsedWidth={xs ? 0 : 80}
         >
             {/* Botón para colapsar/expandir y selector de idioma */}
             <div

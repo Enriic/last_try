@@ -36,7 +36,6 @@ const ValidationBarChart: React.FC<ValidationBarChartProps> = ({ validations }) 
                     placeholder="Selecciona un año"
                     value={selectedYear}
                     defaultValue={ACTUAL_YEAR}
-                    // poner ano actual por defecto
                     onChange={(year) => setSelectedYear(year)}
                     style={{ width: 200 }}
                 >
@@ -50,7 +49,7 @@ const ValidationBarChart: React.FC<ValidationBarChartProps> = ({ validations }) 
         >
             {/* Bar Chart */}
             <ResponsiveContainer width="100%" height={160}>
-                <BarChart data={data} barSize={25}>
+                <BarChart data={data} barSize={25} >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
                         dataKey="month"
@@ -58,7 +57,7 @@ const ValidationBarChart: React.FC<ValidationBarChartProps> = ({ validations }) 
                     />
                     <YAxis allowDecimals={false} />
                     <Tooltip />
-                    <Bar dataKey="validations" fill="#8884d8" />
+                    <Bar dataKey="validations" fill="#7346FF" radius={[8, 8, 0, 0]}/>
                 </BarChart>
             </ResponsiveContainer>
         </Card>

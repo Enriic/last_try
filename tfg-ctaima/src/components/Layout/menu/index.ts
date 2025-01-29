@@ -12,8 +12,7 @@ const menuItems: CustomMenuDataItem[] = [
     ...uploadMenu,
     ...dashboardMenu,
     ...historyMenu,
-    // ...usersMenu,
-    // ...settingsMenu
+
 ];
 
 export default menuItems;

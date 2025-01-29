@@ -9,7 +9,6 @@ function Upload() {
   const fileUrl = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
 
   const handleDownload = () => {
-    // Logic to download the file
     window.open(fileUrl, '_blank');
   };
 

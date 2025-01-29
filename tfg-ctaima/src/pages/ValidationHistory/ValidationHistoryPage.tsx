@@ -1,15 +1,13 @@
 // src/pages/ValidationHistory/ValidationHistoryPage.tsx
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Switch, Typography, notification } from 'antd';
-import ValidationFilters from '../../components/Filters/ValidationFilters/ValidationFilters';
+import React, { useState, useEffect } from 'react';
+import { Row, Col, notification } from 'antd';
 import ValidationTable from '../../components/ValidationTableHistory/ValidationTableHistory';
 import ValidationDetailsModal from '../../components/ValidationDetailsModal/ValidationDetailsModal';
-import { useAuth } from '../../context/AuthContext';
-import { getDocumentTypes } from '../../services/documentService';
+import ValidationFilters from '../../components/Filters/ValidationFilters/ValidationFilters';
 import { getValidations } from '../../services/validationService';
-import { Validation, DocumentType } from '../../types';
-import dayjs, { Dayjs } from 'dayjs';
+import { Validation, ValidationFilterOptions } from '../../types';
+import dayjs from 'dayjs';
 import './ValidationHistory.less';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
@@ -20,35 +18,29 @@ dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 dayjs.extend(customParseFormat);
 
-// Tipo RangeValue
-type RangeValue = [Dayjs | null, Dayjs | null] | null;
-
-const { Text } = Typography;
-
 const ValidationHistoryPage: React.FC = () => {
-    const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
     const [validations, setValidations] = useState<Validation[]>([]);
-    const [filteredValidations, setFilteredValidations] = useState<Validation[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [showAllValidations, setShowAllValidations] = useState<boolean>(true);
     const [selectedValidation, setSelectedValidation] = useState<Validation | null>(null);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-    
-    const { user } = useAuth();
+    const [filters, setFilters] = useState<ValidationFilterOptions>({});
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [pageSize, setPageSize] = useState<number>(10);
+    const [totalItems, setTotalItems] = useState<number>(0);
 
+    
     useEffect(() => {
         fetchData();
-    }, [showAllValidations]); // Dependemos de 'showAllValidations' para refrescar los datos
+    }, []); 
 
-    const fetchData = async () => {
+    const fetchData = async (appliedFilters: ValidationFilterOptions = filters, page = currentPage, size = pageSize) => {
         try {
-            console.log('Fetching data');
             setLoading(true);
-            const validationData = await getValidations(showAllValidations, user);
-            const documentTypes = await getDocumentTypes();
-            setValidations(validationData);
-            setFilteredValidations(validationData);
-            setDocumentTypes(documentTypes);
+
+            const validationResponse = await getValidations(appliedFilters, page, size);
+            setValidations(validationResponse.results);
+            setTotalItems(validationResponse.count);
+
         } catch (error) {
             notification.error({
                 message: 'Upps! Something went wrong',
@@ -60,86 +52,22 @@ const ValidationHistoryPage: React.FC = () => {
         }
     };
 
-    const handleSwitchChange = (checked: boolean) => {
-        setShowAllValidations(checked);
+    const handleApplyFilters = (appliedFilters: ValidationFilterOptions) => {
+        setCurrentPage(1); 
+        setFilters(appliedFilters); 
+        fetchData(appliedFilters, 1); 
     };
 
-    const handleFiltersChange = useCallback((filters: {
-        searchTextValId: string | null;
-        searchTextDocName: string | null;
-        dateRange: RangeValue;
-        documentType: number | null;
-        resultFilter: string | null;
-        company: string | null;
-        resource: string | null;
-    }) => {
-        applyFilters(filters);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [validations]);
+    const handleClearFilters = () => {
+        setFilters({}); 
+        setCurrentPage(1);
+        fetchData({}, 1, pageSize); 
+    };
 
-    const applyFilters = (filters: {
-        searchTextDocName: string | null;
-        searchTextValId: string | null;
-        dateRange: RangeValue;
-        documentType: number | null;
-        resultFilter: string | null;
-        company: string | null;
-        resource: string | null;
-    }) => {
-        const { searchTextDocName, searchTextValId, dateRange, documentType, resultFilter, company, resource } = filters;
-        let data = [...validations];
-
-        console.log('Applying filters');
-
-        if (searchTextDocName) {
-            console.log('Filtering by document name: ', searchTextDocName);
-            data = data.filter((validation) =>
-                validation.document.toLowerCase().includes(searchTextDocName.toLowerCase())
-            );
-        }
-
-        if (searchTextValId) {
-            data = data.filter((validation) =>
-                validation.id.toLowerCase().includes(searchTextValId.toLowerCase())
-            );
-        }
-
-        if (company) {
-            data = data.filter((validation) =>
-                validation.document_info.resource_info.company.toLowerCase().includes(company.toLowerCase())
-            );
-        }
-
-        if (resource) {
-            data = data.filter((validation) =>
-                validation.document_info.resource.toLowerCase().includes(resource.toLowerCase())
-            );
-        }
-
-        if (dateRange) {
-            const [start, end] = dateRange;
-            if (start && end) {
-                data = data.filter((validation) => {
-                    const validationTimestamp = dayjs(validation.timestamp);
-                    if (!validationTimestamp.isValid()) {
-                        return false;
-                    }
-                    return (
-                        start.isSameOrBefore(validationTimestamp, 'day') &&
-                        end.isSameOrAfter(validationTimestamp, 'day')
-                    );
-                });
-            }
-        }
-
-        if (documentType !== null && documentType !== undefined) {
-            data = data.filter((validation) => validation.document_info.document_type_info.id === documentType);
-        }
-
-        if (resultFilter) {
-            data = data.filter((validation) => validation.status === resultFilter);
-        }
-        setFilteredValidations(data);
+    const handlePageChange = (page: number, pageSize?: number) => {
+        setCurrentPage(page);
+        setPageSize(pageSize || 10);
+        fetchData(filters, page, pageSize || 10);
     };
 
     const handleModalClose = () => {
@@ -154,24 +82,26 @@ const ValidationHistoryPage: React.FC = () => {
 
     return (
         <div style={{ padding: 24 }}>
-            <Row align="middle" justify="space-between" style={{ marginBottom: 16 }} className='history-filter-section'>
+            <Row align="middle" justify="center" style={{ marginBottom: 16 }} className='history-filter-section'>
                 <Col span={24}>
                     <ValidationFilters
-                        documentTypes={documentTypes}
-                        onFiltersChange={handleFiltersChange}
+                        validations={validations}
+                        onApplyFilters={handleApplyFilters}
+                        onClearFilters={handleClearFilters}
                     />
                 </Col>
             </Row>
-            <div className="switch-history-filter">
-                <Switch checked={showAllValidations} onChange={handleSwitchChange} size='small' />
-                <Text style={{ marginLeft: 8 }}>
-                    {showAllValidations ? 'Todas las Validaciones' : 'Mis Validaciones'}
-                </Text>
-            </div>
+
             <ValidationTable
-                validations={filteredValidations}
+                validations={validations}
                 loading={loading}
                 onViewDetails={showValidationDetails}
+                pagination={{
+                    current: currentPage,
+                    pageSize: pageSize,
+                    total: totalItems,
+                    onChange: handlePageChange,
+                }}
             />
 
             {/* Modal para los detalles de la validación */}

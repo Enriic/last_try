@@ -4,7 +4,7 @@ import { Validation } from '../types';
 
 export const groupByDocumentType = (validations: Validation[]) => {
     const groups = validations.reduce((acc, val) => {
-        const type = val.document_info.document_type_info.name || "Desconocido";
+        const type = val.document_type_name || "Desconocido";
         if (!acc[type]) {
             acc[type] = { document_type: type, count: 0, approved: 0, rejected: 0 };
         }
