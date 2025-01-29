@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'tfg_ctaima_app',
     'corsheaders',
+    'django_filters',
 ]
 
 # Habilitar middleware para sesiones

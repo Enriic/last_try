@@ -15,12 +15,12 @@ class CompanySerializer(serializers.ModelSerializer):
 
 
 class ResourceSerializer(serializers.ModelSerializer):
-    company_info = CompanySerializer(source='company', read_only=True)
+    # company_info = CompanySerializer(source='company', read_only=True)
     resource_details = serializers.SerializerMethodField()
     
     class Meta:
         model = Resource
-        fields = ['id', 'resource_type', 'company', 'company_info', 'resource_details','timestamp']
+        fields = ['id', 'resource_type', 'company', 'resource_details', 'timestamp']
 
 
     def get_resource_details(self, obj):
@@ -118,7 +118,7 @@ class FieldToValidateOutputSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = FieldToValidate
-        fields = ['id', 'name', 'value', 'description']
+        fields = ['id', 'name', 'expected_value', 'description']
 
 
 class FieldToExtractOutputSerializer(serializers.ModelSerializer):
@@ -130,18 +130,19 @@ class FieldToExtractOutputSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description']
 
 class DocumentSerializer(serializers.ModelSerializer):
-    document_type_info = DocumentTypeSerializer(source='document_type', read_only=True)
-    resource_info = ResourceSerializer(source='resource', read_only=True)
-
     class Meta:
         model = Document
-        fields = ['id', 'user','resource', 'resource_info', 'document_type', 'document_type_info', 'name', 'url', 'timestamp']
+        fields = ['id', 'user', 'resource', 'document_type',  'name', 'url', 'timestamp']
 
 class ValidationSerializer(serializers.ModelSerializer):
-    document_info = DocumentSerializer(source='document', read_only=True)
+    document_name = serializers.CharField(source='document.name', read_only=True)
+    document_type_name = serializers.CharField(source='document.document_type.name', read_only=True)
+    resource_id = serializers.UUIDField(source='document.resource.id', read_only=True)
+    document_type = DocumentTypeSerializer(source='document.document_type', read_only=True)
+    
     class Meta:
         model = Validation
-        fields = ['id', 'document', 'user', 'status', 'validation_details', 'document_info', 'timestamp']
+        fields = ['id', 'document', 'document_name', 'resource_id' ,'document_type_name' , 'document_type',  'user', 'status', 'validation_details', 'timestamp']
 
 class LogSerializer(serializers.ModelSerializer):
     class Meta:

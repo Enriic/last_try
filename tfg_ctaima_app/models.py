@@ -62,7 +62,6 @@ class Resource(models.Model):
         abstract = False  # No es una clase abstracta, por lo que Django creará una tabla para esta clase.
 
 class Vehicle(Resource):
-    
     name = models.CharField(max_length=255)
     registration_id = models.CharField(max_length=50)
     manufacturer = models.CharField(max_length=100)
@@ -98,7 +97,7 @@ class FieldToValidate(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
     name = models.CharField(max_length=100,null=False)
     description = models.TextField(blank=True, null=True)
-    value = models.CharField(max_length=100,null=False, default='')
+    expected_value = models.CharField(max_length=100,null=False, default='')
     treshold = models.FloatField(blank=True, null=True, default=80)
     document_types = models.ManyToManyField(DocumentType, related_name="fields_to_validate")  # Relación many-to-many
 
@@ -126,6 +125,8 @@ class Document(models.Model):
     def __str__(self):
         return f"{self.name} - {self.document_type.name}"
 
+
+
 class Validation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     STATUS_CHOICES = [
@@ -137,7 +138,7 @@ class Validation(models.Model):
     document = models.ForeignKey(Document, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)  # Usar el modelo User de Django
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
-    validation_details = models.JSONField()  # Stores validation details
+    validation_details = models.JSONField()  
     timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):

@@ -7,7 +7,7 @@ import uuid
 def random_string(length):
     return ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', k=length))
 
-def random_tax_id():
+def random_company_id():
     parts = [
         random_string(random.randint(2, 4)),  # Letras o números
         str(random.randint(100000, 999999)),  # Números
@@ -31,10 +31,10 @@ def random_language():
 # Crear Company (Customer/Supplier)
 def create_companies():
     companies = []
-    for _ in range(10):  # Crear 10 registros
+    for _ in range(15):  # Crear 10 registros
         company = Company.objects.create(
             type='customer',  # En este caso, solo clientes
-            tax_id=random_tax_id(),
+            company_id=random_company_id(),
             company_name=f"Company {random_string(5)}",
             industry=random.choice(['Technology', 'Automotive', 'Retail', 'Healthcare']),
             email=random_email(f"info{random_string(3)}"),
@@ -45,6 +45,20 @@ def create_companies():
         companies.append(company)
     print("Companies creados.")
     return companies
+
+# Eliminar duplicados de Validations
+def remove_duplicate_validations():
+    from django.db.models import Min
+
+    duplicates = (Validation.objects
+                  .values('id')
+                  .annotate(min_id=Min('id'))
+                  .values_list('id', 'min_id'))
+
+    keep_ids = [dup[1] for dup in duplicates]
+
+    Validation.objects.exclude(id__in=keep_ids).delete()
+    print("Duplicados eliminados de la tabla Validations.")
 
 # Crear Resource (Vehicle y Employee)
 def create_resources(companies):
@@ -185,8 +199,9 @@ class Command(BaseCommand):
         #create_resources(companies)
         # create_documents()
         # create_validations()
-        create_field_to_validate()
-        create_field_to_extract()
+        # create_field_to_validate()
+        # create_field_to_extract()
+        remove_duplicate_validations()
         print("Sample data initialization completed.")
 
 

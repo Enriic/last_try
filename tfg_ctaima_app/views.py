@@ -1,4 +1,5 @@
 from rest_framework import viewsets, status
+from rest_framework import filters as rest_framework_filters
 from django.contrib.auth.decorators import login_required
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -8,24 +9,28 @@ from .serializers import UserSerializer,CompanySerializer, ResourceSerializer, V
 from tfg_ctaima_app.constants import MOCK_DOCUMENT_URLS
 import random
 from django.contrib.auth import authenticate, login, logout
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from .models import Log, EventType
 from rest_framework.permissions import AllowAny
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from rest_framework.permissions import IsAdminUser
 from django.http import JsonResponse
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet, filters
+from rest_framework.filters import OrderingFilter
+from rest_framework.pagination import PageNumberPagination
+from django.db.models.functions import Concat
+from django.db.models import Value, CharField, Q
 
-
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 10  # Default number of items per page
+    page_size_query_param = 'page_size'  # Allow clients to set page size
+    max_page_size = 100  # Maximum limit for page size
 
 @ensure_csrf_cookie
 @api_view(['GET'])
@@ -181,9 +186,25 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+class DocumentFilter(FilterSet):
+    id__in = filters.BaseInFilter(field_name='id', lookup_expr='in')
+    # name = filters.CharFilter(field_name='name', lookup_expr='icontains')
+    # resource_id = filters.CharFilter(field_name='resource', lookup_expr='exact')
+
+    class Meta:
+        model = Document
+        fields = ['id__in']
+
 class DocumentViewSet(viewsets.ModelViewSet):
-    queryset = Document.objects.all().select_related('document_type', 'user', 'resource')
+    queryset = Document.objects.all()
     serializer_class = DocumentSerializer
+
+    filter_backends = [rest_framework_filters.SearchFilter, rest_framework_filters.OrderingFilter]
+    search_fields = ['name', 'id']  # Add other fields as needed
+    ordering_fields = ['timestamp', 'name', 'id']
+    ordering = ['-timestamp', '-id']
+
+    pagination_class = StandardResultsSetPagination
 
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
@@ -222,18 +243,43 @@ class DocumentViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+class ValidationFilter(FilterSet):
+    document_type = filters.CharFilter(field_name='document__document_type', lookup_expr='exact')  # Filtra por ID del tipo de documento
+    document_id = filters.CharFilter(field_name='document', lookup_expr='exact')  # Filtra por ID del documento
+    validation_id = filters.CharFilter(field_name='id', lookup_expr='exact')  # Filtra por ID de la validación
+    start_date = filters.DateTimeFilter(field_name='timestamp', lookup_expr='gte')  # Fecha de inicio (sin cambios)
+    end_date = filters.DateTimeFilter(field_name='timestamp', lookup_expr='lte')  # Fecha de fin (sin cambios)
+    resource_id = filters.CharFilter(field_name='document__resource', lookup_expr='exact')  # Filtra por ID del recurso
+    company_id = filters.CharFilter(field_name='document__resource__company', lookup_expr='exact')  # Filtra por ID de la compañía
+    status = filters.CharFilter(field_name='status', lookup_expr='exact')  # Filtra por estado (sin cambios)
+    user_id = filters.CharFilter(field_name='user', lookup_expr='exact')  # Filtra por ID de usuario
+
+    class Meta:
+        model = Validation
+        fields = []
+
+
 
 class ValidationViewSet(viewsets.ModelViewSet):
     queryset = Validation.objects.all().select_related('document__document_type', 'user')
     serializer_class = ValidationSerializer
-   
+    pagination_class = StandardResultsSetPagination
+    # Agregar los backends de filtrado
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+
+    # Especificar la clase de filtro personalizada
+    filterset_class = ValidationFilter
+
+    # Opcional: permitir ordenar por ciertos campos
+    ordering_fields = ['timestamp', 'id']
+    ordering = ['-timestamp', '-id']
+
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         
-        # Here api call to OCR will determine the result of the validation
         if serializer.is_valid():
             serializer.save()
-            # Create a log when a new validation is created
+            # Crear un log cuando se crea una nueva validación
             Log.objects.create(
                 user=request.user,
                 event=EventType.CREATE_VALIDATION,
@@ -247,7 +293,7 @@ class ValidationViewSet(viewsets.ModelViewSet):
         serializer = self.serializer_class(validation, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            # Create a log when a validation is updated
+            # Crear un log cuando se actualiza una validación
             Log.objects.create(
                 user=request.user,
                 event=EventType.UPDATE_VALIDATION,
@@ -256,10 +302,28 @@ class ValidationViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # Custom action to get all logs for a specific validation, detail=True means it's a detail endpoint ex: validation/{id}/logs (not very useful)
+    @action(detail=False, methods=['get'], url_path='search') 
+    def search(self, request):
+    # Verificamos si el usuario hizo una solicitud GET
+        query = request.GET.get('query', '')
+        if query is not None and query != '':
+            # Buscar validaciones cuyo ID contenga el texto de búsqueda
+            validations = Validation.objects.filter(id__icontains=query)
+            serializer = self.get_serializer(validations, many=True)
+            return Response(serializer.data)
+        else:
+            return Response({'error': 'No se proporcionó un término de búsqueda.'}, status=400)
+
+    @action(detail=False, methods=['get'], url_path='allValidations')
+    def get_all(self, request):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
     @action(detail=True, methods=['get'], url_path='logs')
     def logs(self, request, pk=None):
-        """Get all logs for a specific validation"""
+        """Obtener todos los logs para una validación específica"""
         validation = self.get_object()
         logs = Log.objects.filter(details__icontains=f"'{validation.id}'")
         serializer = LogSerializer(logs, many=True)
@@ -269,6 +333,7 @@ class ValidationViewSet(viewsets.ModelViewSet):
 class DocumentTypeViewSet(viewsets.ModelViewSet):
     queryset = DocumentType.objects.all()
     serializer_class = DocumentTypeSerializer
+    pagination_class = StandardResultsSetPagination
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -337,13 +402,62 @@ class DocumentTypeViewSet(viewsets.ModelViewSet):
 class CompanyViewSet(viewsets.ModelViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
+    pagination_class = StandardResultsSetPagination
 
+    filter_backends = [rest_framework_filters.SearchFilter, rest_framework_filters.OrderingFilter]
+
+    search_fields = ['company_name', 'company_id']  # Add other fields as needed
+    ordering_fields = ['company_name', 'company_id']
+    ordering = ['company_name', 'company_id']
+
+class ResourceFilter(FilterSet):
+    id__in = filters.BaseInFilter(field_name='id', lookup_expr='in')
+    # name = filters.CharFilter(field_name='name', lookup_expr='icontains')
+    # resource_id = filters.CharFilter(field_name='resource', lookup_expr='exact')
+
+    class Meta:
+        model = Resource
+        fields = ['id__in']
 
 # ViewSet para Resource
 class ResourceViewSet(viewsets.ModelViewSet):
     queryset = Resource.objects.select_related('company')
     serializer_class = ResourceSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ResourceFilter
+    pagination_class = StandardResultsSetPagination
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search = self.request.query_params.get('search', None)
+
+        if search:
+
+            # Anotamos full_name para empleados
+            employee_qs = Resource.objects.filter(resource_type='employee').annotate(
+                full_name=Concat('employee__first_name', Value(' '), 'employee__last_name', output_field=CharField())
+            )
+
+            # Filtramos empleados
+            employee_qs = employee_qs.filter(
+                Q(full_name__icontains=search) |
+                Q(employee__first_name__icontains=search) |
+                Q(employee__last_name__icontains=search) |
+                Q(employee__worker_id__icontains=search)
+            )
+
+            # Filtramos vehículos
+            vehicle_qs = Resource.objects.filter(resource_type='vehicle').filter(
+                Q(vehicle__name__icontains=search) |
+                Q(vehicle__registration_id__icontains=search)
+            )
+
+            # Combinamos las consultas
+            resources = (employee_qs | vehicle_qs).select_related('employee', 'vehicle').distinct()
+
+            return resources
+        else:
+            return queryset
 
 # ViewSet para Vehicle
 class VehicleViewSet(viewsets.ModelViewSet):
