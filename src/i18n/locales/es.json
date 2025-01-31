@@ -1,0 +1,243 @@
+{
+    "menu": {
+        "dashboard": "Tablero",
+        "upload": "Subir documento",
+        "users": "Usuarios",
+        "usersList": "Lista de Usuarios",
+        "usersCreate": "Crear Usuario",
+        "settings": "Configuración",
+        "login": "Iniciar Sesión",
+        "logout": "Cerrar Sesión",
+        "history": "Historial",
+        "language": {
+            "es": "Español",
+            "en": "Inglés"
+        },
+        "application_title": "Mi aplicación"
+    },
+    "common": {
+        "apply": "Aplicar",
+        "clear": "Limpiar"
+    },
+    "upload": {
+        "successMessage": "Archivo enviado correctamente",
+        "documentTypeLabel": "Tipo de Documento",
+        "documentTypeError": "Por favor selecciona el tipo de documento",
+        "documentTypePlaceholder": "Selecciona el tipo de documento",
+        "documentType": {
+            "invoice": "Factura",
+            "receipt": "Recibo",
+            "report": "Informe"
+        },
+        "validationFieldsLabel": "Campos a Validar",
+        "validationFieldsError": "Por favor selecciona al menos un campo",
+        "extractionFieldsLabel": "Campos a Extraer",
+        "extractionFieldsError": "Por favor selecciona al menos un campo",
+        "validationFields": {
+            "date": "Fecha",
+            "amount": "Monto",
+            "client": "Cliente",
+            "address": "Dirección",
+            "vendor": "Vendedor",
+            "summary": "Resumen",
+            "author": "Autor"
+        },
+        "fileLabel": "Archivo",
+        "fileError": "Por favor sube un archivo",
+        "uploadPrompt": "Haz clic o arrastra un archivo a esta área para subirlo",
+        "selectedFile": "Archivo seleccionado",
+        "submitButton": "Enviar",
+        "validateButton": "Validar",
+        "uploadButton": "Subir Documento",
+        "uploading": "Subiendo...",
+        "step1Title": "Subir Documento",
+        "step2Title": "Seleccionar Campos",
+        "useExistingDocumentLabel": "Usar Documento Existente",
+        "useExistingDocument": "Usar Documento Existente",
+        "existingDocumentLabel": "Documento Existente",
+        "existingDocumentError": "Por favor selecciona un documento existente",
+        "existingDocumentPlaceholder": "Selecciona un documento existente",
+        "resourceLabel": "Recurso",
+        "resourceError": "Por favor selecciona un recurso",
+        "resourcePlaceholder": "Selecciona un recurso",
+        "summary": {
+            "documentType": "Tipo de Documento",
+            "resource": "Recurso"
+        },
+        "backButton": "Paso Anterior",
+        "continueButton": "Continuar",
+        "error": {
+            "fileUploadTitle": "¡Ups! Algo salió mal",
+            "fileUpload": "Ocurrió un error al subir el documento",
+            "documentDetails": "No se pudieron obtener los detalles del documento seleccionado",
+            "validationCreate": "Ocurrió un error al crear la validación",
+            "existingDocumentSelect": "Ocurrió un error al seleccionar el documento existente"
+        },
+        "success": {
+            "fileUpload": "Documento subido exitosamente",
+            "validationCreate": "Validación creada exitosamente"
+        }
+    },
+    "dashboardKPIs": {
+        "totalValidations": "Total Validaciones",
+        "approved": "Aprobadas",
+        "rejected": "Rechazadas",
+        "successRate": "Tasa de Éxito"
+    },
+    "documentTypeAnalysis": {
+        "documentType": "Tipo de Documento",
+        "validations": "Validaciones",
+        "approved": "Aprobadas",
+        "rejected": "Rechazadas",
+        "successRate": "Tasa de Éxito",
+        "analysisTitle": "Análisis por Tipo de Documento"
+    },
+    "filters": {
+        "dateTooltip": "Selecciona el rango de fechas para las validaciones",
+        "dateLabel": "Fecha",
+        "documentTypeTooltip": "Selecciona el tipo de documento para filtrar",
+        "documentTypeLabel": "Tipo de Documento",
+        "documentTypePlaceholder": "Selecciona un tipo de documento"
+    },
+    "validationFilters": {
+        "documentTooltip": "Selecciona el documento",
+        "documentLabel": "Documento",
+        "documentPlaceholder": "Selecciona un documento",
+        "validationTooltip": "Selecciona la validación",
+        "validationLabel": "Validación",
+        "validationPlaceholder": "Selecciona una validación",
+        "dateTooltip": "Selecciona el rango de fechas",
+        "dateLabel": "Fecha",
+        "documentTypeTooltip": "Selecciona el tipo de documento",
+        "documentTypeLabel": "Tipo Documento",
+        "documentTypePlaceholder": "Selecciona un tipo de documento",
+        "resultTooltip": "Selecciona el resultado",
+        "resultLabel": "Resultado",
+        "resultPlaceholder": "Resultado",
+        "successOption": "Éxito",
+        "failureOption": "Fallo",
+        "resourceTooltip": "Selecciona el recurso",
+        "resourceLabel": "Recurso",
+        "resourcePlaceholder": "Selecciona un recurso",
+        "companyTooltip": "Selecciona la compañía",
+        "companyLabel": "Compañía",
+        "companyPlaceholder": "Selecciona una compañía"
+    },
+    "logout": {
+        "success": {
+            "message": "Sesión cerrada exitosamente",
+            "description": "Serás redirigido a la página de inicio de sesión"
+        },
+        "error": {
+            "message": "¡Ups! Algo salió mal",
+            "description": "No se pudo cerrar la sesión"
+        },
+        "confirmation": {
+            "title": "Cerrar Sesión",
+            "content": "¿Estás seguro que deseas cerrar la sesión?",
+            "cancel": "No",
+            "confirm": "Si"
+        }
+    },
+    "login": {
+        "form_name": "Iniciar Sesión",
+        "form": {
+            "username": {
+                "label": "Nombre de Usuario",
+                "name": "Nombre de Usuario",
+                "placeholder": "Ingresa tu nombre de usuario",
+                "rules": {
+                    "required_message": "Nombre de usuario es requerido"
+                }
+            },
+            "password": {
+                "label": "Contraseña",
+                "name": "Contraseña",
+                "placeholder": "Ingresa tu contraseña",
+                "rules": {
+                    "required_message": "Contraseña es requerida"
+                }
+            }
+        },
+        "submit": "Iniciar Sesión"
+    },
+    "pdf_viewer": {
+        "doc_load": {
+            "error": {
+                "message": "¡Ups! Algo salió mal",
+                "description": "No se pudo cargar el documento"
+            }
+        },
+        "document": {
+            "no_data": "No se encontró ningún documento"
+        }
+    },
+    "dashboard": {
+        "validation_bar_chart": {
+            "title": "Validaciones/Mes",
+            "select_placeholder": "Selecciona un año"
+        }
+    },
+    "validation_details_modal": {
+        "title": "Detalles de Validación del recurso:",
+        "validation_fields": {
+            "title": "Campos a validar"
+        },
+        "extraction_fields": {
+            "title": "Campos a extraer"
+        },
+        "columns": {
+            "field": "Campo",
+            "obtained_value": "Valor Obtenido",
+            "expected_value": "Valor Esperado",
+            "result": "Resultado"
+        },
+        "resource_render": {
+            "unknown": "Recurso desconocido"
+        },
+        "result_render": {
+            "tag": {
+                "success": "Éxito",
+                "failure": "Fallo"
+            }
+        }
+    },
+    "validationPieChart": {
+        "distributionOfResults": "Distribución de Resultados"
+    },
+    "validationResultModal": {
+        "title": "Resultado de la Validación",
+        "documentName": "Nombre del Documento",
+        "documentType": "Tipo de Documento",
+        "validationResult": "Resultado de la Validación",
+        "validationFields": "Campos validados",
+        "extractionFields": "Campos extraidos",
+        "dateTime": "Fecha y Hora",
+        "fieldDetails": "Detalles de los Campos",
+        "pending": "Pendiente",
+        "success": "Éxito",
+        "failure": "Fallo"
+    },
+    "validationTableHistory": {
+        "date": "Fecha",
+        "documentName": "Nombre del Documento",
+        "documentType": "Tipo de Documento",
+        "result": "Resultado",
+        "actions": "Acciones",
+        "success": "Éxito",
+        "failure": "Fallo",
+        "viewDetails": "Ver Detalles"
+    },
+    "dashboardPage": {
+        "fetchErrorMessage": "¡Ups! Algo salió mal",
+        "fetchErrorDescription": "Ocurrió un error al obtener las validaciones"
+    },
+    "uploadPage": {
+        "title": "Subida de Documentos",
+        "download": "Descargar"
+    },
+    "validationHistoryPage": {
+        "fetchErrorMessage": "¡Ups! Algo salió mal",
+        "fetchErrorDescription": "Ocurrió un error al obtener las validaciones"
+    }
+}

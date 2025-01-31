@@ -1,0 +1,49 @@
+@import '../../../assets/styles/styles.less';
+
+// src/components/Filters/Filters.less
+
+.dash-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #fff;
+    padding: 1.5em 0.5em 1.5em 1em;
+    border-radius: @border-radius-base;
+}
+
+.dash-filter-col {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    margin-bottom: 8px;
+}
+
+.dash-filter-label {
+    display: inline-block;
+    margin-right: 8px;
+    max-width: 80px; // Adjust this value as needed
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+@media (max-width: 576px) {
+    .dash-filter-row {
+        flex-direction: column;
+    }
+
+    .dash-filter-col {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .dash-filter-label {
+        margin-bottom: 4px;
+        max-width: 100%;
+    }
+}
+
+.ant-picker,
+.ant-select {
+    width: 100%;
+}

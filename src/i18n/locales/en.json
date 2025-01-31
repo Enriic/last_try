@@ -1,0 +1,243 @@
+{
+    "menu": {
+        "dashboard": "Dashboard",
+        "upload": "Upload Document",
+        "users": "Users",
+        "usersList": "User List",
+        "usersCreate": "Create User",
+        "settings": "Settings",
+        "login": "Login",
+        "logout": "Logout",
+        "history": "History",
+        "language": {
+            "es": "Spanish",
+            "en": "English"
+        },
+        "application_title": "My application"
+    },
+    "common": {
+        "apply": "Apply",
+        "clear": "Clear"
+    },
+    "upload": {
+        "successMessage": "File uploaded successfully",
+        "documentTypeLabel": "Document Type",
+        "documentTypeError": "Please select the document type",
+        "documentTypePlaceholder": "Select the document type",
+        "documentType": {
+            "invoice": "Invoice",
+            "receipt": "Receipt",
+            "report": "Report"
+        },
+        "validationFieldsLabel": "Fields to Validate",
+        "validationFieldsError": "Please select at least one field",
+        "extractionFieldsLabel": "Fields to Extract",
+        "extractionFieldsError": "Please select at least one field",
+        "validationFields": {
+            "date": "Date",
+            "amount": "Amount",
+            "client": "Client",
+            "address": "Address",
+            "vendor": "Vendor",
+            "summary": "Summary",
+            "author": "Author"
+        },
+        "fileLabel": "File",
+        "fileError": "Please upload a file",
+        "uploadPrompt": "Click or drag a file to this area to upload",
+        "selectedFile": "Selected file",
+        "submitButton": "Submit",
+        "validateButton": "Validate",
+        "uploadButton": "Upload Document",
+        "uploading": "Uploading...",
+        "step1Title": "Upload Document",
+        "step2Title": "Select Fields",
+        "useExistingDocumentLabel": "Use Existing Document",
+        "useExistingDocument": "Use Existing Document",
+        "existingDocumentLabel": "Existing Document",
+        "existingDocumentError": "Please select an existing document",
+        "existingDocumentPlaceholder": "Select an existing document",
+        "resourceLabel": "Resource",
+        "resourceError": "Please select a resource",
+        "resourcePlaceholder": "Select a resource",
+        "summary": {
+            "documentType": "Document Type",
+            "resource": "Resource"
+        },
+        "backButton": "Previous Step",
+        "continueButton": "Continue",
+        "error": {
+            "fileUploadTitle": "Oops! Something went wrong",
+            "fileUpload": "An error occurred while uploading the document",
+            "documentDetails": "Could not retrieve the details of the selected document",
+            "validationCreate": "An error occurred while creating the validation",
+            "existingDocumentSelect": "An error occurred while selecting the existing document"
+        },
+        "success": {
+            "fileUpload": "Document uploaded successfully",
+            "validationCreate": "Validation created successfully"
+        }
+    },
+    "dashboardKPIs": {
+        "totalValidations": "Total Validations",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "successRate": "Success Rate"
+    },
+    "documentTypeAnalysis": {
+        "documentType": "Document Type",
+        "validations": "Validations",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "successRate": "Success Rate",
+        "analysisTitle": "Document Type Analysis"
+    },
+    "filters": {
+        "dateTooltip": "Select the date range for validations",
+        "dateLabel": "Date",
+        "documentTypeTooltip": "Select the type of document to filter",
+        "documentTypeLabel": "Document Type",
+        "documentTypePlaceholder": "Select a document type"
+    },
+    "validationFilters": {
+        "documentTooltip": "Select the document",
+        "documentLabel": "Document",
+        "documentPlaceholder": "Select a document",
+        "validationTooltip": "Select the validation",
+        "validationLabel": "Validation",
+        "validationPlaceholder": "Select a validation",
+        "dateTooltip": "Select the date range",
+        "dateLabel": "Date",
+        "documentTypeTooltip": "Select a document type",
+        "documentTypeLabel": "Document Type",
+        "documentTypePlaceholder": "Select a document type",
+        "resultTooltip": "Select the result",
+        "resultLabel": "Result",
+        "resultPlaceholder": "Result",
+        "successOption": "Success",
+        "failureOption": "Failure",
+        "resourceTooltip": "Select the resource",
+        "resourceLabel": "Resource",
+        "resourcePlaceholder": "Select a resource",
+        "companyTooltip": "Select the company",
+        "companyLabel": "Company",
+        "companyPlaceholder": "Select a company"
+    },
+    "logout": {
+        "success": {
+            "message": "Session closed successfully",
+            "description": "You have been logged out"
+        },
+        "error": {
+            "message": "Oops! Something went wrong",
+            "description": "An error occurred while logging out"
+        },
+        "confirmation": {
+            "title": "Logout",
+            "content": "Are you sure you want to logout?",
+            "cancel": "No",
+            "confirm": "Yes"
+        }
+    },
+    "login": {
+        "form_name": "Login",
+        "form": {
+            "username": {
+                "label": "Username",
+                "name": "Username",
+                "placeholder": "Enter your username",
+                "rules": {
+                    "required_message": "Username is required"
+                }
+            },
+            "password": {
+                "label": "Password",
+                "name": "Password",
+                "placeholder": "Enter your password",
+                "rules": {
+                    "required_message": "Password is required"
+                }
+            }
+        },
+        "submit": "Login"
+    },
+    "pdf_viewer": {
+        "doc_load": {
+            "error": {
+                "message": "Oops! Something went wrong",
+                "description": "Could not load the document"
+            }
+        },
+        "document": {
+            "no_data": "No document found"
+        }
+    },
+    "dashboard": {
+        "validation_bar_chart": {
+            "title": "Validations/Month",
+            "select_placeholder": "Select a year"
+        }
+    },
+    "validation_details_modal": {
+        "title": "Details of the validation with resource:",
+        "validation_fields": {
+            "title": "Fields to validate"
+        },
+        "extraction_fields": {
+            "title": "Fields to extract"
+        },
+        "columns": {
+            "field": "Field",
+            "obtained_value": "Obtained Value",
+            "expected_value": "Expected Value",
+            "result": "Result"
+        },
+        "resource_render": {
+            "unknown": "Unknown resource"
+        },
+        "result_render": {
+            "tag": {
+                "success": "Success",
+                "failure": "Failure"
+            }
+        }
+    },
+    "validationPieChart": {
+        "distributionOfResults": "Distribution of Results"
+    },
+    "validationResultModal": {
+        "title": "Validation Result",
+        "documentName": "Document Name",
+        "documentType": "Document Type",
+        "validationResult": "Validation Result",
+        "validationFields": "Fields validated",
+        "extractionFields": "Fields extracted",
+        "dateTime": "Date and Time",
+        "fieldDetails": "Field Details",
+        "pending": "Pending",
+        "success": "Success",
+        "failure": "Failure"
+    },
+    "validationTableHistory": {
+        "date": "Date",
+        "documentName": "Document Name",
+        "documentType": "Document Type",
+        "result": "Result",
+        "actions": "Actions",
+        "success": "Success",
+        "failure": "Failure",
+        "viewDetails": "View Details"
+    },
+    "dashboardPage": {
+        "fetchErrorMessage": "Oops! Something went wrong",
+        "fetchErrorDescription": "An error occurred while fetching the validations"
+    },
+    "uploadPage": {
+        "title": "Document Upload",
+        "download": "Download"
+    },
+    "validationHistoryPage": {
+        "fetchErrorMessage": "Oops! Something went wrong",
+        "fetchErrorDescription": "An error occurred while fetching the validations"
+    }
+}
