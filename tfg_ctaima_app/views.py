@@ -1,36 +1,55 @@
-from rest_framework import viewsets, status
-from rest_framework import filters as rest_framework_filters
-from django.contrib.auth.decorators import login_required
+from rest_framework import viewsets, status, filters as rest_framework_filters
 from rest_framework.response import Response
-from rest_framework.decorators import action
-from django.contrib.auth.models import User  # Importar el modelo User de Django
-from .models import Company, Resource, Vehicle, Employee, DocumentType, Document, Validation, Log, EventType
-from .serializers import UserSerializer,CompanySerializer, ResourceSerializer, VehicleSerializer, EmployeeSerializer, DocumentTypeSerializer, DocumentSerializer, ValidationSerializer, LogSerializer
-from tfg_ctaima_app.constants import MOCK_DOCUMENT_URLS
-import random
-from django.contrib.auth import authenticate, login, logout
-from rest_framework.response import Response
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework import status
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
-from .models import Log, EventType
-from rest_framework.permissions import AllowAny
-from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
-from rest_framework.permissions import IsAdminUser
-from django.http import JsonResponse
-from django_filters.rest_framework import DjangoFilterBackend, FilterSet, filters
-from rest_framework.filters import OrderingFilter
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.views import APIView
+from rest_framework.filters import OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet, filters
+
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from django.conf import settings
+from django.http import StreamingHttpResponse, JsonResponse
+
 from django.db.models.functions import Concat
 from django.db.models import Value, CharField, Q
+
+import os
+import json
+import pickle
+import random
+import re
+import requests
+
+from .models import (
+    Company, Resource, Vehicle, Employee, DocumentType, Document, Validation, Log, EventType
+)
+from .serializers import (
+    UserSerializer, CompanySerializer, ResourceSerializer, VehicleSerializer,
+    EmployeeSerializer, DocumentTypeSerializer, DocumentSerializer, ValidationSerializer, LogSerializer
+)
+from .utils import (
+    upload_to_blob_storage, calculate_file_hash, generate_sas_token, clean_filename,
+    truncate_filename, transform_validation_details, MAX_FILENAME_LENGTH, update_info
+)
+from .converters import get_param_name
+from tfg_ctaima_app.constants import MOCK_DOCUMENT_URLS
+
+from azure.storage.blob import BlobSasPermissions, BlobClient
+
+
+
 
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 10  # Default number of items per page
     page_size_query_param = 'page_size'  # Allow clients to set page size
     max_page_size = 100  # Maximum limit for page size
+
+    
 
 @ensure_csrf_cookie
 @api_view(['GET'])
@@ -195,6 +214,49 @@ class DocumentFilter(FilterSet):
         model = Document
         fields = ['id__in']
 
+
+class DocumentRetrieveView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        try:
+            # Obtener el documento
+            print("Looking for document:",pk)
+            document = Document.objects.get(pk=pk)
+            print("Document found:",document.name)
+            _, ext = os.path.splitext(document.name)
+            print("Extension:",ext)
+            blob_name = f"{document.file_hash}{ext}"
+            print("Looking for blob:",document.file_hash)
+
+            # Crear el BlobClient
+            blob_client = BlobClient(
+                account_url=f"https://{settings.AZURE_ACCOUNT_NAME}.blob.core.windows.net",
+                container_name=settings.AZURE_CONTAINER,
+                blob_name=blob_name,
+                credential=settings.AZURE_ACCOUNT_KEY
+            )
+
+            stream = blob_client.download_blob()
+
+            print(f"Downloading file: {document.name}")
+
+            # Crear la respuesta de streaming para descarga
+            response = StreamingHttpResponse(
+                streaming_content=stream.chunks(),
+                content_type='application/octet-stream'
+            )
+            response['Content-Length'] = stream.size
+            response['Content-Disposition'] = f'attachment; filename="{document.name}"'
+
+            return response
+
+        except Document.DoesNotExist:
+            return Response({"error": "Documento no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": f"Error al descargar el documento: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 class DocumentViewSet(viewsets.ModelViewSet):
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
@@ -207,22 +269,80 @@ class DocumentViewSet(viewsets.ModelViewSet):
     pagination_class = StandardResultsSetPagination
 
     def create(self, request, *args, **kwargs):
-        data = request.data.copy()
-        data['url'] = random.choice(MOCK_DOCUMENT_URLS)  # Select a random document URL from mock data
-        serializer = self.serializer_class(data=data)
-        print("User creating document:",request.user)
-        print("Data:",data)
-        if serializer.is_valid():
-            serializer.save()
-            print("request resource ID:",request.data['resource'])
-            # Create a log when a new document is created
-            Log.objects.create(
-                user=request.user,
-                event=EventType.CREATE_DOCUMENT,
-                details=f"Document '{serializer.instance.name}' created."
-            )
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        uploaded_file = request.FILES.get('file')
+        if not uploaded_file:
+            return Response({"error": "File is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Calcular el hash del archivo
+        file_hash = calculate_file_hash(uploaded_file)
+        filename = uploaded_file.name
+        print('File Hash:',file_hash)
+        # Obtener la extensión del archivo
+        _, ext = os.path.splitext(filename)
+        # Construir el blob_name usando solo el hash y la extensión
+        blob_name = f"{file_hash}{ext}"
+
+        # Verificar si ya existe un documento con el mismo hash
+        existing_document = Document.objects.filter(file_hash=file_hash).first()
+        if existing_document:
+            serializer = self.get_serializer(existing_document)
+            # No adjuntar el SAS Token a la URL
+            # return Response(serializer.data, status=status.HTTP_200_OK)
+            response_data = {
+                'detail': 'A document with the same content already exists.',
+                'document': serializer.data
+            }
+            return Response(response_data, status=status.HTTP_409_CONFLICT)
+
+        # Subir el archivo utilizando el SAS Token INTERNAMENTE en el backend
+        try:
+            blob_url = upload_to_blob_storage(uploaded_file, blob_name)
+
+        except Exception as e:
+            return Response({"error": f"Error uploading file: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+        print("File Hash obtained", file_hash)
+        # Almacenar y devolver en la respuesta la URL sin el SAS Token
+        associated_entity = request.data.get('associated_entity', 'resource')
+
+        if associated_entity == 'company':
+            data = {
+                'document_type': request.data.get('document_type'),
+                'company': request.data.get('company'),
+                'url': blob_url,
+                'name': filename,
+                'file_hash': file_hash,
+            }
+        else:
+            resource_id = request.data.get('resource')
+            try:
+                # Obtener el recurso
+                resource = Resource.objects.get(pk=resource_id)
+                print("company_id:",resource.company_id)
+            except Resource.DoesNotExist:
+                return Response({"error": "Resource not found."}, status=status.HTTP_400_BAD_REQUEST)
+
+            data = {
+                'document_type': request.data.get('document_type'),
+                'resource': request.data.get('resource'),
+                'company': resource.company_id,
+                'url': blob_url,
+                'name': filename,
+                'file_hash': file_hash,
+            }
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+
+        Log.objects.create(
+            user=request.user,
+            event=EventType.CREATE_DOCUMENT,
+            details=f"Document '{serializer.instance.name}' created."
+        )
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     # Custom action to get all validations for a specific document, detail=True means it's a detail endpoint ex: {id}/validations
     @action(detail=True, methods=['get'], url_path='validations')
@@ -250,7 +370,7 @@ class ValidationFilter(FilterSet):
     start_date = filters.DateTimeFilter(field_name='timestamp', lookup_expr='gte')  # Fecha de inicio (sin cambios)
     end_date = filters.DateTimeFilter(field_name='timestamp', lookup_expr='lte')  # Fecha de fin (sin cambios)
     resource_id = filters.CharFilter(field_name='document__resource', lookup_expr='exact')  # Filtra por ID del recurso
-    company_id = filters.CharFilter(field_name='document__resource__company', lookup_expr='exact')  # Filtra por ID de la compañía
+    company_id = filters.CharFilter(field_name='document__company', lookup_expr='exact')  # Filtra por ID de la compañía
     status = filters.CharFilter(field_name='status', lookup_expr='exact')  # Filtra por estado (sin cambios)
     user_id = filters.CharFilter(field_name='user', lookup_expr='exact')  # Filtra por ID de usuario
 
@@ -276,9 +396,85 @@ class ValidationViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
+        validation_details = request.data['validation_details']
+        print("Validation details:",validation_details)
+
+        request_validation_details = transform_validation_details(validation_details)
+        # print("Request validation details:",request_validation_details)
+        document = Document.objects.get(id=request.data['document'])
+
+        _, ext = os.path.splitext(document.name)
+        doc_name = document.file_hash + ext
+
+        sas_token = generate_sas_token(doc_name, BlobSasPermissions(read=True, write=False, delete=False))
+
+        req_params = {
+            "fields_to_validate": request_validation_details['fields_to_validate'],
+            "fields_to_extract": request_validation_details['fields_to_extract'],
+            "account_url": f"https://{settings.AZURE_ACCOUNT_NAME}.blob.core.windows.net",
+            "container_name": settings.AZURE_CONTAINER,
+            "doc_name": doc_name,
+            "sas_token": sas_token,
+            "document_type": get_param_name(document.document_type.id),
+            "sign": False,
+            "tfg": True,
+            "uuid": "dasdbahhdjaj",
+            "pattern_validation": {
+                "value": [""],
+                "description": "",
+                "threshold": 100
+            }
+        }
+
+        print("Request validations:",req_params)
+
+        validation_endpoint = settings.QA_VALIDATION_ENDPOINT
+        headers = {
+            "Ocp-Apim-Subscription-Key": f'{settings.QA_OCP_APIM_VALIDATION_SUBSCRIPTION_KEY}',
+            "Content-Type": "application/json"
+        }
+        try:
+            response = requests.post(validation_endpoint, json=req_params, headers=headers)
+            response.raise_for_status()
+            validation_result = response.json()
+            print("Validation result:", validation_result)
+
+        except requests.exceptions.RequestException as e:
+            return Response({"error": f"Error during validation request: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            # Actualizar la plantilla con los datos extraidos:
+            # Aseguramos que validation_details es un dict
+        if isinstance(validation_details, str):
+            try:
+                validation_details = json.loads(validation_details)
+            except json.JSONDecodeError:
+                return Response({"error": "validation_details no es un JSON válido."}, status=400)
+        elif not isinstance(validation_details, dict):
+            return Response({"error": "validation_details debe ser un objeto JSON."}, status=400)
+
+        try:
+            # Actualizar la información
+            plantilla_actualizada = update_info(validation_result, validation_details)
+            print("Plantilla actualizada:",plantilla_actualizada)
+        except TypeError as e:
+            return Response({"error": str(e)}, status=400)
+                        
+        #Here we'll make the call to the validation endpoint
         
         if serializer.is_valid():
-            serializer.save()
+            instance = serializer.save()  # Guardamos la instancia en la BD
+
+            # Aquí actualizamos los campos en la base de datos con los datos de plantilla_actualizada
+            instance.validation_details = plantilla_actualizada  # Guardamos como JSON si es necesario
+            
+            if (validation_result['result'] == 'OK'):
+                instance.status = 'success'
+            elif (validation_result['result'] == 'KO'):
+                instance.status = 'failure'
+            else:
+                instance.status = 'pending'
+
+            instance.save() 
             # Crear un log cuando se crea una nueva validación
             Log.objects.create(
                 user=request.user,

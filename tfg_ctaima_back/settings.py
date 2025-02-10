@@ -31,7 +31,6 @@ SESSION_COOKIE_SAMESITE = 'Strict'  # Evita que se envíe con solicitudes de otr
 CSRF_COOKIE_SECURE = True
 
 
-
 env = environ.Env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -51,11 +50,20 @@ DATABASES = {
     }
 }
 
+AZURE_ACCOUNT_NAME = env('AZURE_ACCOUNT_NAME')
+AZURE_ACCOUNT_KEY = env('AZURE_ACCOUNT_KEY')
+AZURE_CONTAINER = env('AZURE_CONTAINER')
+
+QA_VALIDATION_ENDPOINT=env('QA_VALIDATION_ENDPOINT')
+QA_OCP_APIM_VALIDATION_SUBSCRIPTION_KEY=env('QA_OCP_APIM_VALIDATION_SUBSCRIPTION_KEY')
+
+PRE_VALIDATION_ENDPOINT=env('PRE_VALIDATION_ENDPOINT')
+PRE_OCP_APIM_VALIDATION_SUBSCRIPTION_KEY=env('PRE_OCP_APIM_VALIDATION_SUBSCRIPTION_KEY')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret! Save it in .env file in production
-SECRET_KEY = 'django-insecure-h@m9yu!1su$2)8%%nywr+&swgw8wlw#9iizf&jb=g+%$7zfgsm'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -74,9 +82,7 @@ REST_FRAMEWORK = {
 
 }
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

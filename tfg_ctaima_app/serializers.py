@@ -75,7 +75,7 @@ class DocumentTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DocumentType
-        fields = ['id', 'user', 'name', 'description', 'fields_to_validate', 'fields_to_extract']
+        fields = ['id', 'user', 'name', 'description', 'fields_to_validate', 'fields_to_extract', 'associated_entity']
 
     def get_fields_to_validate(self, obj):
         """
@@ -89,7 +89,7 @@ class DocumentTypeSerializer(serializers.ModelSerializer):
                 'id': field['id'],
                 'name': field['name'],
                 'description': field['description'],
-                'value': field.get('value', None)
+                'value': field.get('value', None),
             }
             for field in serializer.data
         ]
@@ -130,19 +130,29 @@ class FieldToExtractOutputSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description']
 
 class DocumentSerializer(serializers.ModelSerializer):
+    file = serializers.FileField(write_only=True, required=False)  # Campo temporal no vinculado al modelo
+
     class Meta:
         model = Document
-        fields = ['id', 'user', 'resource', 'document_type',  'name', 'url', 'timestamp']
+        fields = ['id', 'user', 'resource', 'company', 'document_type',  'name', 'url', 'timestamp', 'file', 'file_hash']
+        
+
+    def create(self, validated_data):
+        # Elimina 'file' de validated_data ya que no es un campo del modelo
+        validated_data.pop('file', None)
+        return super().create(validated_data)
 
 class ValidationSerializer(serializers.ModelSerializer):
     document_name = serializers.CharField(source='document.name', read_only=True)
     document_type_name = serializers.CharField(source='document.document_type.name', read_only=True)
     resource_id = serializers.UUIDField(source='document.resource.id', read_only=True)
+    company = serializers.UUIDField(source='document.company', read_only=True)
     document_type = DocumentTypeSerializer(source='document.document_type', read_only=True)
     
     class Meta:
         model = Validation
-        fields = ['id', 'document', 'document_name', 'resource_id' ,'document_type_name' , 'document_type',  'user', 'status', 'validation_details', 'timestamp']
+        fields = ['id', 'document', 'document_name', 'resource_id', 'company', 'document_type_name' , 'document_type', 'user', 'status', 'validation_details', 'timestamp']
+
 
 class LogSerializer(serializers.ModelSerializer):
     class Meta:

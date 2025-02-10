@@ -83,12 +83,21 @@ class Employee(Resource):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
+class AssociatedEntity(models.TextChoices):
+    RESOURCE = 'resource', 'Resource'
+    COMPANY = 'company', 'Company'
+
 
 class DocumentType(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
     name = models.CharField(max_length=100, unique=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)  # Usar el modelo User de Django
     description = models.TextField(blank=True, null=True)
+    associated_entity = models.CharField(
+        max_length=50,
+        choices=AssociatedEntity.choices,
+        default=AssociatedEntity.RESOURCE
+    )
 
     def __str__(self):
         return self.name
@@ -115,16 +124,17 @@ class FieldToExtract(models.Model):
 
 class Document(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
+    resource = models.ForeignKey(Resource, on_delete=models.CASCADE, null=True, blank=True)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)  # Usar el modelo User de Django
     document_type = models.ForeignKey(DocumentType, on_delete=models.SET_DEFAULT, default=default_document_type)
     name = models.CharField(max_length=255)
-    url = models.URLField()
+    url = models.URLField(max_length=500)
     timestamp = models.DateTimeField(default=timezone.now)
+    file_hash = models.CharField(max_length=500, unique=True, blank=True, null=True)
 
     def __str__(self):
         return f"{self.name} - {self.document_type.name}"
-
 
 
 class Validation(models.Model):

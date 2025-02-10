@@ -20,7 +20,7 @@ class DocumentTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'document_type','resource', 'user', 'timestamp']
+    list_display = ['id', 'name', 'document_type','resource', 'company', 'user', 'timestamp', 'url', 'file_hash']
     readonly_fields = ['id', 'timestamp']
     search_fields = ['name', 'document_type__name']
     list_filter = ['document_type', 'timestamp']
