@@ -60,6 +60,9 @@
         "resourceLabel": "Recurso",
         "resourceError": "Por favor selecciona un recurso",
         "resourcePlaceholder": "Selecciona un recurso",
+        "companyLabel": "Compañía",
+        "companyError": "Por favor selecciona una compañía",
+        "companyPlaceholder": "Selecciona una compañía",
         "summary": {
             "documentType": "Tipo de Documento",
             "resource": "Recurso"
@@ -179,7 +182,14 @@
         }
     },
     "validation_details_modal": {
-        "title": "Detalles de Validación del recurso:",
+        "title": "Detalles de la validación:",
+        "validation_id": "ID de Validación",
+        "document_name": "Nombre del Documento",
+        "document_type": "Tipo de Documento",
+        "resource": "Recurso",
+        "company": "Compañía",
+        "status": "Estado",
+        "timestamp": "Fecha y Hora",
         "validation_fields": {
             "title": "Campos a validar"
         },
@@ -193,7 +203,7 @@
             "result": "Resultado"
         },
         "resource_render": {
-            "unknown": "Recurso desconocido"
+            "unknown": " - "
         },
         "result_render": {
             "tag": {
@@ -239,5 +249,13 @@
     "validationHistoryPage": {
         "fetchErrorMessage": "¡Ups! Algo salió mal",
         "fetchErrorDescription": "Ocurrió un error al obtener las validaciones"
+    },
+    "duplicate_document_modal": {
+        "document_name": "Nombre del Documento",
+        "document_type": "Tipo de Documento",
+        "upload_date": "Fecha de Subida",
+        "view_document_button": "Ver Documento",
+        "title": "Documento Duplicado",
+        "use_existing_document_button": "Usar Documento Existente"
     }
 }

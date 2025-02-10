@@ -5,30 +5,26 @@ import {
     ZoomInOutlined,
     RotateLeftOutlined,
     RotateRightOutlined,
-    DownloadOutlined,
-    FilePdfOutlined,
-    FullscreenOutlined,
+    DownloadOutlined
 } from '@ant-design/icons';
 import { Document, Page } from 'react-pdf';
-//import { SizeType } from 'antd/lib/config-provider/SizeContext';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import './PDFViewer.less';
-import type { PDFDocumentProxy } from "pdfjs-dist";
+import { type PDFDocumentProxy } from "pdfjs-dist";
+import { getDocumentFromBlobContainer } from '../../services/documentService';
 import { useTranslation } from 'react-i18next';
-// Importa los tipos si utilizas TypeScript
 import { PDFViewerProps } from './PDFViewer.types';
-import pdf from '../../assets/mock-data/pdf-files/pdf-test.pdf'
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
 
-
-const PDFViewer: React.FC<PDFViewerProps> = ({ fileUrl, onDownload }) => {
+const PDFViewer: React.FC<PDFViewerProps> = ({ documentId, onDownload, style }) => {
     // const PDFViewer: React.FC<PDFViewerProps> = ({ fileUrl }) => {
     const [numPages, setNumPages] = useState<number | null>(null);
     const [scale, setScale] = useState(1.0);
     const [rotation, setRotation] = useState(0);
-
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [pdfFile, setPdfFile] = useState<any>(null);  // Aquí almacenaremos el PDF obtenido
     const { t, i18n } = useTranslation();
-
-
     const { xs, md, lg } = useBreakpoint();
     const isLargeWidth = lg;
     const isMediumWidth = md && !lg;
@@ -39,6 +35,23 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ fileUrl, onDownload }) => {
         else if (isMediumWidth) setScale(0.75);
         else setScale(0.5);
     }, [isLargeWidth, isMediumWidth]);
+
+
+    useEffect(() => {
+        if (documentId) {
+            fetchPdf();
+        }
+    }, [documentId]);
+
+    const fetchPdf = async () => {
+        try {
+            const pdfBlob = await getDocumentFromBlobContainer(documentId);
+            setPdfFile(pdfBlob);
+        } catch (error) {
+            console.error('Error al obtener el PDF:', error);
+        }
+    }
+
 
     const onDocumentLoadSuccess = ({ numPages }: PDFDocumentProxy) => {
         setNumPages(numPages);
@@ -83,9 +96,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ fileUrl, onDownload }) => {
                 />
                 <Button icon={<DownloadOutlined />} onClick={onDownload} />
             </Space>
-            <div className="pdf-viewer-content">
+            <div className="pdf-viewer-content" style={style}>
                 <Document
-                    file={pdf}
+                    file={pdfFile}
                     onLoadSuccess={onDocumentLoadSuccess}
                     onLoadError={onDocumentLoadError}
                     loading={<Spin />}

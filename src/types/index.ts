@@ -21,6 +21,7 @@ export interface Validation {
     validation_details: ValidationResult;
     timestamp: string;
     resource_id: string;
+    company: string;
     validation_time: number; // Tiempo en segundos que tomó la validación
 }
 
@@ -53,6 +54,8 @@ export interface ValidationResultField extends FieldToValidate{
     result: string; // Podría ser un enum ('success' | 'failure')
 }
 
+
+
 export interface FieldToValidate {
     id: number;
     name: string;
@@ -64,13 +67,15 @@ export interface FieldToExtract {
     id: number;
     name: string;
     description: string;
-    value: string | number | boolean | null}
+    obtained_value: string | number | boolean;
+}
 
 export interface DocumentType {
     id: number;
     name: string; // Nombre del tipo de documento
     description: string; // Descripción del documento
     user: number; // ID del usuario relacionado con el documento
+    associated_entity: string; // tipo de entidad asociada (resource | company)
     fields_to_validate: FieldToValidate[]; // Campos asociados con el documento
     fields_to_extract: FieldToExtract[]; // Campos a extraer del documento
 }
@@ -79,7 +84,7 @@ export interface Document {
     id: string;
     name: string;
     document_type: number | null; // ID del tipo de documento
-    //document_type_name: string | null; // Nombre opcional del tipo de documento
+    company: string ;
     resource: string; // ID del recurso asociado
     timestamp: string;
     url: string; // URL para acceder al documento

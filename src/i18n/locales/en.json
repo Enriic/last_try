@@ -60,6 +60,9 @@
         "resourceLabel": "Resource",
         "resourceError": "Please select a resource",
         "resourcePlaceholder": "Select a resource",
+        "companyLabel": "Company",
+        "companyError": "Please select a company",
+        "companyPlaceholder": "Select a company",
         "summary": {
             "documentType": "Document Type",
             "resource": "Resource"
@@ -179,7 +182,14 @@
         }
     },
     "validation_details_modal": {
-        "title": "Details of the validation with resource:",
+        "validation_id": "Validation ID",
+        "document_name": "Document Name",
+        "document_type": "Document Type",
+        "status": "Status",
+        "resource": "Resource",
+        "company": "Company",
+        "timestamp": "Timestamp",
+        "title": "Details of the validation:",
         "validation_fields": {
             "title": "Fields to validate"
         },
@@ -193,7 +203,7 @@
             "result": "Result"
         },
         "resource_render": {
-            "unknown": "Unknown resource"
+            "unknown": " - "
         },
         "result_render": {
             "tag": {
@@ -239,5 +249,13 @@
     "validationHistoryPage": {
         "fetchErrorMessage": "Oops! Something went wrong",
         "fetchErrorDescription": "An error occurred while fetching the validations"
+    },
+    "duplicate_document_modal": {
+        "document_name": "Document Name",
+        "document_type": "Document Type",
+        "upload_date": "Upload Date",
+        "view_document_button": "View Document",
+        "title": "Duplicate Document",
+        "use_existing_document_button": "Use Existent Document"
     }
 }

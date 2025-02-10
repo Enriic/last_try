@@ -25,6 +25,7 @@ export const getDocumentTypesByIds = async (ids: string[]): Promise<DocumentType
   return response.data;
 }
 
+
 export const getDocuments = async (page = 1, pageSize = 10, search = '') => {
   const response = await axios.get(`${API_URL}/api/document/`, {
     params: { page, page_size: pageSize, search },
@@ -49,30 +50,86 @@ export const getDocumentTypeById = async (documentTypeId: string | number | null
   return response.data;
 }
 
-export const getDocument = async (documentId: string) => {
+export const getDocument = async (documentId: string, field?: string) => {
   const response = await axios.get(`${API_URL}/api/document/${documentId}/`, {
     withCredentials: true,
   });
-  return response.data;
+  return field && response.data[field] ? response.data[field] : response.data;
 };
 
+export const getDocumentFromBlobContainer = async (documentId: string) => {
+  try {
+    const response = await axios.get(`${API_URL}/api/documents/${documentId}/`, {
+      responseType: 'blob',
+      withCredentials: true,
+    });
+
+    const pdfBlob = response.data;
+    return pdfBlob;
+
+  } catch (error) {
+    console.error('Error al obtener el PDF:', error);
+  }
+}
+
+
 export const uploadDocument = async (
-  filename: string,
+  file: File,
   user: string,
   documentType: number | string,
-  resource: string
+  entityId: string,
+  associatedEntity: string,
 ) => {
+  const allowedTypes = [
+    'application/pdf',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'image/png',
+    'image/jpeg',
+    'image/jpg',
+    'image/bmp',
+    'image/tiff'
+  ];
+
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error('Unsupported file type');
+  }
+
+  console.log('Associated entity with entityId:', associatedEntity, entityId);
+
   const formData = new FormData();
   formData.append('user', user);
-  formData.append('name', filename);
+  formData.append('file', file);
   formData.append('document_type', documentType.toString());
-  formData.append('resource', resource);
+  formData.append('associated_entity', associatedEntity);
+  formData.append(associatedEntity, entityId);  // Esto será 'resource' o 'company'
 
-  const response = await axios.post(`${API_URL}/api/document/`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
 
-  return response.data;
+  try {
+    const response = await axios.post(`${API_URL}/api/document/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      validateStatus: (status) => {
+        return status >= 200 && status < 300 || status === 409; // Accept 409 as valid response
+      },
+    });
+
+    if (response.status === 409) {
+      // El documento ya existe
+      return {
+        status: 409,
+        data: response.data, // Contiene 'detail' y 'document'
+      };
+    }
+
+    // Si todo va bien, retornamos los datos del nuevo documento
+    return {
+      status: response.status,
+      data: response.data,
+    };
+  } catch (error) {
+    console.error('Error uploading document:', error);
+    throw error;
+  }
 };

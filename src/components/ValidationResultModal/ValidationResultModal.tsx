@@ -108,8 +108,8 @@ const ValidationResultModal: React.FC<ValidationResultModalProps> = ({
                         <List.Item.Meta
                             title={<span className="item-title">{item.name.toUpperCase()}</span>}
                             description={
-                                <span className={`ant-tag ${item.value === 'success' ? 'ant-tag-green' : 'ant-tag-red'}`}>
-                                    {item.value || t('validationResultModal.pending')}
+                                <span className={`ant-tag ${item.obtained_value ? 'ant-tag-green' : 'ant-tag-red'}`}>
+                                    {item.obtained_value || t('validationResultModal.pending')}
                                 </span>
                             }
                         />

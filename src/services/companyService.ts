@@ -10,3 +10,10 @@ export const getCompanies = async (page = 1, pageSize = 10, search = '') => {
     });
     return response.data;
 };
+
+export const getCompanyById = async (companyId: string | number | null) => {
+    const response = await axios.get(`${API_URL}/api/companies/${companyId}/`, {
+        withCredentials: true,
+    });
+    return response.data;
+};

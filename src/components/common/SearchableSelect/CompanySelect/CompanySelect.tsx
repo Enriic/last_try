@@ -12,9 +12,10 @@ interface CompanySelectProps {
     onChange?: (value: string | null) => void;
     placeholder?: string;
     style?: React.CSSProperties;
+    disabled?: boolean;
 }
 
-const CompanySelect: React.FC<CompanySelectProps> = ({ value, onChange, placeholder, style }) => {
+const CompanySelect: React.FC<CompanySelectProps> = ({ value, onChange, placeholder, style, disabled }) => {
     const [companies, setCompanies] = useState<Company[]>([]);
     const [page, setPage] = useState<number>(1);
     const [pageSize] = useState<number>(10);
@@ -103,6 +104,7 @@ const CompanySelect: React.FC<CompanySelectProps> = ({ value, onChange, placehol
             hasMore={hasMore}
             isLoadingMore={isLoadingMore}
             onSearch={debouncedHandleSearch}
+            disabled={disabled}
         />
     );
 };
