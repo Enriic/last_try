@@ -32,6 +32,21 @@ export interface ValidationResponse {
     results: Validation[];
 }
 
+
+export interface CompanyResponse {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: Company[];
+}
+
+export interface ResourceResponse {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: Resource[];
+}
+
 export interface ValidationDetail {
     name: string;
     fields_to_validate: FieldToValidate[]
@@ -51,10 +66,7 @@ export interface ValidationResult {
 
 export interface ValidationResultField extends FieldToValidate{
     obtained_value: string;
-    result: string; // Podría ser un enum ('success' | 'failure')
 }
-
-
 
 export interface FieldToValidate {
     id: number;
@@ -105,7 +117,7 @@ export interface User {
 
 export interface Company {
     id: string;
-    company_id: string; // Identificación fiscal
+    company_id: string; // Equivalente al tax_id en twind
     company_name: string;
     industry: string;
     email: string;
@@ -119,7 +131,6 @@ export interface Resource {
     id: string;
     resource_type: ResourceType; // Usando enum para tipos de recursos
     company: string; // ID de la compañía
-    //company_info: Company; // Información completa de la compañía
     timestamp: string;
     resource_details: VehicleDetails | EmployeeDetails; // Detalles específicos del recurso
 }
@@ -139,19 +150,7 @@ export interface EmployeeDetails {
     email: string;
     phone: string;
     country: string;
-    worker_id: string; // Número de identificación
+    worker_id: string; // Número de identificación (DNI, Pasaporte, etc.) del empleado
     // Otros campos específicos del empleado
 }
 
-
-export interface ValidationFilterOptions {
-    document_type?: number | string | null;
-    document_id?: string | null;
-    validation_id?: string | null;
-    start_date?: string | null; // formatted as 'YYYY-MM-DD' or ISO string
-    end_date?: string | null;   // formatted as 'YYYY-MM-DD' or ISO string
-    resource_id?: string | null;
-    company_id?: string | null;
-    status?: string | null;
-
-}

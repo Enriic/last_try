@@ -10,10 +10,16 @@ import i18n from './i18n'; // Importa tu configuración de i18n
 import { AuthProvider, useAuth } from './context/AuthContext'; // Importa tu proveedor de autenticación
 // Importa tus componentes de página
 import DashboardPage from './pages/Dashboard/DashboardPage';
+import CompaniesTablePage from './pages/Companies/CompaniesTablePage/CompaniesTablePage';
 import UploadPage from './pages/Upload/UploadPage';
+import NewEmployeePage from './pages/Resources/NewEmployeePage/NewEmployeePage';
+import NewCompanyPage from './pages/Companies/NewCompanyPage/NewCompanyPage';
+import ResourcesPage from './pages/Resources/ResourcesPage';
 import { pdfjs } from 'react-pdf';
+import './assets/styles/styles.less';
 import BasicLayout from './components/Layout/BasicLayout';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
+import EmployeesPage from './pages/Resources/EmployeesPage/EmployeesPage';
 import LoginPage from './pages/Login/LoginPage';
 import ValidationHistoryPage from './pages/ValidationHistory/ValidationHistoryPage';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -37,6 +43,11 @@ function App() {
                     <Route path="upload" element={<UploadPage />} />
                     <Route path="dashboard" element={<DashboardPage />} />
                     <Route path="history" element={<ValidationHistoryPage />} />
+                    {/* <Route path="resources" element={<ResourcesPage />} /> */}
+                    <Route path="companies" element={<CompaniesTablePage/>} />
+                    <Route path="companies/new" element={<NewCompanyPage />} />
+                    <Route path="resources/employees" element={<EmployeesPage />} />
+                    <Route path="resources/employees/new" element={<NewEmployeePage />} />
                   </Route>
                 </Route>
                 <Route path="*" element={<Navigate to="/login" replace />} />

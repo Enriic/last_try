@@ -1,9 +1,33 @@
+// @import '../../assets/styles/styles.less';
+
+// .ant-pro-layout .ant-pro-layout-content {
+//     padding: 0px;
+// }
+
+// .dashboard-filter-section {
+//     background-color: @body-background;
+//     padding: 1em;
+//     border-radius: @border-radius-base;
+//     display: flex;
+//     justify-content: space-between;
+//     margin-bottom: 1em;
+//     border: 1px solid @border-color-base;
+// }
+
+// .dashboard-stats-row-container{
+//     padding: 1em;
+//     display: flex;
+//     justify-content: space-between;
+// }
+
 @import '../../assets/styles/styles.less';
 
+/* Si la regla de ant-pro-layout es necesaria, se mantiene */
 .ant-pro-layout .ant-pro-layout-content {
-    padding: 0px;
+    padding: 0;
 }
 
+/* Estilos para la sección de filtros: se mantiene si ya funciona correctamente */
 .dashboard-filter-section {
     background-color: @body-background;
     padding: 1em;
@@ -14,9 +38,17 @@
     border: 1px solid @border-color-base;
 }
 
-.dashboard-stats-row-container{
-    padding: 1em;
+.dashboard-stats-row-container {
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0px;
+    width: 100%;
+    margin-top: 24px;
 }
 
+.dashboard-kpi-card {
+    flex-grow: 1;
+    width: auto !important;
+    min-width: 260px;
+    max-width: 100%;
+}

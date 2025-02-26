@@ -4,6 +4,22 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    width: 100%;
+}
+
+.validation-filters-container button.ant-btn-link {
+    color: @primary-color;
+    padding-left: 0;
+    height: auto;
+}
+
+.validation-filters-container button.ant-btn-link:hover {
+    color: @hover-color;
+}
+
+.validation-filters-container button.ant-btn-link .anticon {
+    font-size: 12px;
+    margin-right: 4px;
 }
 
 @media (min-width: 1700px) {
@@ -16,14 +32,8 @@
     display: flex;
     flex-flow: row wrap;
     min-width: 0;
-}
-
-.validation-filters-col {
     align-items: center;
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-    margin-bottom: 1.2em;
+    width: 100%;
 }
 
 .validation-filters-col>span {
@@ -34,7 +44,6 @@
 .ant-picker {
     background-color: @body-background;
 }
-
 
 .ant-select-item-option-active {
     background-color: @hover-color !important;
@@ -70,4 +79,49 @@
 .validation-filters-col .ant-picker {
     flex: 1 1 auto;
     width: 100%;
+}
+
+/* Estilos para los botones */
+.validation-filters-buttons {
+    margin-left: auto;
+}
+
+.filters-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    gap: 15px;
+}
+
+.expand-button {
+    white-space: nowrap;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1199px) {
+    .validation-filters-buttons {
+        justify-content: flex-start;
+        margin-left: 0;
+    }
+
+    .filters-actions {
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 767px) {
+    .filters-actions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .action-buttons {
+        margin-top: 10px;
+    }
 }

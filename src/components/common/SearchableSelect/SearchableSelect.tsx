@@ -19,6 +19,7 @@ interface SearchableSelectProps<T> {
     onLoadMore?: () => void;
     hasMore?: boolean;
     isLoadingMore?: boolean;
+    dropdownStyle?: React.CSSProperties;
 }
 
 function SearchableSelect<T>({
@@ -35,6 +36,7 @@ function SearchableSelect<T>({
     onLoadMore,
     hasMore,
     isLoadingMore,
+    dropdownStyle,
 }: SearchableSelectProps<T>) {
 
     const handleSearch = (value: string) => {
@@ -85,10 +87,9 @@ function SearchableSelect<T>({
             onClear={onClear}
             style={style}
             onPopupScroll={handlePopupScroll}
-            dropdownStyle={{ overflowY: 'scroll' }}
+            dropdownStyle={dropdownStyle ? dropdownStyle : { overflowY: 'scroll'}}
         >
             {options}
-        
         </Select>
     );
 }

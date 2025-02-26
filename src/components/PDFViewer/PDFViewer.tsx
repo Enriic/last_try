@@ -18,7 +18,6 @@ import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
 const PDFViewer: React.FC<PDFViewerProps> = ({ documentId, onDownload, style }) => {
-    // const PDFViewer: React.FC<PDFViewerProps> = ({ fileUrl }) => {
     const [numPages, setNumPages] = useState<number | null>(null);
     const [scale, setScale] = useState(1.0);
     const [rotation, setRotation] = useState(0);
@@ -78,8 +77,22 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentId, onDownload, style }) 
                     max={4}
                     step={0.25}
                     value={scale}
-                    onChange={(value) => setScale(value ?? 1.0)}
+                    onChange={(value) => {
+                        // Asegurar que el valor esté dentro de los límites y sea un número
+                        if (value !== null) {
+                            const newScale = Math.min(Math.max(value, 0.5), 4);
+                            setScale(newScale);
+                        } else {
+                            // Si se borra completamente el input, establecer en 1.0 (100%)
+                            setScale(1.0);
+                        }
+                    }}
                     formatter={(value) => `${Math.round((value ?? 1.0) * 100)}%`}
+                    parser={(value) => {
+                        // Extraer el número del string "X%" y convertirlo a decimal para escala
+                        const parsed = parseFloat(value?.replace('%', '') || '100') / 100;
+                        return isNaN(parsed) ? 1 : parsed;
+                    }}
                 />
                 <Button
                     icon={<ZoomInOutlined />}

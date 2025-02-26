@@ -3,7 +3,7 @@ import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { ProLayout, ProSettings } from '@ant-design/pro-layout';
 import { CustomMenuDataItem } from './menu/types'; // Importamos los tipos de menú
 import menuItems from './menu'; // Importamos los menús definidos
-import { Typography, Select, message, Modal, notification } from 'antd';
+import { Typography, Select, Modal, notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
@@ -184,8 +184,8 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
             headerRender={() => null}
             collapsedButtonRender={() => null}
             onMenuHeaderClick={() => {
-                setPathname('/');
-                navigate('/');
+                setPathname('/upload');
+                navigate('/upload');
             }}
             breakpoint="xs"
         >
@@ -194,7 +194,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
                     display: 'flex',
                     alignItems: 'center',
                     padding: 16,
-                    background: '#fff',
+                    background: 'white',
                 }}
             >
                 {toggleMenu}

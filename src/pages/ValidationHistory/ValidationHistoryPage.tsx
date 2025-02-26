@@ -6,13 +6,15 @@ import ValidationTable from '../../components/ValidationTableHistory/ValidationT
 import ValidationDetailsModal from '../../components/ValidationDetailsModal/ValidationDetailsModal';
 import ValidationFilters from '../../components/Filters/ValidationFilters/ValidationFilters';
 import { getValidations } from '../../services/validationService';
-import { Validation, ValidationFilterOptions } from '../../types';
+import { Validation } from '../../types';
+import { ValidationFilterOptions } from '../../types/filters';
 import dayjs from 'dayjs';
 import './ValidationHistory.less';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { useTranslation } from 'react-i18next'; // Importar el hook de traducción
+import { useTranslation } from 'react-i18next';
+import { PageContainer } from '@ant-design/pro-layout';
 
 // Añadir plugins a dayjs
 dayjs.extend(isSameOrBefore);
@@ -20,7 +22,7 @@ dayjs.extend(isSameOrAfter);
 dayjs.extend(customParseFormat);
 
 const ValidationHistoryPage: React.FC = () => {
-    const { t } = useTranslation(); // Utilizar el hook de traducción
+    const { t } = useTranslation();
 
     const [validations, setValidations] = useState<Validation[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -31,7 +33,6 @@ const ValidationHistoryPage: React.FC = () => {
     const [pageSize, setPageSize] = useState<number>(10);
     const [totalItems, setTotalItems] = useState<number>(0);
 
-
     useEffect(() => {
         fetchData();
     }, []);
@@ -39,7 +40,6 @@ const ValidationHistoryPage: React.FC = () => {
     const fetchData = async (appliedFilters: ValidationFilterOptions = filters, page = currentPage, size = pageSize) => {
         try {
             setLoading(true);
-
             const validationResponse = await getValidations(appliedFilters, page, size);
             setValidations(validationResponse.results);
             setTotalItems(validationResponse.count);
@@ -78,13 +78,15 @@ const ValidationHistoryPage: React.FC = () => {
         setSelectedValidation(null);
     };
 
-    function showValidationDetails(validation: Validation): void {
+    const showValidationDetails = (validation: Validation): void => {
         setSelectedValidation(validation);
         setIsModalVisible(true);
     }
 
     return (
-        <div style={{ padding: 24 }}>
+        <PageContainer className='page-container' header={{
+            title: t('companiesPage.title'), 
+        }}>
             <Row align="middle" justify="center" style={{ marginBottom: 16 }} className='history-filter-section'>
                 <Col span={24}>
                     <ValidationFilters
@@ -115,7 +117,7 @@ const ValidationHistoryPage: React.FC = () => {
                     onClose={handleModalClose}
                 />
             )}
-        </div>
+        </PageContainer>
     );
 };
 

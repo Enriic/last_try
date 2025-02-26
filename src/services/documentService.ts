@@ -35,7 +35,6 @@ export const getDocuments = async (page = 1, pageSize = 10, search = '') => {
 };
 
 export const getDocumentsByIds = async (ids: string[]): Promise<Document[]> => {
-
   const params = {
     id__in: ids.join(','),
   };
@@ -44,6 +43,7 @@ export const getDocumentsByIds = async (ids: string[]): Promise<Document[]> => {
 };
 
 export const getDocumentTypeById = async (documentTypeId: string | number | null) => {
+  if (documentTypeId === null || documentTypeId === undefined) return
   const response = await axios.get(`${API_URL}/api/documentTypes/${documentTypeId}/`, {
     withCredentials: true,
   });
@@ -77,8 +77,11 @@ export const uploadDocument = async (
   file: File,
   user: string,
   documentType: number | string,
-  entityId: string,
-  associatedEntity: string,
+  // entityId: string,
+  // associatedEntity: string,
+  resourceId: string | null,
+  companyId: string | null,
+  associatedEntities: string[],
 ) => {
   const allowedTypes = [
     'application/pdf',
@@ -95,14 +98,17 @@ export const uploadDocument = async (
     throw new Error('Unsupported file type');
   }
 
-  console.log('Associated entity with entityId:', associatedEntity, entityId);
+  // console.log('Associated entity with entityId:', associatedEntity, entityId);
 
   const formData = new FormData();
   formData.append('user', user);
   formData.append('file', file);
   formData.append('document_type', documentType.toString());
-  formData.append('associated_entity', associatedEntity);
-  formData.append(associatedEntity, entityId);  // Esto será 'resource' o 'company'
+  formData.append('resource', resourceId || '');
+  formData.append('company', companyId || '');
+  // formData.append('associated_entity', associatedEntity);
+  // formData.append(associatedEntity, entityId);  // Esto será 'resource' o 'company'
+  formData.append('associated_entities',JSON.stringify(associatedEntities));
 
 
   try {
@@ -133,3 +139,22 @@ export const uploadDocument = async (
     throw error;
   }
 };
+
+export const handleDownload = async (documentId: string) => {
+  try {
+    const response = await getDocumentFromBlobContainer(documentId);
+    const document_name = await getDocument(documentId, 'name');
+
+    const pdfBlob = response;
+    const fileURL = URL.createObjectURL(pdfBlob);
+    const link = document.createElement('a');
+    link.href = fileURL;
+    link.setAttribute('download', document_name); // Puedes obtener el nombre del archivo del servidor
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(fileURL);
+  } catch (error) {
+    console.error('Error al descargar el PDF:', error);
+  }
+}

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { notification } from 'antd';
-import { getCompanies } from '../../../../services/companyService';
+import { getCompaniesForSelect } from '../../../../services/companyService';
 import { Company } from '../../../../types';
 import SearchableSelect from '../SearchableSelect';
 import { debounce } from 'lodash';
@@ -35,7 +35,7 @@ const CompanySelect: React.FC<CompanySelectProps> = ({ value, onChange, placehol
             } else {
                 setIsLoadingMore(true);
             }
-            const data = await getCompanies(pageNumber, pageSize, search);
+            const data = await getCompaniesForSelect(pageNumber, pageSize, search);
             const { results, count } = data;
 
             if (pageNumber === 1) {

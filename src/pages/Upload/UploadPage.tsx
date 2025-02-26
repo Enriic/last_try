@@ -39,7 +39,7 @@ function Upload() {
         title: t('uploadPage.title'), // Usar traducción para el título
       }}
     >
-      <div className="upload-page-content">
+      <div className="upload-page-content" style={{ padding: '2em', backgroundColor: 'white', borderRadius: 16 }}>
         <Row gutter={16}>
           {/* Left Column: Upload Component */}
           <Col

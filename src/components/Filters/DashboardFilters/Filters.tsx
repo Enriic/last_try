@@ -1,8 +1,9 @@
 // src/components/Filters/Filters.tsx
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DatePicker, Row, Col, Tooltip } from 'antd';
-import { Validation, ValidationFilterOptions } from '../../../types';
+import { Validation } from '../../../types';
+import { ValidationFilterOptions } from '../../../types/filters';
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
@@ -12,6 +13,7 @@ import JunoButton from '../../common/JunoButton';
 import { JunoButtonTypes } from '../../common/JunoButton/JunoButton.types';
 import DocumentTypeSelect from '../../common/SearchableSelect/DocumentTypeSelect/DocumentTypeSelect';
 import { useTranslation } from 'react-i18next';
+import { useWindowSize } from '../../../hooks/useWindowSize';
 
 type RangeValue = [Dayjs | null, Dayjs | null] | null;
 
@@ -30,6 +32,17 @@ const Filters: React.FC<FiltersProps> = ({ onApplyFilters, onClearFilters }) => 
     const { t } = useTranslation();
     const [dateRange, setDateRange] = useState<RangeValue | null>(null);
     const [documentType, setDocumentType] = useState<string | number | null>(null);
+    const [showTooltips, setShowTooltips] = useState(false);
+
+    // Get window width to determine if tooltips should be shown
+    const { width } = useWindowSize();
+
+    // Determine if tooltips should be shown based on screen width
+    useEffect(() => {
+        // Show tooltips on screens smaller than 1200px (instead of 992px)
+        // This is a good middle ground between never showing them and showing them too often
+        setShowTooltips(width < 1200);
+    }, [width]);
 
     const handleDateChange = (dates: RangeValue | null) => {
         setDateRange(dates);
@@ -54,36 +67,65 @@ const Filters: React.FC<FiltersProps> = ({ onApplyFilters, onClearFilters }) => 
         onApplyFilters(filters);
     };
 
+    // Render date label with optional tooltip
+    const renderDateLabel = () => {
+        const label = <span style={{ textAlign: 'right' }} className="dash-filter-label">{t('filters.dateLabel')}: </span>;
+
+        return showTooltips ? (
+            <Tooltip title={t('filters.dateTooltip')} overlayStyle={{ fontSize: "12px" }}>
+                {label}
+            </Tooltip>
+        ) : label;
+    };
+
+    // Render document type label with optional tooltip
+    const renderDocTypeLabel = () => {
+        const label = <span className="dash-filter-label">{t('filters.documentTypeLabel')}: </span>;
+
+        return showTooltips ? (
+            <Tooltip title={t('filters.documentTypeTooltip')} overlayStyle={{ fontSize: "12px" }}>
+                {label}
+            </Tooltip>
+        ) : label;
+    };
+
     return (
-        <Row gutter={[16, 16]} className="dash-filter-row" justify="start">
-            <Col xs={24} sm={24} md={12} lg={6} xl={8} className="dash-filter-col">
-                <Tooltip title={t('filters.dateTooltip')}>
-                    <span className="dash-filter-label">{t('filters.dateLabel')}: </span>
-                </Tooltip>
-                <RangePicker
-                    value={dateRange}
-                    onChange={handleDateChange}
-                    style={{ width: '100%' }}
-                />
+        <Row gutter={[16, 16]} className="dash-filter-row" align="middle">
+            {/* Date filter */}
+            <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={8} className="dash-filter-col" >
+                {renderDateLabel()}
+                <div className="filter-input-wrapper">
+                    <RangePicker
+                        value={dateRange}
+                        onChange={handleDateChange}
+                        className="filter-input"
+                    />
+                </div>
             </Col>
-            <Col xs={24} sm={24} md={12} lg={6} xl={8} className="dash-filter-col">
-                <Tooltip title={t('filters.documentTypeTooltip')}>
-                    <span className="dash-filter-label">{t('filters.documentTypeLabel')}: </span>
-                </Tooltip>
-                <DocumentTypeSelect
-                    value={documentType?.toString() || null}
-                    onChange={handleDocumentTypeChange}
-                    placeholder={t('filters.documentTypePlaceholder')}
-                    style={{ width: '100%' }}
-                />
+
+            {/* Document type filter */}
+            <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={8} className="dash-filter-col">
+                {renderDocTypeLabel()}
+                <div className="filter-input-wrapper">
+                    <DocumentTypeSelect
+                        value={documentType?.toString() || null}
+                        onChange={handleDocumentTypeChange}
+                        placeholder={t('filters.documentTypePlaceholder')}
+                        style={{width: '100%'}}
+                    />
+                </div>
             </Col>
-            <Col xs={24} sm={24} md={12} lg={12} xl={8} className="dash-filter-col" style={{ justifyContent: 'flex-end' }}>
-                <JunoButton buttonType={JunoButtonTypes.Ok} type="primary" onClick={applyFilters} style={{ marginRight: 8 }}>
-                    {t('common.apply')}
-                </JunoButton>
-                <JunoButton buttonType={JunoButtonTypes.Cancel} type="default" onClick={clearFilters}>
-                    {t('common.clear')}
-                </JunoButton>
+
+            {/* Action buttons */}
+            <Col xs={24} sm={24} md={24} lg={24} xl={8} xxl={8} className="dash-filter-col dash-filter-buttons">
+                <div className="button-container">
+                    <JunoButton buttonType={JunoButtonTypes.Ok} type="primary" onClick={applyFilters}>
+                        {t('common.apply')}
+                    </JunoButton>
+                    <JunoButton buttonType={JunoButtonTypes.Cancel} type="default" onClick={clearFilters}>
+                        {t('common.clear')}
+                    </JunoButton>
+                </div>
             </Col>
         </Row>
     );

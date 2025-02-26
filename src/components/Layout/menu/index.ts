@@ -2,17 +2,21 @@
 
 import { CustomMenuDataItem } from './types';
 import dashboardMenu from './dashboard';
-import usersMenu from './upload';
-import settingsMenu from './history';
+
+import settingsMenu from './settings';
 import uploadMenu from './upload';
 import historyMenu from './history';
 import logoutMenu from './logout';
+import resourcesMenu from './resources';
+import companiesMenu from './companies';
 
 const menuItems: CustomMenuDataItem[] = [
     ...uploadMenu,
     ...dashboardMenu,
     ...historyMenu,
-
+    ...settingsMenu,
+    ...resourcesMenu,
+    ...companiesMenu,
 ];
 
 export default menuItems;

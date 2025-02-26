@@ -1,7 +1,8 @@
 // src/services/validationService.ts
 
 import axios from 'axios';
-import { Validation, ValidationRequest, ValidationFilterOptions, ValidationResponse } from '../types';
+import { Validation, ValidationRequest, ValidationResponse } from '../types';
+import { ValidationFilterOptions } from '../types/filters';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 

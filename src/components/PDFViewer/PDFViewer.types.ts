@@ -1,5 +1,5 @@
 export interface PDFViewerProps {
     documentId: string;
-    onDownload?: () => void;
+    onDownload?: (documentId:string) => void;
     style?: React.CSSProperties;
 }

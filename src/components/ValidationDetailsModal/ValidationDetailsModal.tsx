@@ -3,14 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Table, Row, Col, Descriptions, Typography } from 'antd';
 import { AlignType } from 'rc-table/lib/interface';
-import { Validation, VehicleDetails, EmployeeDetails, ResourceType, Resource, Company } from '../../types';
+import { Validation, VehicleDetails, EmployeeDetails, ResourceType, Resource } from '../../types';
 import PDFViewer from '../PDFViewer/PDFViewer';  // Importa el componente PDFViewer
 import './ValidationDetailsModal.less';
 import { getResource } from '../../services/resourceService';
-import { getDocumentFromBlobContainer, getDocument } from '../../services/documentService'; // Importa la función getDocumentFromBlobContainer
+import { handleDownload } from '../../services/documentService'; // Importa la función getDocumentFromBlobContainer
 import { useTranslation } from 'react-i18next';
-import { render } from 'less';
-import { getCompanyById } from '../../services/companyService';
+
 
 interface ValidationDetailsModalProps {
     visible: boolean;
@@ -50,37 +49,35 @@ const ValidationDetailsModal: React.FC<ValidationDetailsModalProps> = ({ visible
             align: 'center' as AlignType,
             render: (value: string) => value || '',
         },
-        {
-            title: t('validation_details_modal.columns.result'),
-            dataIndex: 'result',
-            key: 'result',
-            align: 'center' as AlignType,
-            render: (result: string) =>
-                result === 'success' ? (
-                    <span className='ant-tag ant-tag-green'>
-                        {t('validation_details_modal.result_render.tag.success')}
-                    </span>
-                ) : (
-                    <span className='ant-tag ant-tag-red'>
-                        {t('validation_details_modal.result_render.tag.failure')}
-                    </span>
-                ),
-        },
+        // {
+        //     title: t('validation_details_modal.columns.result'),
+        //     dataIndex: 'result',
+        //     key: 'result',
+        //     align: 'center' as AlignType,
+        //     render: (result: string) =>
+        //         result === 'success' ? (
+        //             <span className='ant-tag ant-tag-green'>
+        //                 {t('validation_details_modal.result_render.tag.success')}
+        //             </span>
+        //         ) : (
+        //             <span className='ant-tag ant-tag-red'>
+        //                 {t('validation_details_modal.result_render.tag.failure')}
+        //             </span>
+        //         ),
+        // },
     ];
 
     const fetchData = async (resourceId?: string) => {
         if (resourceId) {
             const resource = await getResource(resourceId);
             setResource(resource);
-            //setCompany(resource.company)
             console.log('validation', validation);
         } else {
             setResource(null);
         }
-        // console.log('validation', validation);
-        // const company = await getCompanyById(validation.company_id);
-        // setCompany(company);
+
     };
+
 
     const renderResourceInfo = () => {
         if (resource?.resource_type === ResourceType.VEHICLE) {
@@ -128,7 +125,9 @@ const ValidationDetailsModal: React.FC<ValidationDetailsModalProps> = ({ visible
                             {validation.company}
                         </Descriptions.Item>
                         <Descriptions.Item label={t('validation_details_modal.status')} labelStyle={{ color: 'grey' }} className='description-item description-itemstatus'>
-                            {validation.status}
+                            <span style={{ color: validation.status === 'success' ? 'green' : 'inherit'}}>
+                                {validation.status.toLocaleUpperCase()}
+                            </span>
                         </Descriptions.Item>
                         <Descriptions.Item label={t('validation_details_modal.timestamp')} labelStyle={{ color: 'grey' }} className='description-item description-itemtimestamp'>
                             {new Date(validation.timestamp).toISOString().replace('T', ' ').split('.')[0]}
@@ -168,7 +167,7 @@ const ValidationDetailsModal: React.FC<ValidationDetailsModalProps> = ({ visible
 
                 {/* Columna derecha: Visor de PDF */}
                 <Col xs={24} md={12} style={{ overflowY: 'auto', paddingLeft: '16px' }}>
-                    <PDFViewer documentId={validation.document} />
+                    <PDFViewer documentId={validation.document} onDownload={async () => await handleDownload(validation.document)}/>
                 </Col>
             </Row>
         </Modal>

@@ -1,8 +1,9 @@
 // src/components/ValidationFilters/ValidationFilters.tsx
 
 import React, { useState } from 'react';
-import { Row, Col, DatePicker, Select, Tooltip } from 'antd';
-import { Validation, ValidationFilterOptions } from '../../../types';
+import { Row, Col, DatePicker, Select, Tooltip, Button } from 'antd';
+import { Validation } from '../../../types';
+import { ValidationFilterOptions } from '../../../types/filters.ts';
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
@@ -16,6 +17,7 @@ import { JunoButtonTypes } from '../../common/JunoButton/JunoButton.types';
 import DocumentTypeSelect from '../../common/SearchableSelect/DocumentTypeSelect/DocumentTypeSelect.tsx';
 import './ValidationFilters.less';
 import { useTranslation } from 'react-i18next';
+import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
@@ -41,6 +43,7 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, o
     const [status, setStatus] = useState<string | null>(null);
     const [companyId, setCompanyId] = useState<string | null>(null);
     const [resourceId, setResourceId] = useState<string | null>(null);
+    const [isExpanded, setIsExpanded] = useState(false);
 
     const applyFilters = () => {
         const filters: ValidationFilterOptions = {
@@ -96,9 +99,16 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, o
         setResourceId(value);
     };
 
+    const toggleExpanded = () => {
+        setIsExpanded(!isExpanded);
+    };
+
+    
+
     return (
         <div className='validation-filters-container'>
             <Row gutter={16} className='validation-filters-row' align='middle' justify='start'>
+                {/* First 4 filters - always visible */}
                 <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
                     <Tooltip title={t('validationFilters.documentTooltip')} overlayStyle={{ fontSize: "12px" }}>
                         <span className="label-text">{t('validationFilters.documentLabel')}: </span>
@@ -134,70 +144,92 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, o
                     />
                 </Col>
 
-                <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
-                    <Tooltip title={t('validationFilters.documentTypeTooltip')} overlayStyle={{ fontSize: "12px" }}>
-                        <span className="label-text">{t('validationFilters.documentTypeLabel')}: </span>
-                    </Tooltip>
-                    <DocumentTypeSelect
-                        value={documentType?.toString() || null}
-                        onChange={handleDocumentTypeChange}
-                        placeholder={t('validationFilters.documentTypePlaceholder')}
-                        style={{ width: 250 }}
-                    />
-                </Col>
 
-                <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
-                    <Tooltip title={t('validationFilters.resultTooltip')} overlayStyle={{ fontSize: "12px" }}>
-                        <span className="label-text">{t('validationFilters.resultLabel')}: </span>
-                    </Tooltip>
-                    <Select
-                        placeholder={t('validationFilters.resultPlaceholder')}
-                        style={{ width: 250 }}
-                        onChange={handleStatusChange}
-                        allowClear
-                        value={status || undefined}
-                    >
-                        <Option value="success">{t('validationFilters.successOption')}</Option>
-                        <Option value="failure">{t('validationFilters.failureOption')}</Option>
-                    </Select>
-                </Col>
+                {/* Additional filters - visible only when expanded */}
+                {isExpanded && (
+                    <>
 
-                <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
-                    <Tooltip title={t('validationFilters.resourceTooltip')} overlayStyle={{ fontSize: "12px" }}>
-                        <span className="label-text">{t('validationFilters.resourceLabel')}: </span>
-                    </Tooltip>
-                    <ResourceSelect
-                        value={resourceId}
-                        onChange={handleResourceChange}
-                        placeholder={t('validationFilters.resourcePlaceholder')}
-                        style={{ width: 250 }}
-                    />
-                </Col>
+                        <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
+                            <Tooltip title={t('validationFilters.documentTypeTooltip')} overlayStyle={{ fontSize: "12px" }}>
+                                <span className="label-text">{t('validationFilters.documentTypeLabel')}: </span>
+                            </Tooltip>
+                            <DocumentTypeSelect
+                                value={documentType?.toString() || null}
+                                onChange={handleDocumentTypeChange}
+                                placeholder={t('validationFilters.documentTypePlaceholder')}
+                                style={{ width: 250 }}
+                            />
+                        </Col>
 
-                <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
-                    <Tooltip title={t('validationFilters.companyTooltip')} overlayStyle={{ fontSize: "12px" }}>
-                        <span className="label-text">{t('validationFilters.companyLabel')}: </span>
-                    </Tooltip>
-                    <CompanySelect
-                        value={companyId}
-                        onChange={handleCompanyChange}
-                        placeholder={t('validationFilters.companyPlaceholder')}
-                        style={{ width: 250 }}
-                    />
-                </Col>
-            </Row>
+                        <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
+                            <Tooltip title={t('validationFilters.resultTooltip')} overlayStyle={{ fontSize: "12px" }}>
+                                <span className="label-text">{t('validationFilters.resultLabel')}: </span>
+                            </Tooltip>
+                            <Select
+                                placeholder={t('validationFilters.resultPlaceholder')}
+                                style={{ width: 250 }}
+                                onChange={handleStatusChange}
+                                allowClear
+                                value={status || undefined}
+                            >
+                                <Option value="success">{t('validationFilters.successOption')}</Option>
+                                <Option value="failure">{t('validationFilters.failureOption')}</Option>
+                            </Select>
+                        </Col>
 
-            <Row>
-                <Col xs={24} sm={24} md={24} lg={24} xl={24} xxl={24} style={{ display: 'flex', justifyContent: 'end', marginTop: 16, gap: 10 }}>
-                    <JunoButton buttonType={JunoButtonTypes.Ok} type='primary' onClick={applyFilters}>
-                        {t('common.apply')}
-                    </JunoButton>
-                    <JunoButton buttonType={JunoButtonTypes.Cancel} type='default' onClick={clearFilters}>
-                        {t('common.clear')}
-                    </JunoButton>
+                        <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
+                            <Tooltip title={t('validationFilters.resourceTooltip')} overlayStyle={{ fontSize: "12px" }}>
+                                <span className="label-text">{t('validationFilters.resourceLabel')}: </span>
+                            </Tooltip>
+                            <ResourceSelect
+                                value={resourceId}
+                                onChange={handleResourceChange}
+                                placeholder={t('validationFilters.resourcePlaceholder')}
+                                style={{ width: 250 }}
+                            />
+                        </Col>
+
+                        <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
+                            <Tooltip title={t('validationFilters.companyTooltip')} overlayStyle={{ fontSize: "12px" }}>
+                                <span className="label-text">{t('validationFilters.companyLabel')}: </span>
+                            </Tooltip>
+                            <CompanySelect
+                                value={companyId}
+                                onChange={handleCompanyChange}
+                                placeholder={t('validationFilters.companyPlaceholder')}
+                                style={{ width: 250 }}
+                            />
+                        </Col>
+                    </>
+                )}
+
+                {/* Buttons - Responsive placement */}
+                <Col xs={24} sm={24} md={24} lg={24} xl={8} xxl={6} className='validation-filters-col validation-filters-buttons'>
+                    <div className="filters-actions">
+                        {/* Expand/Collapse button - Priority if only one fits */}
+                        <Button
+                            type="link"
+                            onClick={toggleExpanded}
+                            icon={isExpanded ? <UpOutlined /> : <DownOutlined />}
+                            className="expand-button"
+                        >
+                            {isExpanded ? t('common.collapse') || 'Collapse' : t('common.expand') || 'Expand'}
+                        </Button>
+
+                        {/* Apply and Clear buttons */}
+                        <div className="action-buttons">
+                            <JunoButton buttonType={JunoButtonTypes.Ok} type='primary' onClick={applyFilters}>
+                                {t('common.apply')}
+                            </JunoButton>
+                            <JunoButton buttonType={JunoButtonTypes.Cancel} type='default' onClick={clearFilters}>
+                                {t('common.clear')}
+                            </JunoButton>
+                        </div>
+                    </div>
                 </Col>
             </Row>
         </div>
-    )};
+    );
+};
 
 export default ValidationFilters;

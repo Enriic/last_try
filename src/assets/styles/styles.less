@@ -13,7 +13,7 @@
     background-color: @primary-color !important;
 }
 
-.ant-tooltip-inner{
+.ant-tooltip-inner {
     border-radius: @border-radius-base !important;
 }
 
@@ -25,11 +25,19 @@ div.ant-spin {
 }
 
 .page-container {
-    background-color: @body-background;
-    padding: 0px;
-    margin: 15px;
-    border-radius: 16px;
+    // background-color: @body-background;
+    // margin: 15px;
+    border-radius: 0px !important;
 }
+
+.ant-page-header{
+    background-color: white !important;
+}
+
+.ant-pro-page-container-children-container {
+    padding: 15px !important;
+}
+
 
 // Margins
 .mb-15em {
@@ -85,4 +93,49 @@ button.ant-btn.not-clickable {
 
 button.ant-btn.not-clickable:hover {
     cursor: inherit;
+}
+
+.ant-notification {
+    width: 300px;
+}
+
+.ant-notification-notice {
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e8e8e8;
+}
+
+.ant-notification-notice-message {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.ant-notification-notice-description {
+    font-size: 14px;
+    color: #666;
+}
+
+.ant-notification-notice-close {
+    color: #999;
+}
+
+.ant-notification-notice-close:hover {
+    color: #666;
+}
+
+.ant-notification-notice-success {
+    border-left: 4px solid #52c41a;
+}
+
+.ant-notification-notice-error {
+    border-left: 4px solid #f5222d;
+}
+
+.ant-notification-notice-warning {
+    border-left: 4px solid #faad14;
+}
+
+.ant-notification-notice-info {
+    border-left: 4px solid #1890ff;
 }

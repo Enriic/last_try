@@ -32,7 +32,7 @@ const ValidationTableHistory: React.FC<ValidationTableHistoryProps> = ({
         } else if (status === 'failure') {
             return <Tag color="red">{t('validationTableHistory.failure')}</Tag>;
         } else {
-            return <Tag>{status}</Tag>;
+            return <Tag>{status.toLocaleUpperCase()}</Tag>;
         }
     };
 

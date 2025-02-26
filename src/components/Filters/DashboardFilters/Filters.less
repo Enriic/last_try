@@ -1,49 +1,153 @@
 @import '../../../assets/styles/styles.less';
 
-// src/components/Filters/Filters.less
-
 .dash-filter-row {
     display: flex;
     flex-wrap: wrap;
     background-color: #fff;
-    padding: 1.5em 0.5em 1.5em 1em;
+    padding: 1.5em 1em;
     border-radius: @border-radius-base;
 }
 
 .dash-filter-col {
     display: flex;
     align-items: center;
-    flex-wrap: nowrap;
-    margin-bottom: 8px;
+    overflow: hidden; // Evita que el contenido se desborde
 }
 
 .dash-filter-label {
     display: inline-block;
-    margin-right: 8px;
-    max-width: 80px; // Adjust this value as needed
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     flex-shrink: 0;
+    min-width: 120px;
+    margin-right: 8px;
 }
 
-@media (max-width: 576px) {
-    .dash-filter-row {
-        flex-direction: column;
+.filter-input-wrapper {
+    flex: 1;
+    max-width: calc(100% - 130px);
+    min-width: 0; // Importante para que flex pueda reducir el tamaño por debajo del contenido
+}
+
+.filter-input {
+    width: 100% !important;
+}
+
+// Style for the buttons column
+.dash-filter-buttons {
+    justify-content: flex-end;
+    margin-bottom: 0;
+    align-items: center;
+}
+
+.button-container {
+    display: flex;
+    gap: 12px;
+    margin-left: auto;
+}
+
+// Large screens
+@media (min-width: 1200px) {
+    .dash-filter-col {
+        height: 40px;
     }
 
-    .dash-filter-col {
-        flex-direction: row;
-        align-items: center;
+    .dash-filter-buttons {
+        height: 40px;
+    }
+}
+
+// Medium-large screens
+@media (max-width: 1199px) {
+    .dash-filter-label {
+        min-width: 100px;
+    }
+
+    .filter-input-wrapper {
+        max-width: calc(100% - 110px);
+    }
+
+    // En pantallas menores a 1200px pero mayores a 992px, asegurarse de que los botones están alineados correctamente
+    .dash-filter-buttons {
+        justify-content: flex-end;
+    }
+}
+
+// Medium screens
+@media (max-width: 991px) {
+
+    // Hacer que los botones salten a su propia línea antes
+    .dash-filter-buttons {
+        justify-content: flex-start;
+        height: auto;
+        width: 100%;
+    }
+
+    .button-container {
+        margin-left: 0;
+        width: auto;
     }
 
     .dash-filter-label {
-        margin-bottom: 4px;
-        max-width: 100%;
+        min-width: 90px;
+    }
+
+    .filter-input-wrapper {
+        max-width: calc(100% - 100px);
     }
 }
 
-.ant-picker,
+// Small screens
+@media (max-width: 767px) {
+    .dash-filter-row {
+        padding: 1em;
+    }
+
+    .dash-filter-label {
+        min-width: 80px;
+    }
+
+    .filter-input-wrapper {
+        max-width: calc(100% - 90px);
+    }
+
+    .button-container {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+// Extra small screens
+@media (max-width: 576px) {
+    .dash-filter-col {
+        flex-direction: column;
+        align-items: flex-start;
+        height: auto;
+    }
+
+    .dash-filter-label {
+        width: 100%;
+        min-width: 100%;
+        margin-bottom: 8px;
+        margin-right: 0;
+    }
+
+    .filter-input-wrapper {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .button-container {
+        margin-top: 8px;
+    }
+}
+
+// Ensure Ant Design components fill their containers
+.ant-picker {
+    width: 100%;
+}
+
 .ant-select {
     width: 100%;
 }

@@ -3,21 +3,20 @@ import { Form, Checkbox, Upload, Button, notification, Steps } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { UploadFile } from 'antd/lib/upload/interface';
 import { useTranslation } from 'react-i18next';
-import { uploadDocument, getDocument, getDocumentTypeById, getDocumentFromBlobContainer } from '../../services/documentService';
+import { uploadDocument, getDocument, getDocumentTypeById } from '../../services/documentService';
 import { getResourceById } from '../../services/resourceService';
 import { FieldToValidate, FieldToExtract, Validation, Resource, VehicleDetails, EmployeeDetails, DocumentType, Company, Document } from '../../types';
 import './JunoUplaodFile.less';
 import { useAuth } from '../../context/AuthContext';
 import { createValidation } from '../../services/validationService';
 import { getCompanyById } from '../../services/companyService';
-import ValidationResultModal from '../ValidationResultModal/ValidationResultModal';
 import ResourceSelect from '../common/SearchableSelect/ResourceSelect/ResourceSelect';
 import DocumentSelect from '../common/SearchableSelect/DocumentSelect/DocumentSelect';
 import DocumentTypeSelect from '../common/SearchableSelect/DocumentTypeSelect/DocumentTypeSelect';
 import CompanySelect from '../common/SearchableSelect/CompanySelect/CompanySelect';
 import DuplicateDocumentModal from '../DuplicateDocumentModal/DuplicateDocumentModal';
-import PDFViewer from '../../components/PDFViewer/PDFViewer';
-import { set } from 'lodash';
+import ValidationDetailsModal from '../ValidationDetailsModal/ValidationDetailsModal';
+import DynamicInputs from './DynamicForm/DynamicForm';
 
 
 const { Dragger } = Upload;
@@ -55,36 +54,24 @@ const JunoUploadFile: React.FC<JunoUploadFileProps> = ({ documentId, setDocument
     const [useExistingDocument, setUseExistingDocument] = useState<boolean>(false);
 
     const [associatedEntity, setAssociatedEntity] = useState<string>('resource'); // Valor por defecto 'resource'
+    const [associatedEntities, setAssociatedEntities] = useState<string[]>([]);
+
 
     const [existingDocumentData, setExistingDocumentData] = useState<Document | null>(null);
     const [isDuplicateModalVisible, setIsDuplicateModalVisible] = useState<boolean>(false);
 
     const handleDocumentTypeChange = async (value: number | string | null) => {
         setDocumentType(value);
+        if (!value) {
+            setSelectedDocType(null);
+            return;
+        }
         const selectedDocType = await getDocumentTypeById(value);
         setSelectedDocType(selectedDocType);
-        setAssociatedEntity(selectedDocType.associated_entity); // Almacenar el tipo de entidad asociada
+        setAssociatedEntities(selectedDocType.associated_entities); // Almacenar los tipos de entidad asociados
+        console.log(selectedDocType)
     };
 
-
-    // const handleDownload = async () => {
-    //     try {
-    //       const response = await getDocumentFromBlobContainer(documentId);
-    //       const document_name = await getDocument(documentId, 'name');
-          
-    //       const pdfBlob = response;
-    //       const fileURL = URL.createObjectURL(pdfBlob);
-    //       const link = document.createElement('a');
-    //       link.href = fileURL;
-    //       link.setAttribute('download', document_name); // Puedes obtener el nombre del archivo del servidor
-    //       document.body.appendChild(link);
-    //       link.click();
-    //       document.body.removeChild(link);
-    //       URL.revokeObjectURL(fileURL);
-    //     } catch (error) {
-    //       console.error('Error al descargar el PDF:', error);
-    //     }
-    //   };
 
     const handleResourceChange = async (value: string | null) => {
         setResource(value);
@@ -142,7 +129,7 @@ const JunoUploadFile: React.FC<JunoUploadFileProps> = ({ documentId, setDocument
                 setSelectedDocType(docTypeDetails);
                 handleDocumentTypeChange(docDetails.document_type);
                 handleResourceChange(docDetails.resource);
-
+                handleCompanyChange(docDetails.company);
             } catch (error) {
                 notification.error({
                     message: 'Error',
@@ -161,7 +148,7 @@ const JunoUploadFile: React.FC<JunoUploadFileProps> = ({ documentId, setDocument
         setSelectedFieldsToExtract(checkedValues);
     };
 
-     
+
 
     const uploadProps = {
         fileList,
@@ -199,15 +186,16 @@ const JunoUploadFile: React.FC<JunoUploadFileProps> = ({ documentId, setDocument
                     if (fileList[0] && documentType && (resource || companyId)) {
                         const file = fileList[0] as UploadFile<unknown>;
 
-                        const entityId = associatedEntity === 'company' ? companyId : resource;
+                        //const entityId = associatedEntity === 'company' ? companyId : resource;
 
                         try {
                             const response = await uploadDocument(
                                 file.originFileObj as File,
                                 user?.id || 'undefined',
                                 documentType,
-                                entityId?.toString() || '',
-                                associatedEntity
+                                resource,
+                                companyId,
+                                associatedEntities
                             );
 
                             if (response.status === 409) {
@@ -293,29 +281,29 @@ const JunoUploadFile: React.FC<JunoUploadFileProps> = ({ documentId, setDocument
                             .filter((field: FieldToValidate) => selectedFieldsToValidate.includes(field.id.toString()))
                             .map((field: FieldToValidate) => {
                                 let expectedValue = '';
-                                console.log('Associated Entity:', associatedEntity)
-                                if (associatedEntity === 'company') {
+                                console.log('Associated Entity:', associatedEntities)
+                                if (associatedEntities.includes('company')) {
                                     console.log('Estamos dentro del if de associatedEntity = Company')
+                                    console.log('SelectedCompany:', selectedCompany)
                                     if (selectedCompany && field.name in selectedCompany) {
                                         console.log('Field name', field.name)
                                         console.log('Selected Company', selectedCompany)
                                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                         expectedValue = (selectedCompany as any)[field.name]?.toString() || '';
                                     }
-                                } else if (associatedEntity === 'resource') {
+                                }
+                                if (associatedEntities.includes('resource') && selectedResource?.resource_details) {
                                     console.log('Selectedresource:', selectedResource)
-                                    if (selectedResource?.resource_details) {
-                                        const details = selectedResource.resource_details;
-                                        console.log('Resource Details:', details);
+                                    const details = selectedResource.resource_details;
+                                    console.log('Resource Details:', details);
 
-                                        if (isVehicleDetails(details) && selectedResource.resource_type === 'vehicle') {
-                                            if (field.name in details) {
-                                                expectedValue = (details as VehicleDetails)[field.name as keyof VehicleDetails]?.toString() || '';
-                                            }
-                                        } else if (isEmployeeDetails(details) && selectedResource.resource_type === 'employee') {
-                                            if (field.name in details) {
-                                                expectedValue = (details as EmployeeDetails)[field.name as keyof EmployeeDetails]?.toString() || '';
-                                            }
+                                    if (isVehicleDetails(details) && selectedResource.resource_type === 'vehicle') {
+                                        if (field.name in details) {
+                                            expectedValue = (details as VehicleDetails)[field.name as keyof VehicleDetails]?.toString() || '';
+                                        }
+                                    } else if (isEmployeeDetails(details) && selectedResource.resource_type === 'employee') {
+                                        if (field.name in details) {
+                                            expectedValue = (details as EmployeeDetails)[field.name as keyof EmployeeDetails]?.toString() || '';
                                         }
                                     }
                                 }
@@ -359,6 +347,9 @@ const JunoUploadFile: React.FC<JunoUploadFileProps> = ({ documentId, setDocument
                         description: 'La validación ha sido creada correctamente',
                         duration: 3,
                     });
+
+
+
                 }
             } catch (error) {
                 console.log('Error al crear la validación:', error);
@@ -392,7 +383,7 @@ const JunoUploadFile: React.FC<JunoUploadFileProps> = ({ documentId, setDocument
     };
 
     return (
-        <>
+        < >
             <Steps current={currentStep} className="upload-steps">
                 <Step title={t('upload.step1Title')} />
                 <Step title={t('upload.step2Title')} />
@@ -448,45 +439,14 @@ const JunoUploadFile: React.FC<JunoUploadFileProps> = ({ documentId, setDocument
                                     />
                                 </Form.Item>
 
-                                {associatedEntity === 'company' ? (
-                                    // Mostrar CompanySelect
-                                    <Form.Item
-                                        label={t('upload.companyLabel')}
-                                        name="company"
-                                        rules={[
-                                            {
-                                                required: !useExistingDocument,
-                                                message: t('upload.companyError'),
-                                            },
-                                        ]}
-                                    >
-                                        <CompanySelect
-                                            value={companyId}
-                                            onChange={handleCompanyChange}
-                                            placeholder={t('upload.companyPlaceholder')}
-                                            disabled={useExistingDocument}
-                                        />
-                                    </Form.Item>
-                                ) : (
-                                    // Mostrar ResourceSelect
-                                    <Form.Item
-                                        label={t('upload.resourceLabel')}
-                                        name="resource"
-                                        rules={[
-                                            {
-                                                required: !useExistingDocument,
-                                                message: t('upload.resourceError'),
-                                            },
-                                        ]}
-                                    >
-                                        <ResourceSelect
-                                            value={resource}
-                                            onChange={handleResourceChange}
-                                            placeholder={t('upload.resourcePlaceholder')}
-                                            disabled={useExistingDocument}
-                                        />
-                                    </Form.Item>
-                                )}
+                                <DynamicInputs
+                                    associatedEntities={associatedEntities}
+                                    useExistingDocument={useExistingDocument}
+                                    companyId={companyId}
+                                    resource={resource}
+                                    handleCompanyChange={handleCompanyChange}
+                                    handleResourceChange={handleResourceChange}
+                                />
 
                                 <Form.Item
                                     label={t('upload.fileLabel')}
@@ -556,13 +516,13 @@ const JunoUploadFile: React.FC<JunoUploadFileProps> = ({ documentId, setDocument
                         <Form.Item
                             label={t('upload.validationFieldsLabel')}
                             name="validationFields"
-                        // Si es obligatorio
-                        // rules={[
-                        //   {
-                        //     required: true,
-                        //     message: t('upload.validationFieldsError'),
-                        //   },
-                        // ]}
+                            // Si es obligatorio
+                            rules={[
+                                {
+                                    required: true,
+                                    message: t('upload.validationFieldsError'),
+                                },
+                            ]}
                         >
                             <Checkbox.Group
                                 options={
@@ -618,15 +578,10 @@ const JunoUploadFile: React.FC<JunoUploadFileProps> = ({ documentId, setDocument
             </Form>
 
             {validation && uploadedDocument && (
-                <ValidationResultModal
+                <ValidationDetailsModal
                     visible={isModalVisible}
+                    validation={validation}
                     onClose={handleModalClose}
-                    documentName={validation.document_name}
-                    documentType={selectedDocType?.name || ''}
-                    validationResult={validation.status}
-                    timestamp={validation.timestamp}
-                    fields_to_validate={validation.validation_details.fields_to_validate}
-                    fields_to_extract={validation.validation_details.fields_to_extract}
                 />
             )}
 

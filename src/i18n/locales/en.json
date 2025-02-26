@@ -9,6 +9,16 @@
         "login": "Login",
         "logout": "Logout",
         "history": "History",
+        "resources": {
+            "label": "Resources",
+            "employees": {
+                "label": "Employees"
+            },
+            "vehicles": {
+                "label": "Vehicles"
+            }
+        },
+        "companies": "Companies",
         "language": {
             "es": "Spanish",
             "en": "English"
@@ -17,7 +27,10 @@
     },
     "common": {
         "apply": "Apply",
-        "clear": "Clear"
+        "clear": "Clear",
+        "back": "Back",
+        "expand": "Expand",
+        "collapse": "Collapse"
     },
     "upload": {
         "successMessage": "File uploaded successfully",
@@ -96,11 +109,21 @@
         "analysisTitle": "Document Type Analysis"
     },
     "filters": {
-        "dateTooltip": "Select the date range for validations",
+        "dateTooltip": "Select the date range",
         "dateLabel": "Date",
-        "documentTypeTooltip": "Select the type of document to filter",
+        "documentTypeTooltip": "Select the type of document",
         "documentTypeLabel": "Document Type",
         "documentTypePlaceholder": "Select a document type"
+    },
+    "notification": {
+        "success": {
+            "title": "Success",
+            "description": "Operation completed successfully"
+        },
+        "error": {
+            "title": "Oops! Something went wrong",
+            "description": "An error occurred while processing the request"
+        }
     },
     "validationFilters": {
         "documentTooltip": "Select the document",
@@ -124,7 +147,8 @@
         "resourcePlaceholder": "Select a resource",
         "companyTooltip": "Select the company",
         "companyLabel": "Company",
-        "companyPlaceholder": "Select a company"
+        "companyPlaceholder": "Select a company",
+        "companyRequiredMessage": "Company is required"
     },
     "logout": {
         "success": {
@@ -215,19 +239,6 @@
     "validationPieChart": {
         "distributionOfResults": "Distribution of Results"
     },
-    "validationResultModal": {
-        "title": "Validation Result",
-        "documentName": "Document Name",
-        "documentType": "Document Type",
-        "validationResult": "Validation Result",
-        "validationFields": "Fields validated",
-        "extractionFields": "Fields extracted",
-        "dateTime": "Date and Time",
-        "fieldDetails": "Field Details",
-        "pending": "Pending",
-        "success": "Success",
-        "failure": "Failure"
-    },
     "validationTableHistory": {
         "date": "Date",
         "documentName": "Document Name",
@@ -250,6 +261,12 @@
         "fetchErrorMessage": "Oops! Something went wrong",
         "fetchErrorDescription": "An error occurred while fetching the validations"
     },
+    "resourcesPage": {
+        "title": "Create resource"
+    },
+    "companiesPage": {
+        "title": "Create company"
+    },
     "duplicate_document_modal": {
         "document_name": "Document Name",
         "document_type": "Document Type",
@@ -257,5 +274,146 @@
         "view_document_button": "View Document",
         "title": "Duplicate Document",
         "use_existing_document_button": "Use Existent Document"
+    },
+    "resource_form": {
+        "vehicle": {
+            "vehicle_name": {
+                "label": "Vehicle Name",
+                "placeholder": "Enter the vehicle name",
+                "required_message": "Vehicle name is required"
+            },
+            "manufacturer": {
+                "label": "Manufacturer",
+                "placeholder": "Enter the manufacturer",
+                "required_message": "Manufacturer is required"
+            },
+            "registration_id": {
+                "label": "Registration ID",
+                "placeholder": "Enter the registration ID",
+                "required_message": "Registration ID is required"
+            },
+            "model": {
+                "label": "Model",
+                "placeholder": "Enter the model",
+                "required_message": "Model is required"
+            },
+            "weight": {
+                "label": "Weight",
+                "placeholder": "Enter the weight",
+                "required_message": "Weight is required"
+            }
+        },
+        "employee": {
+            "first_name": {
+                "label": "First Name",
+                "placeholder": "Enter the first name",
+                "required_message": "First name is required"
+            },
+            "last_name": {
+                "label": "Last Name",
+                "placeholder": "Enter the last name",
+                "required_message": "Last name is required"
+            },
+            "email": {
+                "label": "Email",
+                "placeholder": "Enter the email",
+                "required_message": "Email is required",
+                "invalid_format_message": "Invalid email format (example@gmail.com)"
+            },
+            "phone": {
+                "label": "Phone",
+                "placeholder": "Enter the phone",
+                "required_message": "Phone is required"
+            },
+            "prefix": {
+                "label": "Prefix",
+                "placeholder": "Prefix (e.g. +1)",
+                "required_message": "Prefix is required"
+            },
+            "country": {
+                "label": "Country",
+                "placeholder": "Enter the country",
+                "required_message": "Country is required"
+            },
+            "worker_id": {
+                "label": "Worker ID",
+                "placeholder": "Enter the worker ID",
+                "required_message": "Worker ID is required"
+            },
+            "company": {
+                "label": "Company",
+                "placeholder": "Select the company",
+                "required_message": "Company is required"
+            }
+        }
+    },
+    "company_form": {
+        "company_id": {
+            "label": "Company ID",
+            "placeholder": "Enter the company ID",
+            "required_message": "Company ID is required"
+        },
+        "company_name": {
+            "label": "Company Name",
+            "placeholder": "Enter the company name",
+            "required_message": "Company name is required"
+        },
+        "industry": {
+            "label": "Industry",
+            "placeholder": "Enter the industry",
+            "required_message": "Industry is required"
+        },
+        "email": {
+            "label": "Email",
+            "placeholder": "Enter the email",
+            "required_message": "Email is required",
+            "invalid_format_message": "Invalid email format (example@gmail.com)"
+        },
+        "phone": {
+            "label": "Phone",
+            "placeholder": "Enter the phone",
+            "required_message": "Phone is required"
+        },
+        "prefix": {
+            "label": "Prefix",
+            "placeholder": "Prefix (e.g. +1)",
+            "required_message": "Prefix is required"
+        },
+        "location": {
+            "label": "Location",
+            "placeholder": "Enter the location",
+            "required_message": "Location is required"
+        },
+        "language": {
+            "label": "Language",
+            "placeholder": "Enter the language",
+            "required_message": "Language is required"
+        },
+        "save": "Save"
+    },
+    "companies_table_page": {
+        "title": "Companies",
+        "search_placeholder": "Search company",
+        "new_company": "+ New"
+    },
+    "employees_table_page": {
+        "title": "Employees",
+        "search_placeholder": "Search employee",
+        "new_employee": "+ New"
+    },
+    "company_table": {
+        "date": "Date",
+        "company_id": "Company ID",
+        "company_name": "Company Name",
+        "industry": "Industry"
+    },
+    "employee_table": {
+        "date": "Date",
+        "first_name": "First Name",
+        "last_name": "Last Name",
+        "email": "Email",
+        "phone": "Phone",
+        "country": "Country",
+        "worker_id": "Worker ID"
     }
 }

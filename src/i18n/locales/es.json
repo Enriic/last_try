@@ -9,6 +9,16 @@
         "login": "Iniciar Sesión",
         "logout": "Cerrar Sesión",
         "history": "Historial",
+        "resources": {
+            "label": "Recursos",
+            "employees": {
+                "label": "Empleados"
+            },
+            "vehicles": {
+                "label": "Vehículos"
+            }
+        },
+        "companies": "Compañías",
         "language": {
             "es": "Español",
             "en": "Inglés"
@@ -17,7 +27,10 @@
     },
     "common": {
         "apply": "Aplicar",
-        "clear": "Limpiar"
+        "clear": "Limpiar",
+        "back": "Atrás",
+        "expand": "Expandir",
+        "collapse": "Colapsar"
     },
     "upload": {
         "successMessage": "Archivo enviado correctamente",
@@ -96,11 +109,21 @@
         "analysisTitle": "Análisis por Tipo de Documento"
     },
     "filters": {
-        "dateTooltip": "Selecciona el rango de fechas para las validaciones",
+        "dateTooltip": "Selecciona el rango de fechas",
         "dateLabel": "Fecha",
-        "documentTypeTooltip": "Selecciona el tipo de documento para filtrar",
+        "documentTypeTooltip": "Selecciona el tipo de documento",
         "documentTypeLabel": "Tipo de Documento",
         "documentTypePlaceholder": "Selecciona un tipo de documento"
+    },
+    "notification": {
+        "success": {
+            "title": "Success",
+            "description": "Operation completed successfully"
+        },
+        "error": {
+            "title": "Oops! Something went wrong",
+            "description": "An error occurred while processing the request"
+        }
     },
     "validationFilters": {
         "documentTooltip": "Selecciona el documento",
@@ -124,7 +147,8 @@
         "resourcePlaceholder": "Selecciona un recurso",
         "companyTooltip": "Selecciona la compañía",
         "companyLabel": "Compañía",
-        "companyPlaceholder": "Selecciona una compañía"
+        "companyPlaceholder": "Selecciona una compañía",
+        "companyRequiredMessage": "Debe seleccionar una compañía"
     },
     "logout": {
         "success": {
@@ -215,19 +239,6 @@
     "validationPieChart": {
         "distributionOfResults": "Distribución de Resultados"
     },
-    "validationResultModal": {
-        "title": "Resultado de la Validación",
-        "documentName": "Nombre del Documento",
-        "documentType": "Tipo de Documento",
-        "validationResult": "Resultado de la Validación",
-        "validationFields": "Campos validados",
-        "extractionFields": "Campos extraidos",
-        "dateTime": "Fecha y Hora",
-        "fieldDetails": "Detalles de los Campos",
-        "pending": "Pendiente",
-        "success": "Éxito",
-        "failure": "Fallo"
-    },
     "validationTableHistory": {
         "date": "Fecha",
         "documentName": "Nombre del Documento",
@@ -250,6 +261,12 @@
         "fetchErrorMessage": "¡Ups! Algo salió mal",
         "fetchErrorDescription": "Ocurrió un error al obtener las validaciones"
     },
+    "resourcesPage": {
+        "title": "Crear Recurso"
+    },
+    "companiesPage": {
+        "title": "Crear Compañía"
+    },
     "duplicate_document_modal": {
         "document_name": "Nombre del Documento",
         "document_type": "Tipo de Documento",
@@ -257,5 +274,146 @@
         "view_document_button": "Ver Documento",
         "title": "Documento Duplicado",
         "use_existing_document_button": "Usar Documento Existente"
+    },
+    "resource_form": {
+        "vehicle": {
+            "vehicle_name": {
+                "label": "Nombre del Vehículo",
+                "placeholder": "Ingrese el nombre del vehículo",
+                "required_message": "El nombre del vehículo es obligatorio"
+            },
+            "manufacturer": {
+                "label": "Fabricante",
+                "placeholder": "Ingrese el fabricante",
+                "required_message": "El fabricante es obligatorio"
+            },
+            "registration_id": {
+                "label": "ID de Registro",
+                "placeholder": "Ingrese el ID de registro",
+                "required_message": "El ID de registro es obligatorio"
+            },
+            "model": {
+                "label": "Modelo",
+                "placeholder": "Ingrese el modelo",
+                "required_message": "El modelo es obligatorio"
+            },
+            "weight": {
+                "label": "Peso",
+                "placeholder": "Ingrese el peso",
+                "required_message": "El peso es obligatorio"
+            }
+        },
+        "employee": {
+            "first_name": {
+                "label": "Nombre",
+                "placeholder": "Ingrese el nombre",
+                "required_message": "El nombre es obligatorio"
+            },
+            "last_name": {
+                "label": "Apellido",
+                "placeholder": "Ingrese el apellido",
+                "required_message": "El apellido es obligatorio"
+            },
+            "email": {
+                "label": "Correo Electrónico",
+                "placeholder": "Ingrese el correo electrónico",
+                "required_message": "El correo electrónico es obligatorio",
+                "invalid_format_message": "El correo electrónico no tiene un formato válido (ejemplo@gmail.com)"
+            },
+            "phone": {
+                "label": "Teléfono",
+                "placeholder": "Ingrese el teléfono",
+                "required_message": "El teléfono es obligatorio"
+            },
+            "prefix": {
+                "label": "Prefijo",
+                "placeholder": "Prefijo (e.j. +1)",
+                "required_message": "El prefijo es obligatorio"
+            },
+            "country": {
+                "label": "País",
+                "placeholder": "Ingrese el país",
+                "required_message": "El país es obligatorio"
+            },
+            "worker_id": {
+                "label": "ID de Trabajador",
+                "placeholder": "Ingrese el ID de trabajador",
+                "required_message": "El ID de trabajador es obligatorio"
+            },
+            "company": {
+                "label": "Compañía",
+                "placeholder": "Seleccione la compañía",
+                "required_message": "La compañía es obligatoria"
+            }
+        }
+    },
+    "company_form": {
+        "company_id": {
+            "label": "ID de la Empresa",
+            "placeholder": "Ingrese el ID de la empresa",
+            "required_message": "El ID de la empresa es obligatorio"
+        },
+        "company_name": {
+            "label": "Nombre de la Empresa",
+            "placeholder": "Ingrese el nombre de la empresa",
+            "required_message": "El nombre de la empresa es obligatorio"
+        },
+        "industry": {
+            "label": "Industria",
+            "placeholder": "Ingrese la industria",
+            "required_message": "La industria es obligatoria"
+        },
+        "email": {
+            "label": "Correo Electrónico",
+            "placeholder": "Ingrese el correo electrónico",
+            "required_message": "El correo electrónico es obligatorio",
+            "invalid_format_message": "Formato de correo electrónico inválido (ejemplo@gmail.com)"
+        },
+        "phone": {
+            "label": "Teléfono",
+            "placeholder": "Ingrese el teléfono",
+            "required_message": "El teléfono es obligatorio"
+        },
+        "prefix": {
+            "label": "Prefijo",
+            "placeholder": "Prefijo (e.j. +1)",
+            "required_message": "El prefijo es obligatorio"
+        },
+        "location": {
+            "label": "Ubicación",
+            "placeholder": "Ingrese la ubicación",
+            "required_message": "La ubicación es obligatoria"
+        },
+        "language": {
+            "label": "Idioma",
+            "placeholder": "Ingrese el idioma",
+            "required_message": "El idioma es obligatorio"
+        },
+        "save": "Guardar"
+    },
+    "companies_table_page": {
+        "title": "Compañías",
+        "search_placeholder": "Buscar compañía",
+        "new_company": "+ Nueva"
+    },
+    "employees_table_page": {
+        "title": "Empleados",
+        "search_placeholder": "Buscar empleado",
+        "new_employee": "+ Nuevo"
+    },
+    "company_table": {
+        "date": "Fecha",
+        "company_id": "ID de la Empresa",
+        "company_name": "Nombre de la Empresa",
+        "industry": "Industria"
+    },
+    "employee_table": {
+        "date": "Fecha",
+        "first_name": "Nombre",
+        "last_name": "Apellido",
+        "email": "Correo Electrónico",
+        "phone": "Teléfono",
+        "country": "País",
+        "worker_id": "ID de Trabajador"
     }
 }

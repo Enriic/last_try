@@ -13,7 +13,6 @@ interface DocumentTypeSelectProps {
     placeholder?: string;
     style?: React.CSSProperties;
     disabled?: boolean;
-
 }
 
 const DocumentTypeSelect: React.FC<DocumentTypeSelectProps> = ({ value, onChange, disabled, placeholder, style }) => {
