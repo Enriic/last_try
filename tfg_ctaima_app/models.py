@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User  # Importar el modelo User de Django
 import uuid
 from enum import Enum
+from django.contrib.postgres.fields import ArrayField
 
 class EventType(Enum):
     CREATE_DOCUMENT = 'CREATE_DOCUMENT'
@@ -14,10 +15,34 @@ class EventType(Enum):
     EDIT_DOCUMENT = 'EDIT_DOCUMENT'
     EDIT_DOCUMENT_TYPE = 'EDIT_DOCUMENT_TYPE'
     DELETE_DOCUMENT_TYPE = 'DELETE_DOCUMENT_TYPE'
-    LOGIN = 'LOGIN'
+    UPDATE_DOCUMENT_TYPE = 'UPDATE_DOCUMENT_TYPE'
+    LOGIN = 'LOGIN',
+    LOGOUT = 'LOGOUT',
     CREATE_USER = 'CREATE_USER'
     UPDATE_USER = 'UPDATE_USER'
     DELETE_USER = 'DELETE_USER'
+    CREATE_COMPANY = 'CREATE_COMPANY'
+    UPDATE_COMPANY = 'UPDATE_COMPANY'
+    DELETE_COMPANY = 'DELETE_COMPANY'
+    CREATE_RESOURCE = 'CREATE_RESOURCE'
+    UPDATE_RESOURCE = 'UPDATE_RESOURCE'
+    DELETE_RESOURCE = 'DELETE_RESOURCE'
+    CREATE_FIELD_TO_VALIDATE = 'CREATE_FIELD_TO_VALIDATE'
+    UPDATE_FIELD_TO_VALIDATE = 'UPDATE_FIELD_TO_VALIDATE'
+    DELETE_FIELD_TO_VALIDATE = 'DELETE_FIELD_TO_VALIDATE'
+    CREATE_FIELD_TO_EXTRACT = 'CREATE_FIELD_TO_EXTRACT'
+    UPDATE_FIELD_TO_EXTRACT = 'UPDATE_FIELD_TO_EXTRACT'
+    DELETE_FIELD_TO_EXTRACT = 'DELETE_FIELD_TO_EXTRACT'
+    CREATE_LOG = 'CREATE_LOG'
+    DELETE_LOG = 'DELETE_LOG'
+    UPDATE_LOG = 'UPDATE_LOG'
+    CREATE_EMPLOYEE = 'CREATE_EMPLOYEE'
+    UPDATE_EMPLOYEE = 'UPDATE_EMPLOYEE'
+    DELETE_EMPLOYEE = 'DELETE_EMPLOYEE'
+    CREATE_VEHICLE = 'CREATE_VEHICLE'
+    UPDATE_VEHICLE = 'UPDATE_VEHICLE'
+    DELETE_VEHICLE = 'DELETE_VEHICLE'
+    
 
 
 def default_document_type():
@@ -27,21 +52,20 @@ def default_resource():
     return Resource.objects.get_or_create(resource_type='employee')[0].id
 
 class Company(models.Model):
-    type_choices = (
-        ('customer', 'Customer'),
-        ('supplier', 'Supplier'),
-    )
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     company_id = models.CharField(max_length=50, unique=True)
-    type = models.CharField(max_length=50, choices=type_choices, default='customer')
     company_name = models.CharField(max_length=255)
-    industry = models.CharField(max_length=255)
-    email = models.EmailField()
+    industry = models.CharField(max_length=255, blank=True, null=True)
+    email = models.EmailField(null=True, blank=True, unique=True)
     location = models.CharField(max_length=255)
-    phone = models.CharField(max_length=20)
+    phone = models.CharField(max_length=20, null=True, blank=True)
     language = models.CharField(max_length=50)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['company_name', 'company_id']  # Define el orden por defecto
+        verbose_name = "Company"
+        verbose_name_plural = "Companies"
 
     def __str__(self):
         return self.company_name
@@ -59,14 +83,17 @@ class Resource(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        ordering = ['id', 'timestamp']  # Define el orden por defecto
+        verbose_name = "Resource"
+        verbose_name_plural = "Resources"
         abstract = False  # No es una clase abstracta, por lo que Django creará una tabla para esta clase.
 
 class Vehicle(Resource):
     name = models.CharField(max_length=255)
     registration_id = models.CharField(max_length=50)
-    manufacturer = models.CharField(max_length=100)
-    model = models.CharField(max_length=100)
-    weight = models.FloatField()
+    manufacturer = models.CharField(max_length=100, blank=True, null=True)
+    model = models.CharField(max_length=100, blank=True, null=True)
+    weight = models.FloatField(blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -75,8 +102,8 @@ class Vehicle(Resource):
 class Employee(Resource):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    email = models.EmailField()
-    phone = models.CharField(max_length=20)
+    email = models.EmailField(blank=True, null=True)
+    phone = models.CharField(max_length=25, blank=True, null=True)
     country = models.CharField(max_length=100)
     worker_id = models.CharField(max_length=50)
 
@@ -93,11 +120,25 @@ class DocumentType(models.Model):
     name = models.CharField(max_length=100, unique=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)  # Usar el modelo User de Django
     description = models.TextField(blank=True, null=True)
-    associated_entity = models.CharField(
-        max_length=50,
-        choices=AssociatedEntity.choices,
-        default=AssociatedEntity.RESOURCE
+    api_doc_type_text = models.CharField(max_length=50, default='')
+    pattern_validation = models.JSONField(blank=True, null=True)
+    pattern_invalidation = models.JSONField(blank=True, null=True)
+
+    # associated_entity = models.CharField(
+    #     max_length=50,
+    #     choices=AssociatedEntity.choices,
+    #     default=AssociatedEntity.RESOURCE
+    # )
+    associated_entities = ArrayField(
+        models.CharField(max_length=50, choices=AssociatedEntity.choices),
+        default=list,
+        blank=True
     )
+
+    class Meta:
+        ordering = ['id', 'name']  # Define el orden por defecto
+        verbose_name = "Document Type"
+        verbose_name_plural = "Document Types"
 
     def __str__(self):
         return self.name
@@ -106,7 +147,7 @@ class FieldToValidate(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
     name = models.CharField(max_length=100,null=False)
     description = models.TextField(blank=True, null=True)
-    expected_value = models.CharField(max_length=100,null=False, default='')
+    expected_value = models.CharField(max_length=100,null=True,blank=True, default='')
     treshold = models.FloatField(blank=True, null=True, default=80)
     document_types = models.ManyToManyField(DocumentType, related_name="fields_to_validate")  # Relación many-to-many
 

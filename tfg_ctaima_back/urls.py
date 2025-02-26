@@ -32,7 +32,15 @@ Admin Endpoint:
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from tfg_ctaima_app.views import UserViewSet, CompanyViewSet, ResourceViewSet, VehicleViewSet, EmployeeViewSet, DocumentTypeViewSet, DocumentViewSet, ValidationViewSet, LogViewSet, login_view, get_csrf_token, logout_view, DocumentRetrieveView
+
+from tfg_ctaima_app.views.document_views import DocumentViewSet, DocumentRetrieveView
+from tfg_ctaima_app.views.document_type_views import DocumentTypeViewSet
+from tfg_ctaima_app.views.auth_views import login_view, logout_view, get_csrf_token
+from tfg_ctaima_app.views.user_views import UserViewSet
+from tfg_ctaima_app.views.company_views import CompanyViewSet
+from tfg_ctaima_app.views.resource_views import ResourceViewSet, EmployeeViewSet, VehicleViewSet
+from tfg_ctaima_app.views.validation_views import ValidationViewSet
+from tfg_ctaima_app.views.log_views import LogViewSet
 
 # Crear un enrutador para las vistas
 router = DefaultRouter()

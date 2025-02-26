@@ -15,7 +15,7 @@ from .models import Document, DocumentType, Log, Validation, Company, Resource, 
 
 @admin.register(DocumentType)
 class DocumentTypeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'description']
+    list_display = ['id', 'name', 'description', 'api_doc_type_text']
     search_fields = ['name', 'description']
 
 @admin.register(Document)
