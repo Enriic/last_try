@@ -18,6 +18,7 @@ export interface Validation {
     document_type_name: string;
     user: number;
     status: ValidationStatus; // Usando enum
+    justification?: string;
     validation_details: ValidationResult;
     timestamp: string;
     resource_id: string;
@@ -130,7 +131,7 @@ export interface Company {
 export interface Resource {
     id: string;
     resource_type: ResourceType; // Usando enum para tipos de recursos
-    company: string; // ID de la compañía
+    //company: string; // ID de la compañía
     timestamp: string;
     resource_details: VehicleDetails | EmployeeDetails; // Detalles específicos del recurso
 }

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import './NewCompanyPage.less';
 import { Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import CompanyForm from '../../../components/CompanyForm/CompanyForm';
+import CompanyForm from '../../../components/Forms/CompanyForm/CompanyForm';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useTranslation } from 'react-i18next'; // Importar el hook de traducción
 import { ArrowLeftOutlined } from '@ant-design/icons';

@@ -10,12 +10,10 @@ import './JunoUplaodFile.less';
 import { useAuth } from '../../context/AuthContext';
 import { createValidation } from '../../services/validationService';
 import { getCompanyById } from '../../services/companyService';
-import ResourceSelect from '../common/SearchableSelect/ResourceSelect/ResourceSelect';
 import DocumentSelect from '../common/SearchableSelect/DocumentSelect/DocumentSelect';
 import DocumentTypeSelect from '../common/SearchableSelect/DocumentTypeSelect/DocumentTypeSelect';
-import CompanySelect from '../common/SearchableSelect/CompanySelect/CompanySelect';
-import DuplicateDocumentModal from '../DuplicateDocumentModal/DuplicateDocumentModal';
-import ValidationDetailsModal from '../ValidationDetailsModal/ValidationDetailsModal';
+import DuplicateDocumentModal from '../Modals/DuplicateDocumentModal/DuplicateDocumentModal';
+import ValidationDetailsModal from '../Modals/ValidationDetailsModal/ValidationDetailsModal';
 import DynamicInputs from './DynamicForm/DynamicForm';
 
 
@@ -53,7 +51,6 @@ const JunoUploadFile: React.FC<JunoUploadFileProps> = ({ documentId, setDocument
 
     const [useExistingDocument, setUseExistingDocument] = useState<boolean>(false);
 
-    const [associatedEntity, setAssociatedEntity] = useState<string>('resource'); // Valor por defecto 'resource'
     const [associatedEntities, setAssociatedEntities] = useState<string[]>([]);
 
 
@@ -186,8 +183,6 @@ const JunoUploadFile: React.FC<JunoUploadFileProps> = ({ documentId, setDocument
                     if (fileList[0] && documentType && (resource || companyId)) {
                         const file = fileList[0] as UploadFile<unknown>;
 
-                        //const entityId = associatedEntity === 'company' ? companyId : resource;
-
                         try {
                             const response = await uploadDocument(
                                 file.originFileObj as File,
@@ -281,21 +276,16 @@ const JunoUploadFile: React.FC<JunoUploadFileProps> = ({ documentId, setDocument
                             .filter((field: FieldToValidate) => selectedFieldsToValidate.includes(field.id.toString()))
                             .map((field: FieldToValidate) => {
                                 let expectedValue = '';
-                                console.log('Associated Entity:', associatedEntities)
                                 if (associatedEntities.includes('company')) {
-                                    console.log('Estamos dentro del if de associatedEntity = Company')
-                                    console.log('SelectedCompany:', selectedCompany)
+
                                     if (selectedCompany && field.name in selectedCompany) {
-                                        console.log('Field name', field.name)
-                                        console.log('Selected Company', selectedCompany)
+
                                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                         expectedValue = (selectedCompany as any)[field.name]?.toString() || '';
                                     }
                                 }
                                 if (associatedEntities.includes('resource') && selectedResource?.resource_details) {
-                                    console.log('Selectedresource:', selectedResource)
                                     const details = selectedResource.resource_details;
-                                    console.log('Resource Details:', details);
 
                                     if (isVehicleDetails(details) && selectedResource.resource_type === 'vehicle') {
                                         if (field.name in details) {
@@ -338,7 +328,6 @@ const JunoUploadFile: React.FC<JunoUploadFileProps> = ({ documentId, setDocument
 
                     console.log('Validación creada:', validation);
 
-
                     setValidationResult(validation);
                     setIsModalVisible(true);
 
@@ -347,9 +336,6 @@ const JunoUploadFile: React.FC<JunoUploadFileProps> = ({ documentId, setDocument
                         description: 'La validación ha sido creada correctamente',
                         duration: 3,
                     });
-
-
-
                 }
             } catch (error) {
                 console.log('Error al crear la validación:', error);

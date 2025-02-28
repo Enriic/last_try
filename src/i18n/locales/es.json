@@ -213,6 +213,7 @@
         "resource": "Recurso",
         "company": "Compañía",
         "status": "Estado",
+        "justification": "Justificación",
         "timestamp": "Fecha y Hora",
         "validation_fields": {
             "title": "Campos a validar"
@@ -234,6 +235,10 @@
                 "success": "Éxito",
                 "failure": "Fallo"
             }
+        },
+        "status_options": {
+            "success": "EXITO",
+            "failure": "FALLO"
         }
     },
     "validationPieChart": {

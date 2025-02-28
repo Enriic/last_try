@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Row, Col, notification } from 'antd';
-import DashboardKPIs from '../../components/DashboardKPIs/DashboardKPIs';
-import ValidationBarChart from '../../components/ValidationBarChart/ValidationBarChart';
-import ValidationPieChart from '../../components/ValidationPieChart/ValidationPieChart';
-import DocumentTypeAnalysis from '../../components/DocumentTypeAnalysis/DocumentTypeAnalysis';
+import DashboardKPIs from '../../components/DashboardItems/DashboardKPIs/DashboardKPIs';
+import ValidationBarChart from '../../components/DashboardItems/ValidationBarChart/ValidationBarChart';
+import ValidationPieChart from '../../components/DashboardItems/ValidationPieChart/ValidationPieChart';
+import DocumentTypeAnalysis from '../../components/DashboardItems/DocumentTypeAnalysis/DocumentTypeAnalysis';
 import Filters from '../../components/Filters/DashboardFilters/Filters';
 import { getAllValidations } from '../../services/validationService';
 import { Validation } from '../../types';

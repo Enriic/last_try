@@ -13,10 +13,10 @@ import companiesMenu from './companies';
 const menuItems: CustomMenuDataItem[] = [
     ...uploadMenu,
     ...dashboardMenu,
-    ...historyMenu,
-    ...settingsMenu,
-    ...resourcesMenu,
     ...companiesMenu,
+    ...resourcesMenu,
+    ...historyMenu,
+
 ];
 
 export default menuItems;

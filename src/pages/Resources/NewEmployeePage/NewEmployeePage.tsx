@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useTranslation } from 'react-i18next'; // Importar el hook de traducción
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import EmployeeResourceForm from '../../../components/EmployeeForm/EmployeeForm';
+import EmployeeResourceForm from '../../../components/Forms/EmployeeForm/EmployeeForm';
 
 
 const NewCompanyPage: React.FC = () => {

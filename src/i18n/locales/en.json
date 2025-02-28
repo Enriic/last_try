@@ -210,6 +210,7 @@
         "document_name": "Document Name",
         "document_type": "Document Type",
         "status": "Status",
+        "justification": "Justification",
         "resource": "Resource",
         "company": "Company",
         "timestamp": "Timestamp",
@@ -234,6 +235,10 @@
                 "success": "Success",
                 "failure": "Failure"
             }
+        },
+        "status_options": {
+            "success": "APPROVED",
+            "failure": "FAILED"
         }
     },
     "validationPieChart": {

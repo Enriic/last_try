@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Row, Col, notification } from 'antd';
-import ValidationTable from '../../components/ValidationTableHistory/ValidationTableHistory';
-import ValidationDetailsModal from '../../components/ValidationDetailsModal/ValidationDetailsModal';
+import ValidationTable from '../../components/Tables/ValidationTableHistory/ValidationTableHistory';
+import ValidationDetailsModal from '../../components/Modals/ValidationDetailsModal/ValidationDetailsModal';
 import ValidationFilters from '../../components/Filters/ValidationFilters/ValidationFilters';
 import { getValidations } from '../../services/validationService';
 import { Validation } from '../../types';
@@ -85,7 +85,7 @@ const ValidationHistoryPage: React.FC = () => {
 
     return (
         <PageContainer className='page-container' header={{
-            title: t('companiesPage.title'), 
+            title: t('companiesPage.title'),
         }}>
             <Row align="middle" justify="center" style={{ marginBottom: 16 }} className='history-filter-section'>
                 <Col span={24}>

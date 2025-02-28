@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Row, Col, notification, Input } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import JunoButton from '../../../components/common/JunoButton';
-import CompanyTable from '../../../components/CompanyTable/CompanyTable';
+import CompanyTable from '../../../components/Tables/CompanyTable/CompanyTable';
 import { getCompaniesForSelect } from '../../../services/companyService';
 import { Company } from '../../../types';
 import './CompaniesTablePage.less';
@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { debounce } from 'lodash';
 import { JunoButtonTypes } from '../../../components/common/JunoButton/JunoButton.types';
 import { PageContainer } from '@ant-design/pro-layout';
-import CompanyUpdateModal from '../../../components/CompanyUpdateModal/CompanyUpdateModal';
+import CompanyUpdateModal from '../../../components/Modals/CompanyUpdateModal/CompanyUpdateModal';
 
 
 
@@ -28,7 +28,7 @@ const CompaniesTablePage: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
-    
+
 
     useEffect(() => {
         fetchData(1, pageSize, searchTerm);

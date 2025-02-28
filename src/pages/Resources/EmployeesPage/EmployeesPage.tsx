@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Row, Col, notification, Input } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import JunoButton from '../../../components/common/JunoButton';
-import EmployeeTable from '../../../components/EmployeeTable/EmployeeTable';
+import EmployeeTable from '../../../components/Tables/EmployeeTable/EmployeeTable';
 import { getResourcesByType } from '../../../services/resourceService';
 import { Resource } from '../../../types';
 import './EmployeesPage.less';
@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { debounce } from 'lodash';
 import { JunoButtonTypes } from '../../../components/common/JunoButton/JunoButton.types';
 import { PageContainer } from '@ant-design/pro-layout';
-import EmployeeUpdateModal from '../../../components/EmployeeUpdateModal/EmployeeUpdateModal';
+import EmployeeUpdateModal from '../../../components/Modals/EmployeeUpdateModal/EmployeeUpdateModal';
 
 const EmployeePage: React.FC = () => {
     const { t } = useTranslation();
