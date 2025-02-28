@@ -60,7 +60,7 @@ const VehicleTable: React.FC<VehicleTableProps> = ({
         },
         {
             key: 'actions',
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
             render: (_: any, record: Vehicle) => (
                 <Button type="link" onClick={() => onViewDetails(record)}>
                     <EditOutlined />

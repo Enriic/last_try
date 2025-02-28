@@ -54,7 +54,7 @@ const CompanyTable: React.FC<CompanyTableProps> = ({
         },
         {
             key: 'actions',
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
             render: (_: any, record: Company) => (
                 <Button type="link" onClick={() => onViewDetails(record)}>
                     <EditOutlined />

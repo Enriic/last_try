@@ -1,5 +1,4 @@
 import { CustomMenuDataItem } from './types';
-import { UserOutlined } from '@ant-design/icons';
 
 const usersMenu: CustomMenuDataItem[] = [
     {

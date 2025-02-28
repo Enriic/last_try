@@ -6,6 +6,7 @@ import { getCompaniesForSelect } from '../../../../services/companyService';
 import { Company } from '../../../../types';
 import SearchableSelect from '../SearchableSelect';
 import { debounce } from 'lodash';
+import { useTranslation } from 'react-i18next';
 
 interface CompanySelectProps {
     value?: string | null;
@@ -23,6 +24,7 @@ const CompanySelect: React.FC<CompanySelectProps> = ({ value, onChange, placehol
     const [loading, setLoading] = useState<boolean>(false);
     const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
     const [searchValue, setSearchValue] = useState<string>('');
+    const { t } = useTranslation();
 
     useEffect(() => {
         fetchCompanies(1, searchValue);
@@ -46,10 +48,10 @@ const CompanySelect: React.FC<CompanySelectProps> = ({ value, onChange, placehol
             setTotalItems(count);
             setPage(pageNumber);
 
-        } catch (error) {
+        } catch (e) {
             notification.error({
-                message: '¡Ups! Algo salió mal',
-                description: 'Ocurrió un error al obtener las compañías',
+                message: t('notification.error.title'),
+                description: t('notification.error.description'),
                 duration: 3,
             });
         } finally {

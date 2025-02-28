@@ -63,7 +63,7 @@ const ValidationTableHistory: React.FC<ValidationTableHistoryProps> = ({
         },
         {
             key: 'actions',
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
             render: (_: any, record: Validation) => (
                 <Button type="link" onClick={() => onViewDetails(record)}>
                     {t('validationTableHistory.viewDetails')}

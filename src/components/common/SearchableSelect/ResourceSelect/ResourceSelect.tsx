@@ -6,6 +6,7 @@ import { notification } from 'antd';
 import { getResourcesBySearch } from '../../../../services/resourceService';
 import { Resource, EmployeeDetails, VehicleDetails } from '../../../../types';
 import SearchableSelect from '../../SearchableSelect/SearchableSelect';
+import { useTranslation } from 'react-i18next';
 
 interface ResourceSelectProps {
     value?: string | null;
@@ -23,6 +24,7 @@ const ResourceSelect: React.FC<ResourceSelectProps> = ({ value, onChange, placeh
     const [loading, setLoading] = useState<boolean>(false);
     const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
     const [searchValue, setSearchValue] = useState<string>('');
+    const { t } = useTranslation();
 
     useEffect(() => {
         fetchResources(1, searchValue);
@@ -49,8 +51,8 @@ const ResourceSelect: React.FC<ResourceSelectProps> = ({ value, onChange, placeh
 
         } catch (error) {
             notification.error({
-                message: '¡Ups! Algo salió mal',
-                description: 'Ocurrió un error al obtener las compañías',
+                message: t('notification.error.title'),
+                description: t('notification.error.description'),
                 duration: 3,
             });
         } finally {

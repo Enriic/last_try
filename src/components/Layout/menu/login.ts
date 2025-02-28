@@ -2,7 +2,6 @@ import { CustomMenuDataItem } from './types';
 import { LoginOutlined } from '@ant-design/icons';
 import React from 'react';
 
-
 const loginMenu: CustomMenuDataItem[] = [
     {
         path: '/login',

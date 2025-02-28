@@ -10,8 +10,3 @@ export interface ValidationFilterOptions {
 
 }
 
-export interface CompanyFilterOptions {
-    id?: string | null;
-    company_name?: string | null;
-    company_id?: string | null;
-}

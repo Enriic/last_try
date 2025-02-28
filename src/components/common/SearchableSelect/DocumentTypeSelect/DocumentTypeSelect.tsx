@@ -6,6 +6,7 @@ import { getDocumentTypes } from '../../../../services/documentService';
 import { DocumentType } from '../../../../types';
 import SearchableSelect from '../SearchableSelect';
 import { debounce } from 'lodash';
+import { useTranslation } from 'react-i18next';
 
 interface DocumentTypeSelectProps {
     value?: string | null;
@@ -23,6 +24,7 @@ const DocumentTypeSelect: React.FC<DocumentTypeSelectProps> = ({ value, onChange
     const [loading, setLoading] = useState<boolean>(false);
     const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
     const [searchValue, setSearchValue] = useState<string>('');
+    const { t } = useTranslation();
 
     useEffect(() => {
         fetchDocumentTypes(1, searchValue);
@@ -48,8 +50,8 @@ const DocumentTypeSelect: React.FC<DocumentTypeSelectProps> = ({ value, onChange
 
         } catch (error) {
             notification.error({
-                message: '¡Ups! Algo salió mal',
-                description: 'Ocurrió un error al obtener las compañías',
+                message: t('notification.error.title'),
+                description: t('notification.error.description'),
                 duration: 3,
             });
         } finally {

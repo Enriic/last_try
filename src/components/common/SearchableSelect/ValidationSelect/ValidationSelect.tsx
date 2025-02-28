@@ -1,12 +1,11 @@
 // src/components/Validation
-
-
 import React, { useEffect, useState } from 'react';
 import { notification, Spin } from 'antd';
 import { getValidationsForSelect } from '../../../../services/validationService';
 import { Validation } from '../../../../types';
 import SearchableSelect from '../SearchableSelect';
 import { debounce } from 'lodash';
+import { useTranslation } from 'react-i18next';
 
 
 interface ValidationSelectProps {
@@ -24,6 +23,7 @@ const ValidationSelect: React.FC<ValidationSelectProps> = ({ value, onChange, pl
     const [loading, setLoading] = useState<boolean>(false);
     const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
     const [searchValue, setSearchValue] = useState<string>('');
+    const { t } = useTranslation();
 
     useEffect(() => {
         fetchValidations(page, searchValue);
@@ -51,8 +51,8 @@ const ValidationSelect: React.FC<ValidationSelectProps> = ({ value, onChange, pl
 
         } catch (error) {
             notification.error({
-                message: '¡Ups! Algo salió mal',
-                description: 'Ocurrió un error al obtener las compañías',
+                message: t('notification.error.title'),
+                description: t('notification.error.description'),
                 duration: 3,
             });
         } finally {
@@ -109,7 +109,7 @@ const ValidationSelect: React.FC<ValidationSelectProps> = ({ value, onChange, pl
             keySelector={keySelector}
             hasMore={hasMore}
             isLoadingMore={isLoadingMore}
-            onSearch={debouncedHandleSearch} 
+            onSearch={debouncedHandleSearch}
         />
     );
 };

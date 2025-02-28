@@ -26,7 +26,7 @@ const LoginComponent = () => {
             console.log('Logging in with:', values.username, values.password);
             await login(values.username, values.password);
             navigate('/upload', { replace: true }); // Redirige al home o a la ruta deseada
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
         } catch (error: any) {
             console.error('Error al iniciar sesión:', error);
             notification.error({

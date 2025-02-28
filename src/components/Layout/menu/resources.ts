@@ -1,12 +1,12 @@
 import { CustomMenuDataItem } from './types';
-import { AppstoreAddOutlined } from '@ant-design/icons';
+import { TeamOutlined } from '@ant-design/icons';
 import React from 'react';
 
 const resourcesMenu: CustomMenuDataItem[] = [
     {
         key: 'resources',
         name: 'menu.resources.label',
-        icon: React.createElement(AppstoreAddOutlined),
+        icon: React.createElement(TeamOutlined),
         type: 'group',
         roles: ['admin', 'staff', 'active'],
         children: [

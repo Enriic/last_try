@@ -53,7 +53,7 @@ export const getResourcesBySearch = async (page = 1, pageSize = 10, search = '')
     return response.data;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export const createResource = async (resource: any) => {
     const response = await axios.post(`${API_URL}/api/resources/`, resource, {
         withCredentials: true,
@@ -61,16 +61,16 @@ export const createResource = async (resource: any) => {
     return response.data;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export const updateResource = async (id: string, resource: any) => {
     const response = await axios.put(`${API_URL}/api/resources/${id}/`, resource, {
         withCredentials: true,
     });
-    console.log('resource data',resource)
+    console.log('resource data', resource)
     return response.data;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export const createEmployee = async (resource: any) => {
     const response = await axios.post(`${API_URL}/api/employees/`, resource, {
         withCredentials: true,
@@ -78,7 +78,7 @@ export const createEmployee = async (resource: any) => {
     return response.data;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export const updateEmployee = async (id: string, resource: any) => {
     const response = await axios.put(`${API_URL}/api/employees/${id}/`, resource, {
         withCredentials: true,

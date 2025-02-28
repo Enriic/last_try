@@ -1,6 +1,5 @@
 // src/components/EmployeeForm/EmployeeForm.tsx
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect } from 'react';
 import { Form, Input, notification } from 'antd';
 import { useTranslation } from 'react-i18next';

@@ -21,7 +21,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentId, onDownload, style }) 
     const [numPages, setNumPages] = useState<number | null>(null);
     const [scale, setScale] = useState(1.0);
     const [rotation, setRotation] = useState(0);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const [pdfFile, setPdfFile] = useState<any>(null);  // Aquí almacenaremos el PDF obtenido
     const { t, i18n } = useTranslation();
     const { xs, md, lg } = useBreakpoint();

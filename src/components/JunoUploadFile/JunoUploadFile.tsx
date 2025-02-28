@@ -261,12 +261,12 @@ const JunoUploadFile: React.FC<JunoUploadFileProps> = ({ documentId, setDocument
                     const status = 'pending';
 
                     // Type Guards para determinar el tipo de detalles
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
                     function isVehicleDetails(details: any): details is VehicleDetails {
                         return 'registration_id' in details;
                     }
 
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
                     function isEmployeeDetails(details: any): details is EmployeeDetails {
                         return 'worker_id' in details;
                     }
@@ -280,7 +280,7 @@ const JunoUploadFile: React.FC<JunoUploadFileProps> = ({ documentId, setDocument
 
                                     if (selectedCompany && field.name in selectedCompany) {
 
-                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
                                         expectedValue = (selectedCompany as any)[field.name]?.toString() || '';
                                     }
                                 }

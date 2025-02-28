@@ -44,7 +44,7 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
             const data = await getField(field);
             setCountries(data);
         } catch (error) {
-            console.error("Error al obtener los países:", error);
+            console.error("Something went wrong tying to fetch countries", error);
         } finally {
             setLoading(false);
         }

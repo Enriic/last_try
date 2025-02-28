@@ -18,6 +18,7 @@ import DocumentTypeSelect from '../../common/SearchableSelect/DocumentTypeSelect
 import './ValidationFilters.less';
 import { useTranslation } from 'react-i18next';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
+import { DateFormat } from '../../../types/format.ts';
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
@@ -49,8 +50,8 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, o
         const filters: ValidationFilterOptions = {
             document_id: documentId,
             validation_id: validationId,
-            start_date: dateRange && dateRange[0] ? dateRange[0].format('YYYY-MM-DD') : null,
-            end_date: dateRange && dateRange[1] ? dateRange[1].format('YYYY-MM-DD') : null,
+            start_date: dateRange && dateRange[0] ? dateRange[0].format(DateFormat) : null,
+            end_date: dateRange && dateRange[1] ? dateRange[1].format(DateFormat) : null,
             document_type: documentType,
             status: status,
             company_id: companyId,
@@ -102,8 +103,6 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, o
     const toggleExpanded = () => {
         setIsExpanded(!isExpanded);
     };
-
-    
 
     return (
         <div className='validation-filters-container'>

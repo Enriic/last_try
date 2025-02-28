@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect } from 'react';
 import { Form, Input, InputNumber, notification } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -7,7 +6,6 @@ import CompanySelect from '../../common/SearchableSelect/CompanySelect/CompanySe
 import JunoButton from '../../common/JunoButton';
 import { JunoButtonTypes } from '../../common/JunoButton/JunoButton.types';
 import { createResource, updateResource } from '../../../services/resourceService';
-import './ResourceForm.less';
 import { Resource } from '../../../types';
 
 interface VehicleResourceFormProps {

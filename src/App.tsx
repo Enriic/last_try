@@ -14,7 +14,6 @@ import CompaniesTablePage from './pages/Companies/CompaniesTablePage/CompaniesTa
 import UploadPage from './pages/Upload/UploadPage';
 import NewEmployeePage from './pages/Resources/NewEmployeePage/NewEmployeePage';
 import NewCompanyPage from './pages/Companies/NewCompanyPage/NewCompanyPage';
-import ResourcesPage from './pages/Resources/ResourcesPage';
 import { pdfjs } from 'react-pdf';
 import './assets/styles/styles.less';
 import BasicLayout from './components/Layout/BasicLayout';

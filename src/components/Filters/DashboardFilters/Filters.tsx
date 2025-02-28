@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { DatePicker, Row, Col, Tooltip } from 'antd';
-import { Validation } from '../../../types';
 import { ValidationFilterOptions } from '../../../types/filters';
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
@@ -14,6 +13,7 @@ import { JunoButtonTypes } from '../../common/JunoButton/JunoButton.types';
 import DocumentTypeSelect from '../../common/SearchableSelect/DocumentTypeSelect/DocumentTypeSelect';
 import { useTranslation } from 'react-i18next';
 import { useWindowSize } from '../../../hooks/useWindowSize';
+import { DateFormat } from '../../../types/format';
 
 type RangeValue = [Dayjs | null, Dayjs | null] | null;
 
@@ -37,10 +37,7 @@ const Filters: React.FC<FiltersProps> = ({ onApplyFilters, onClearFilters }) => 
     // Get window width to determine if tooltips should be shown
     const { width } = useWindowSize();
 
-    // Determine if tooltips should be shown based on screen width
     useEffect(() => {
-        // Show tooltips on screens smaller than 1200px (instead of 992px)
-        // This is a good middle ground between never showing them and showing them too often
         setShowTooltips(width < 1200);
     }, [width]);
 
@@ -60,8 +57,8 @@ const Filters: React.FC<FiltersProps> = ({ onApplyFilters, onClearFilters }) => 
 
     const applyFilters = () => {
         const filters: ValidationFilterOptions = {
-            start_date: dateRange && dateRange[0] ? dateRange[0].format('YYYY-MM-DD') : null,
-            end_date: dateRange && dateRange[1] ? dateRange[1].format('YYYY-MM-DD') : null,
+            start_date: dateRange && dateRange[0] ? dateRange[0].format(DateFormat) : null,
+            end_date: dateRange && dateRange[1] ? dateRange[1].format(DateFormat) : null,
             document_type: documentType,
         };
         onApplyFilters(filters);

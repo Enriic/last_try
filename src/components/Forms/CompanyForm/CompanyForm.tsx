@@ -1,7 +1,5 @@
 // src/components/CompanyForm/CompanyForm.tsx
 
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect } from 'react';
 import { Form, Input, notification } from 'antd';
 import { useNavigate } from 'react-router-dom';

@@ -2,7 +2,6 @@ import { CustomMenuDataItem } from './types';
 import { LogoutOutlined } from '@ant-design/icons';
 import React from 'react';
 
-
 const logoutMenu: CustomMenuDataItem[] = [
     {
         path: '/Logout',

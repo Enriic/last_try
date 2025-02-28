@@ -61,7 +61,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
         },
         {
             key: 'actions',
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
             render: (_: any, record: Resource) => (
                 <Button type="link" onClick={() => onViewDetails(record)}>
                     <EditOutlined />

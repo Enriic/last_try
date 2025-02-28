@@ -15,10 +15,10 @@ export const groupByDocumentType = (validations: Validation[]) => {
             acc[type].rejected += 1;
         }
         return acc;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     }, {} as any);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     return Object.values(groups).map((group: any) => ({
         ...group,
         successRate: group.count > 0 ? (group.approved / group.count) * 100 : 0,

@@ -2,7 +2,6 @@ import { CustomMenuDataItem } from './types';
 import { PieChartOutlined } from '@ant-design/icons';
 import React from 'react';
 
-
 const dashboardMenu: CustomMenuDataItem[] = [
     {
         path: '/dashboard',

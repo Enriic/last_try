@@ -17,7 +17,7 @@ interface ValidationBarChartProps {
 const ValidationBarChart: React.FC<ValidationBarChartProps> = ({ validations }) => {
     const [selectedYear, setSelectedYear] = useState(ACTUAL_YEAR);
 
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
 
     // Extract years from the validations data
     const years = Array.from(new Set(validations.map((val) => new Date(val.timestamp).getFullYear().toString())));
