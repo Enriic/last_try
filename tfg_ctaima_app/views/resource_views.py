@@ -19,7 +19,7 @@ from .decorators import log_event
 logger = logging.getLogger(__name__)
 
 class ResourceViewSet(viewsets.ModelViewSet):
-    queryset = Resource.objects.select_related('company', 'employee', 'vehicle').all().order_by('-timestamp')
+    queryset = Resource.objects.select_related('employee', 'vehicle').all().order_by('-timestamp')
     serializer_class = ResourceSerializer
     filter_backends = [rest_framework_filters.SearchFilter, rest_framework_filters.OrderingFilter]
     filterset_class = ResourceFilter
@@ -100,7 +100,9 @@ class ResourceViewSet(viewsets.ModelViewSet):
         return Response({'error': 'No se proporcionó un término de búsqueda.'}, status=status.HTTP_400_BAD_REQUEST)
 
 class EmployeeViewSet(viewsets.ModelViewSet):
-    queryset = Employee.objects.select_related('company').all().order_by('-timestamp')
+    queryset = Employee.objects.all().order_by('-timestamp')
+    # queryset = Employee.objects.select_related('company').all().order_by('-timestamp')
+
     filter_backends = [rest_framework_filters.SearchFilter, rest_framework_filters.OrderingFilter]
     search_fields = ['first_name', 'last_name','worker_id']
     serializer_class = EmployeeSerializer
@@ -141,7 +143,9 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class VehicleViewSet(viewsets.ModelViewSet):
-    queryset = Vehicle.objects.select_related('company').all()
+    # queryset = Vehicle.objects.select_related('company').all()
+    queryset = Vehicle.objects.all()
+
     serializer_class = VehicleSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = StandardResultsSetPagination

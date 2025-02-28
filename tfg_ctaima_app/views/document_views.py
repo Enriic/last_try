@@ -143,9 +143,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
             if resource_id:
                 resource = get_object_or_404(Resource, pk=resource_id)
                 data['resource'] = resource.id
-                # Si company no se asignó manualmente, lo asignamos del recurso
-                if 'company' not in data:
-                    data['company'] = resource.company.id
+               
 
 
         serializer = self.get_serializer(data=data)

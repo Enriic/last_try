@@ -59,7 +59,7 @@ class Company(models.Model):
     email = models.EmailField(null=True, blank=True, unique=True)
     location = models.CharField(max_length=255)
     phone = models.CharField(max_length=20, null=True, blank=True)
-    language = models.CharField(max_length=50)
+    language = models.CharField(max_length=50, null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -79,7 +79,7 @@ class Resource(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     resource_type = models.CharField(max_length=50, choices=type_choices, default='employee')
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    #company = models.ForeignKey(Company, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -121,6 +121,7 @@ class DocumentType(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)  # Usar el modelo User de Django
     description = models.TextField(blank=True, null=True)
     api_doc_type_text = models.CharField(max_length=50, default='')
+    sign = models.BooleanField(default=False)
     pattern_validation = models.JSONField(blank=True, null=True)
     pattern_invalidation = models.JSONField(blank=True, null=True)
 
@@ -190,6 +191,7 @@ class Validation(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)  # Usar el modelo User de Django
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     validation_details = models.JSONField()  
+    justification = models.TextField(blank=True, null=True)
     timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):

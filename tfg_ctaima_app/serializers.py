@@ -86,7 +86,9 @@ class ResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Resource
-        fields = ['id', 'resource_type', 'company', 'resource_details', 'timestamp']
+        fields = ['id', 'resource_type', 'resource_details', 'timestamp']
+        # fields = ['id', 'resource_type', 'company', 'resource_details', 'timestamp']
+
 
     def get_resource_details(self, obj):
         """
@@ -138,7 +140,7 @@ class DocumentTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = DocumentType
         fields = [
-            'id', 'user', 'name', 'description',
+            'id', 'user', 'name', 'description', 'sign', 'api_doc_type_text',
             'fields_to_validate', 'fields_to_extract', 'associated_entities'
         ]
 
@@ -210,7 +212,7 @@ class ValidationSerializer(serializers.ModelSerializer):
         model = Validation
         fields = [
             'id', 'document', 'document_name', 'resource_id', 'company',
-            'document_type_name', 'document_type', 'user', 'status',
+            'document_type_name', 'document_type', 'user', 'status', 'justification', 
             'validation_details', 'timestamp'
         ]
 

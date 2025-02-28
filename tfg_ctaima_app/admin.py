@@ -47,7 +47,7 @@ class CompanyAdmin(admin.ModelAdmin):
 
 @admin.register(Resource)
 class ResourceAdmin(admin.ModelAdmin):
-    list_display = ['id', 'resource_type', 'company', 'timestamp']
+    list_display = ['id', 'resource_type', 'timestamp']
 
 
 @admin.register(Vehicle)
