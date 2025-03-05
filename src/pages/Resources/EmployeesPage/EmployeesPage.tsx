@@ -14,23 +14,43 @@ import { JunoButtonTypes } from '../../../components/common/JunoButton/JunoButto
 import { PageContainer } from '@ant-design/pro-layout';
 import EmployeeUpdateModal from '../../../components/Modals/EmployeeUpdateModal/EmployeeUpdateModal';
 
+/**
+ * Página para mostrar y gestionar empleados
+ */
 const EmployeePage: React.FC = () => {
+    /* Hook para acceder a las funciones de traducción */
     const { t } = useTranslation();
+    /* Hook para la navegación entre páginas */
     const navigate = useNavigate();
 
+    /* Estado para almacenar la lista de empleados */
     const [employees, setEmployees] = useState<Resource[]>([]);
+    /* Estado para controlar la carga de datos */
     const [loading, setLoading] = useState<boolean>(true);
+    /* Estado para la página actual de la paginación */
     const [currentPage, setCurrentPage] = useState<number>(1);
+    /* Estado para el tamaño de página */
     const [pageSize, setPageSize] = useState<number>(10);
+    /* Estado para el número total de elementos */
     const [totalItems, setTotalItems] = useState<number>(0);
+    /* Estado para el término de búsqueda */
     const [searchTerm, setSearchTerm] = useState<string>('');
+    /* Estado para la visibilidad del modal de actualización */
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+    /* Estado para el empleado seleccionado */
     const [selectedEmployee, setSelectedEmployee] = useState<Resource | null>(null);
 
+    /* Efecto para cargar los datos iniciales */
     useEffect(() => {
         fetchData(1, pageSize, searchTerm);
     }, []);
 
+    /**
+     * Función para obtener los datos de los empleados
+     * @param pageNumber - Número de página actual
+     * @param pageSize - Tamaño de página
+     * @param search - Término de búsqueda
+     */
     const fetchData = async (pageNumber: number, pageSize: number, search: string) => {
         try {
             setLoading(true);
@@ -49,6 +69,9 @@ const EmployeePage: React.FC = () => {
         }
     };
 
+    /**
+     * Función de búsqueda con debounce para evitar demasiadas peticiones
+     */
     const debouncedSearch = useMemo(
         () =>
             debounce((value: string) => {
@@ -58,34 +81,50 @@ const EmployeePage: React.FC = () => {
         [pageSize]
     );
 
+    /* Efecto para limpiar el debounce al desmontar el componente */
     useEffect(() => {
         return () => {
             debouncedSearch.cancel();
         };
     }, [debouncedSearch]);
 
+    /**
+     * Manejador para el cambio en el campo de búsqueda
+     */
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setSearchTerm(value);
         debouncedSearch(value);
     };
 
+    /**
+     * Manejador para el cambio de página
+     */
     const handlePageChange = (page: number, pageSize?: number) => {
         setCurrentPage(page);
         setPageSize(pageSize || 10);
         fetchData(page, pageSize || 10, searchTerm);
     };
 
+    /**
+     * Manejador para crear un nuevo empleado
+     */
     const handleNewEmployee = () => {
         navigate('/resources/employees/new');
     };
 
+    /**
+     * Manejador para cerrar el modal de actualización
+     */
     const handleModalClose = () => {
         setIsModalVisible(false);
         setSelectedEmployee(null);
         fetchData(currentPage, pageSize, searchTerm);
     };
 
+    /**
+     * Manejador para mostrar los detalles de un empleado
+     */
     const showEmployeeDetails = (employee: Resource): void => {
         setSelectedEmployee(employee);
         setIsModalVisible(true);
@@ -93,6 +132,7 @@ const EmployeePage: React.FC = () => {
 
     return (
         <PageContainer className='page-container' header={{ title: t('employees_table_page.title') }}>
+            {/* Sección de búsqueda y botón para crear nuevo empleado */}
             <Row className="employee-search-section">
                 <Col
                     style={{
@@ -104,12 +144,14 @@ const EmployeePage: React.FC = () => {
                     }}
                     span={24}
                 >
+                    {/* Campo de búsqueda */}
                     <Input
                         style={{ width: '85%' }}
                         placeholder={t('employees_table_page.search_placeholder') || 'Buscar...'}
                         value={searchTerm}
                         onChange={handleSearchChange}
                     />
+                    {/* Botón para crear nuevo empleado */}
                     <JunoButton
                         style={{ width: '15%' }}
                         buttonType={JunoButtonTypes.Add}
@@ -121,6 +163,7 @@ const EmployeePage: React.FC = () => {
                 </Col>
             </Row>
 
+            {/* Tabla de empleados */}
             <EmployeeTable
                 employees={employees}
                 loading={loading}
@@ -133,6 +176,7 @@ const EmployeePage: React.FC = () => {
                 onViewDetails={showEmployeeDetails}
             />
 
+            {/* Modal para actualizar empleado */}
             {isModalVisible && selectedEmployee && (
                 <EmployeeUpdateModal
                     employee={selectedEmployee}

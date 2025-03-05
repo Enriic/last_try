@@ -6,10 +6,17 @@ import { Validation } from '../../../types';
 import './ValidationTableHistory.less';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Propiedades para el componente de tabla de historial de validaciones
+ */
 interface ValidationTableHistoryProps {
+    /* Lista de validaciones a mostrar */
     validations: Validation[];
+    /* Estado de carga de la tabla */
     loading: boolean;
+    /* Función para manejar la visualización de detalles de una validación */
     onViewDetails: (validation: Validation) => void;
+    /* Configuración de paginación */
     pagination: {
         current: number;
         pageSize: number;
@@ -18,14 +25,21 @@ interface ValidationTableHistoryProps {
     };
 }
 
+/**
+ * Componente para mostrar una tabla con el historial de validaciones de documentos
+ */
 const ValidationTableHistory: React.FC<ValidationTableHistoryProps> = ({
     validations,
     loading,
     onViewDetails,
     pagination,
 }) => {
+    /* Hook para acceder a las funciones de traducción */
     const { t } = useTranslation();
 
+    /**
+     * Función para renderizar un tag de estado según el resultado de la validación
+     */
     const renderTag = (status: string) => {
         if (status === 'success') {
             return <Tag color="green">{t('validationTableHistory.success')}</Tag>;
@@ -36,6 +50,7 @@ const ValidationTableHistory: React.FC<ValidationTableHistoryProps> = ({
         }
     };
 
+    /* Definición de columnas de la tabla */
     const columns = [
         {
             title: t('validationTableHistory.date'),
@@ -63,7 +78,7 @@ const ValidationTableHistory: React.FC<ValidationTableHistoryProps> = ({
         },
         {
             key: 'actions',
-
+            /* Columna para acciones, muestra un botón para ver detalles */
             render: (_: any, record: Validation) => (
                 <Button type="link" onClick={() => onViewDetails(record)}>
                     {t('validationTableHistory.viewDetails')}
@@ -72,10 +87,12 @@ const ValidationTableHistory: React.FC<ValidationTableHistoryProps> = ({
         },
     ];
 
+    /* Muestra un indicador de carga si los datos están cargando */
     if (loading) {
         return <Spin />;
     }
 
+    /* Renderiza la tabla de validaciones */
     return (
         <Table
             size="middle"

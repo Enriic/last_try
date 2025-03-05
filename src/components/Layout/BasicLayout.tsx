@@ -14,42 +14,49 @@ const { Text } = Typography;
 const { Option } = Select;
 const { confirm } = Modal;
 
+{/* Interfaz que define las propiedades para el componente de layout */ }
 interface BasicLayoutProps {
     children?: ReactNode;
 }
 
+{/* 
+ * Componente principal de layout para toda la aplicación
+ * Proporciona la estructura, navegación y elementos comunes para todas las páginas
+ */}
 const BasicLayout: React.FC<BasicLayoutProps> = () => {
     const navigate = useNavigate();
     const [pathname, setPathname] = useState<string>('/');
     const { t, i18n } = useTranslation();
     const { logout, user } = useAuth();
 
+    {/* Maneja el proceso de cierre de sesión */ }
     const handleLogout = async () => {
         try {
             await logout();
             notification.success({
-                message: t('logout.success.message'), // Traducido
-                description: t('logout.success.description'), // Traducido
+                message: t('logout.success.message'),
+                description: t('logout.success.description'),
                 duration: 3,
             });
             navigate('/login');
         } catch (error) {
             console.error('Error al cerrar sesión:', error);
             notification.error({
-                message: t('logout.error.message'), // Traducido
-                description: t('logout.error.description'), // Traducido
+                message: t('logout.error.message'),
+                description: t('logout.error.description'),
                 duration: 3,
             });
         }
     };
 
+    {/* Muestra un diálogo de confirmación antes de cerrar sesión */ }
     const showLogoutConfirm = () => {
         confirm({
-            title: t('logout.confirmation.title'), // Traducido
-            content: t('logout.confirmation.content'), // Traducido
-            okText: t('logout.confirmation.confirm'), // Traducido
+            title: t('logout.confirmation.title'),
+            content: t('logout.confirmation.content'),
+            okText: t('logout.confirmation.confirm'),
             okType: 'danger',
-            cancelText: t('logout.confirmation.cancel'), // Traducido
+            cancelText: t('logout.confirmation.cancel'),
             onOk() {
                 handleLogout();
             },
@@ -63,10 +70,13 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
 
     const location = useLocation();
 
+    {/* Estado para controlar el colapso del menú lateral */ }
     const [collapsed, setCollapsed] = useState<boolean>(false);
 
+    {/* Hook para detectar el tamaño de pantalla */ }
     const { xs } = useBreakpoint();
 
+    {/* Colapsa automáticamente el menú en pantallas pequeñas */ }
     useEffect(() => {
         if (xs) {
             setCollapsed(true);
@@ -75,6 +85,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
         }
     }, [xs]);
 
+    {/* Filtra los elementos del menú según los roles del usuario */ }
     const filterMenuItemsByRoles = (items: CustomMenuDataItem[]): CustomMenuDataItem[] =>
         items
             .filter((item) => {
@@ -91,8 +102,10 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
                 return newItem;
             });
 
+    {/* Aplica el filtro de roles al menú */ }
     const finalMenuItems = filterMenuItemsByRoles(menuItems);
 
+    {/* Añade la opción de cerrar sesión al menú si el usuario está autenticado */ }
     if (user) {
         finalMenuItems.push({
             path: '/logout',
@@ -102,6 +115,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
         });
     }
 
+    {/* Aplica traducciones a los elementos del menú */ }
     const menuDataRender = (menuData: CustomMenuDataItem[]): CustomMenuDataItem[] =>
         menuData.map((item) => {
             const localItem = {
@@ -112,6 +126,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
             return localItem;
         });
 
+    {/* Personaliza el renderizado de cada elemento del menú */ }
     const menuItemRender = (
         item: CustomMenuDataItem & { isUrl: boolean; onClick: () => void },
         defaultDom: React.ReactNode,
@@ -135,6 +150,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
         );
     };
 
+    {/* Botón para colapsar/expandir el menú lateral */ }
     const toggleMenu = (
         <div
             onClick={() => setCollapsed(!collapsed)}
@@ -148,17 +164,19 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
         </div>
     );
 
+    {/* Selector de idioma de la aplicación */ }
     const languageSelector = (
         <Select
             value={i18n.language}
             style={{ width: 120 }}
             onChange={(lng) => i18n.changeLanguage(lng)}
         >
-            <Option value="es">{t('menu.language.es')}</Option> {/* Traducido */}
-            <Option value="en">{t('menu.language.en')}</Option> {/* Traducido */}
+            <Option value="es">{t('menu.language.es')}</Option>
+            <Option value="en">{t('menu.language.en')}</Option>
         </Select>
     );
 
+    {/* Configuración general del layout */ }
     const settings: ProSettings = {
         fixSiderbar: true,
         fixedHeader: true,
@@ -179,7 +197,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
             menuDataRender={menuDataRender}
             menuItemRender={menuItemRender}
             location={location}
-            title={t('menu.application_title')} 
+            title={t('menu.application_title')}
             siderWidth={228}
             headerRender={() => null}
             collapsedButtonRender={() => null}
@@ -189,6 +207,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
             }}
             breakpoint="xs"
         >
+            {/* Barra superior con controles de navegación e idioma */}
             <div
                 style={{
                     display: 'flex',
@@ -201,6 +220,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
                 <div style={{ flex: 1 }} />
                 {languageSelector}
             </div>
+            {/* Contenido principal de la página */}
             <Outlet />
         </ProLayout>
     );

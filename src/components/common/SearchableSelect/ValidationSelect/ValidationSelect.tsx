@@ -1,4 +1,4 @@
-// src/components/Validation
+// src/components/common/SearchableSelect/ValidationSelect/ValidationSelect.tsx
 import React, { useEffect, useState } from 'react';
 import { notification, Spin } from 'antd';
 import { getValidationsForSelect } from '../../../../services/validationService';
@@ -7,7 +7,9 @@ import SearchableSelect from '../SearchableSelect';
 import { debounce } from 'lodash';
 import { useTranslation } from 'react-i18next';
 
-
+/**
+ * Props para el componente ValidationSelect
+ */
 interface ValidationSelectProps {
     value?: string | null;
     onChange?: (value: string | null) => void;
@@ -15,6 +17,11 @@ interface ValidationSelectProps {
     style?: React.CSSProperties;
 }
 
+/**
+ * Componente para seleccionar validaciones con búsqueda y paginación
+ * 
+ * Permite buscar validaciones por ID con soporte para carga paginada mediante scroll infinito
+ */
 const ValidationSelect: React.FC<ValidationSelectProps> = ({ value, onChange, placeholder, style }) => {
     const [validations, setValidations] = useState<Validation[]>([]);
     const [page, setPage] = useState<number>(1);
@@ -25,27 +32,27 @@ const ValidationSelect: React.FC<ValidationSelectProps> = ({ value, onChange, pl
     const [searchValue, setSearchValue] = useState<string>('');
     const { t } = useTranslation();
 
+    /**
+     * Cargar validaciones al montar el componente o cambiar el término de búsqueda
+     */
     useEffect(() => {
         fetchValidations(page, searchValue);
     }, [searchValue]);
 
-
+    /**
+     * Obtiene el listado de validaciones desde el servidor
+     * @param pageNumber Número de página que se solicita
+     * @param search Término de búsqueda opcional
+     */
     const fetchValidations = async (pageNumber: number, search: string) => {
         try {
-            if (pageNumber === 1) {
-                setLoading(true);
-            } else {
-                setIsLoadingMore(true);
-            }
+            // Control de estado de carga según sea primera página o paginación
+            pageNumber === 1 ? setLoading(true) : setIsLoadingMore(true);
             const data = await getValidationsForSelect(pageNumber, pageSize, search);
             const { results, count } = data;
-            console.log('validaciones cargadas: ', data.results)
 
-            if (pageNumber === 1) {
-                setValidations(results);
-            } else {
-                setValidations((prevValidations) => [...prevValidations, ...results]);
-            }
+            // Si es la primera página, reemplazar datos; si no, añadir a los existentes
+            pageNumber === 1 ? setValidations(results) : setValidations((prevValidations) => [...prevValidations, ...results]);
             setTotalItems(count);
             setPage(pageNumber);
 
@@ -56,14 +63,14 @@ const ValidationSelect: React.FC<ValidationSelectProps> = ({ value, onChange, pl
                 duration: 3,
             });
         } finally {
-            if (pageNumber === 1) {
-                setLoading(false);
-            } else {
-                setIsLoadingMore(false);
-            }
+            // Restablecer estado de carga
+            pageNumber === 1 ? setLoading(false) : setIsLoadingMore(false);
         }
     };
 
+    /**
+     * Solicita la siguiente página de resultados cuando se detecta scroll hasta el final
+     */
     const handleLoadMore = () => {
         if (isLoadingMore || validations.length >= totalItems) {
             return;
@@ -72,31 +79,45 @@ const ValidationSelect: React.FC<ValidationSelectProps> = ({ value, onChange, pl
         fetchValidations(nextPage, searchValue);
     };
 
+    /**
+     * Maneja la búsqueda con debounce para evitar peticiones excesivas
+     */
     const debouncedHandleSearch = debounce((value: string) => {
         setSearchValue(value);
-        setPage(1);
-    }, 600);
+        setPage(1); // Reiniciar a primera página cuando hay nueva búsqueda
+    }, 400);
 
+    /**
+     * Maneja el cambio de valor seleccionado
+     */
     const handleSelectChange = (value: string | null) => {
         if (onChange) {
             onChange(value);
         }
+        // Si se borra la selección, limpiar búsqueda y reiniciar paginación
         if (!value) {
             setSearchValue('');
             setPage(1);
         }
     };
 
-
+    /**
+     * Define cómo se visualiza cada opción en el desplegable
+     * En este caso, muestra el ID de la validación
+     */
     const renderOption = (item: Validation) => item.id;
 
+    /**
+     * Define qué campo usar como clave única para cada opción
+     */
     const keySelector = (item: Validation) => item.id;
 
+    /**
+     * Determina si hay más resultados disponibles para cargar
+     */
     const hasMore = validations.length < totalItems;
 
-
     return (
-
         <SearchableSelect<Validation>
             data={validations}
             value={value}

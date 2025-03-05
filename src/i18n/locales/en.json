@@ -25,6 +25,7 @@
         },
         "application_title": "My application"
     },
+    
     "common": {
         "apply": "Apply",
         "clear": "Clear",
@@ -164,7 +165,8 @@
             "content": "Are you sure you want to logout?",
             "cancel": "No",
             "confirm": "Yes"
-        }
+        },
+        "button": "Logout"
     },
     "login": {
         "form_name": "Login",
@@ -266,11 +268,17 @@
         "fetchErrorMessage": "Oops! Something went wrong",
         "fetchErrorDescription": "An error occurred while fetching the validations"
     },
-    "resourcesPage": {
-        "title": "Create resource"
+    "newEmployeePage": {
+        "title": "Create Employee"
+    },
+    "newCompanyPage": {
+        "title": "Create Company"
+    },
+    "employeesPage": {
+        "title": "Employees"
     },
     "companiesPage": {
-        "title": "Create company"
+        "title": "Companies"
     },
     "duplicate_document_modal": {
         "document_name": "Document Name",

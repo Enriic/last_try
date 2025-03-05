@@ -1,4 +1,4 @@
-// src/components/CompanySelect/CompanySelect.tsx
+// src/components/common/SearchableSelect/CompanySelect/CompanySelect.tsx
 
 import React, { useEffect, useState } from 'react';
 import { notification } from 'antd';
@@ -8,6 +8,9 @@ import SearchableSelect from '../SearchableSelect';
 import { debounce } from 'lodash';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Props para el componente CompanySelect
+ */
 interface CompanySelectProps {
     value?: string | null;
     onChange?: (value: string | null) => void;
@@ -16,6 +19,11 @@ interface CompanySelectProps {
     disabled?: boolean;
 }
 
+/**
+ * Componente para seleccionar empresas con búsqueda y paginación
+ * 
+ * Permite buscar empresas por nombre y cargar más resultados mediante scroll infinito
+ */
 const CompanySelect: React.FC<CompanySelectProps> = ({ value, onChange, placeholder, style, disabled }) => {
     const [companies, setCompanies] = useState<Company[]>([]);
     const [page, setPage] = useState<number>(1);
@@ -26,25 +34,29 @@ const CompanySelect: React.FC<CompanySelectProps> = ({ value, onChange, placehol
     const [searchValue, setSearchValue] = useState<string>('');
     const { t } = useTranslation();
 
+    /**
+     * Cargar compañías al cambiar el término de búsqueda
+     */
     useEffect(() => {
         fetchCompanies(1, searchValue);
     }, [searchValue]);
 
+    /**
+     * Obtiene el listado de compañías desde el servidor
+     * @param pageNumber Número de página que se solicita
+     * @param search Término de búsqueda opcional
+     */
     const fetchCompanies = async (pageNumber: number, search: string) => {
         try {
-            if (pageNumber === 1) {
-                setLoading(true);
-            } else {
-                setIsLoadingMore(true);
-            }
+            // Control de estado de carga según sea primera página o paginación
+            pageNumber === 1 ? setLoading(true) : setIsLoadingMore(true);
+
+
             const data = await getCompaniesForSelect(pageNumber, pageSize, search);
             const { results, count } = data;
 
-            if (pageNumber === 1) {
-                setCompanies(results);
-            } else {
-                setCompanies((prevCompanies) => [...prevCompanies, ...results]);
-            }
+            // Si es la primera página, reemplazar datos; si no, añadir a los existentes
+            pageNumber === 1 ? setCompanies(results) : setCompanies((prevCompanies) => [...prevCompanies, ...results]);
             setTotalItems(count);
             setPage(pageNumber);
 
@@ -55,14 +67,14 @@ const CompanySelect: React.FC<CompanySelectProps> = ({ value, onChange, placehol
                 duration: 3,
             });
         } finally {
-            if (pageNumber === 1) {
-                setLoading(false);
-            } else {
-                setIsLoadingMore(false);
-            }
+            // Restablecer estado de carga
+            pageNumber === 1 ? setLoading(false) : setIsLoadingMore(false);
         }
     };
 
+    /**
+     * Solicita la siguiente página de resultados cuando se detecta scroll hasta el final
+     */
     const handleLoadMore = () => {
         if (isLoadingMore || companies.length >= totalItems) {
             return;
@@ -71,25 +83,41 @@ const CompanySelect: React.FC<CompanySelectProps> = ({ value, onChange, placehol
         fetchCompanies(nextPage, searchValue);
     };
 
+    /**
+     * Maneja la búsqueda con debounce para evitar peticiones excesivas
+     */
     const debouncedHandleSearch = debounce((value: string) => {
         setSearchValue(value);
-        setPage(1);
-    }, 600);
+        setPage(1); // Reiniciar a primera página cuando hay nueva búsqueda
+    }, 400);
 
+    /**
+     * Maneja el cambio de valor seleccionado
+     */
     const handleSelectChange = (value: string | null) => {
         if (onChange) {
             onChange(value);
         }
+        // Si se borra la selección, limpiar búsqueda y reiniciar paginación
         if (!value) {
             setSearchValue('');
             setPage(1);
         }
     };
 
+    /**
+     * Define cómo se visualiza cada opción en el desplegable
+     */
     const renderOption = (item: Company) => `${item.company_name} - ${item.company_id}`;
 
+    /**
+     * Define qué campo usar como clave única para cada opción
+     */
     const keySelector = (item: Company) => item.id;
 
+    /**
+     * Determina si hay más resultados disponibles para cargar
+     */
     const hasMore = companies.length < totalItems;
 
     return (

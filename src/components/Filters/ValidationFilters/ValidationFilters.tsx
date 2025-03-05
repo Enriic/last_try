@@ -1,4 +1,4 @@
-// src/components/ValidationFilters/ValidationFilters.tsx
+// src/components/Filters/ValidationFilters/ValidationFilters.tsx
 
 import React, { useState } from 'react';
 import { Row, Col, DatePicker, Select, Tooltip, Button } from 'antd';
@@ -20,23 +20,41 @@ import { useTranslation } from 'react-i18next';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { DateFormat } from '../../../types/format.ts';
 
+// Extender las funcionalidades de dayjs para comparaciones y formato de fechas
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 dayjs.extend(customParseFormat);
 
+/**
+ * Tipo personalizado para el rango de fechas
+ * Puede ser un array con dos valores Dayjs (inicio y fin) o null
+ */
 type RangeValue = [Dayjs | null, Dayjs | null] | null;
 
+// Desestructuración de componentes de Ant Design
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
+/**
+ * Props para el componente ValidationFilters
+ */
 interface ValidationFiltersProps {
-    validations: Validation[];
     onApplyFilters: (filters: ValidationFilterOptions) => void;
     onClearFilters: () => void;
 }
 
+/**
+ * Componente de filtros avanzados para la pantalla de validaciones
+ * 
+ * Permite filtrar validaciones por múltiples criterios como documento, ID de validación,
+ * rango de fechas, tipo de documento, estado, compañía y recurso asociado.
+ * Implementa un diseño expandible para optimizar el espacio en pantalla.
+ */
 const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, onClearFilters }) => {
+    // Obtener función de traducción para internacionalización
     const { t } = useTranslation();
+
+    // Estados para los diferentes filtros
     const [documentId, setDocumentId] = useState<string | null>(null);
     const [validationId, setValidationId] = useState<string | null>(null);
     const [dateRange, setDateRange] = useState<RangeValue>(null);
@@ -44,8 +62,14 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, o
     const [status, setStatus] = useState<string | null>(null);
     const [companyId, setCompanyId] = useState<string | null>(null);
     const [resourceId, setResourceId] = useState<string | null>(null);
+
+    // Estado para controlar la expansión/colapso de filtros adicionales
     const [isExpanded, setIsExpanded] = useState(false);
 
+    /**
+     * Recopila todos los filtros aplicados y los pasa al componente padre
+     * Convierte las fechas al formato esperado por la API
+     */
     const applyFilters = () => {
         const filters: ValidationFilterOptions = {
             document_id: documentId,
@@ -60,6 +84,9 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, o
         onApplyFilters(filters);
     };
 
+    /**
+     * Restablece todos los filtros a su estado inicial y notifica al componente padre
+     */
     const clearFilters = () => {
         setDocumentId(null);
         setValidationId(null);
@@ -71,35 +98,65 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, o
         onClearFilters();
     };
 
+    /**
+     * Maneja el cambio en el selector de documento
+     * @param value ID del documento seleccionado
+     */
     const handleDocumentIdChange = (value: string | null) => {
         setDocumentId(value);
     };
 
+    /**
+     * Maneja el cambio en el selector de validación
+     * @param value ID de la validación seleccionada
+     */
     const handleValidationIdChange = (value: string | null) => {
         setValidationId(value);
     };
 
+    /**
+     * Maneja el cambio en el selector de rango de fechas
+     * @param dates Nuevo rango de fechas seleccionado
+     */
     const handleDateChange = (dates: RangeValue) => {
         setDateRange(dates);
     };
 
+    /**
+     * Maneja el cambio en el selector de tipo de documento
+     * @param value ID del tipo de documento seleccionado
+     */
     const handleDocumentTypeChange = (value: number | string | null) => {
         setDocumentType(value);
-        console.log("Filter value for document type:", value);
     };
 
+    /**
+     * Maneja el cambio en el selector de estado de validación
+     * @param value Estado seleccionado (success/failure)
+     */
     const handleStatusChange = (value: string | null) => {
         setStatus(value);
     };
 
+    /**
+     * Maneja el cambio en el selector de compañía
+     * @param value ID de la compañía seleccionada
+     */
     const handleCompanyChange = (value: string | null) => {
         setCompanyId(value);
     };
 
+    /**
+     * Maneja el cambio en el selector de recurso
+     * @param value ID del recurso seleccionado
+     */
     const handleResourceChange = (value: string | null) => {
         setResourceId(value);
     };
 
+    /**
+     * Alterna entre mostrar/ocultar los filtros adicionales
+     */
     const toggleExpanded = () => {
         setIsExpanded(!isExpanded);
     };
@@ -107,8 +164,9 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, o
     return (
         <div className='validation-filters-container'>
             <Row gutter={16} className='validation-filters-row' align='middle' justify='start'>
-                {/* First 4 filters - always visible */}
+                {/* Filtros principales - siempre visibles */}
                 <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
+                    {/* Selector de documento */}
                     <Tooltip title={t('validationFilters.documentTooltip')} overlayStyle={{ fontSize: "12px" }}>
                         <span className="label-text">{t('validationFilters.documentLabel')}: </span>
                     </Tooltip>
@@ -121,6 +179,7 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, o
                 </Col>
 
                 <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
+                    {/* Selector de ID de validación */}
                     <Tooltip title={t('validationFilters.validationTooltip')} overlayStyle={{ fontSize: "12px" }}>
                         <span className="label-text">{t('validationFilters.validationLabel')}</span>
                     </Tooltip>
@@ -133,6 +192,7 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, o
                 </Col>
 
                 <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
+                    {/* Selector de rango de fechas */}
                     <Tooltip title={t('validationFilters.dateTooltip')} overlayStyle={{ fontSize: "12px" }}>
                         <span className="label-text">{t('validationFilters.dateLabel')}: </span>
                     </Tooltip>
@@ -143,12 +203,11 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, o
                     />
                 </Col>
 
-
-                {/* Additional filters - visible only when expanded */}
+                {/* Filtros adicionales - visibles solo cuando está expandido */}
                 {isExpanded && (
                     <>
-
                         <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
+                            {/* Selector de tipo de documento */}
                             <Tooltip title={t('validationFilters.documentTypeTooltip')} overlayStyle={{ fontSize: "12px" }}>
                                 <span className="label-text">{t('validationFilters.documentTypeLabel')}: </span>
                             </Tooltip>
@@ -161,6 +220,7 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, o
                         </Col>
 
                         <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
+                            {/* Selector de estado de validación (éxito/fallo) */}
                             <Tooltip title={t('validationFilters.resultTooltip')} overlayStyle={{ fontSize: "12px" }}>
                                 <span className="label-text">{t('validationFilters.resultLabel')}: </span>
                             </Tooltip>
@@ -177,6 +237,7 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, o
                         </Col>
 
                         <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
+                            {/* Selector de recurso asociado */}
                             <Tooltip title={t('validationFilters.resourceTooltip')} overlayStyle={{ fontSize: "12px" }}>
                                 <span className="label-text">{t('validationFilters.resourceLabel')}: </span>
                             </Tooltip>
@@ -189,6 +250,7 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, o
                         </Col>
 
                         <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6} className='validation-filters-col'>
+                            {/* Selector de compañía */}
                             <Tooltip title={t('validationFilters.companyTooltip')} overlayStyle={{ fontSize: "12px" }}>
                                 <span className="label-text">{t('validationFilters.companyLabel')}: </span>
                             </Tooltip>
@@ -202,10 +264,10 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, o
                     </>
                 )}
 
-                {/* Buttons - Responsive placement */}
+                {/* Sección de botones - colocación responsiva */}
                 <Col xs={24} sm={24} md={24} lg={24} xl={8} xxl={6} className='validation-filters-col validation-filters-buttons'>
                     <div className="filters-actions">
-                        {/* Expand/Collapse button - Priority if only one fits */}
+                        {/* Botón expandir/colapsar - Prioridad si solo cabe uno */}
                         <Button
                             type="link"
                             onClick={toggleExpanded}
@@ -215,7 +277,7 @@ const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, o
                             {isExpanded ? t('common.collapse') || 'Collapse' : t('common.expand') || 'Expand'}
                         </Button>
 
-                        {/* Apply and Clear buttons */}
+                        {/* Botones aplicar y limpiar */}
                         <div className="action-buttons">
                             <JunoButton buttonType={JunoButtonTypes.Ok} type='primary' onClick={applyFilters}>
                                 {t('common.apply')}

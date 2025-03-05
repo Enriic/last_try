@@ -9,21 +9,27 @@ import { useTranslation } from 'react-i18next'; // Importar el hook de traducci�
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import EmployeeResourceForm from '../../../components/Forms/EmployeeForm/EmployeeForm';
 
-
+/**
+ * Página para crear un nuevo empleado
+ */
 const NewCompanyPage: React.FC = () => {
-    const { t } = useTranslation(); // Utilizar el hook de traducción
+    /* Hook para acceder a las funciones de traducción */
+    const { t } = useTranslation();
+    /* Hook para la navegación entre páginas */
     const navigate = useNavigate();
 
     return (
         <PageContainer
             className="page-container"
             header={{
-                title: t('companiesPage.title'), // Usar traducción para el título
+                title: t('newEmployeePage.title'), // Usar traducción para el título
+                /* Botones adicionales en la cabecera */
                 extra: [
                     <Button
                         key="back"
                         type="default"
                         icon={<ArrowLeftOutlined />}
+                        /* Navega a la página de empleados al hacer clic */
                         onClick={() => navigate('/resources/employees')}
                     >
                         {t('common.back') || 'Volver'}
@@ -32,6 +38,7 @@ const NewCompanyPage: React.FC = () => {
             }}
         >
             <div>
+                {/* Formulario para crear un nuevo empleado */}
                 <EmployeeResourceForm />
             </div>
         </PageContainer>

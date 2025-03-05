@@ -6,10 +6,17 @@ import './VehicleTable.less';
 import { useTranslation } from 'react-i18next';
 import { EditOutlined } from '@ant-design/icons';
 
+/**
+ * Propiedades para el componente de tabla de vehículos
+ */
 interface VehicleTableProps {
+    /* Lista de vehículos a mostrar */
     vehicles: Vehicle[];
+    /* Estado de carga de la tabla */
     loading: boolean;
+    /* Función para manejar la visualización de detalles de un vehículo */
     onViewDetails: (vehicle: Vehicle) => void;
+    /* Configuración de paginación */
     pagination: {
         current: number;
         pageSize: number;
@@ -18,14 +25,19 @@ interface VehicleTableProps {
     };
 }
 
+/**
+ * Componente para mostrar una tabla de vehículos
+ */
 const VehicleTable: React.FC<VehicleTableProps> = ({
     vehicles,
     loading,
     pagination,
     onViewDetails,
 }) => {
+    /* Hook para acceder a las funciones de traducción */
     const { t } = useTranslation();
 
+    /* Definición de columnas de la tabla */
     const columns = [
         {
             title: t('vehicle_table.date'),
@@ -60,7 +72,7 @@ const VehicleTable: React.FC<VehicleTableProps> = ({
         },
         {
             key: 'actions',
-
+            /* Columna para acciones, muestra un botón para editar */
             render: (_: any, record: Vehicle) => (
                 <Button type="link" onClick={() => onViewDetails(record)}>
                     <EditOutlined />
@@ -69,10 +81,12 @@ const VehicleTable: React.FC<VehicleTableProps> = ({
         },
     ];
 
+    /* Muestra un indicador de carga si los datos están cargando */
     if (loading) {
         return <Spin />;
     }
 
+    /* Renderiza la tabla de vehículos */
     return (
         <Table
             size="middle"

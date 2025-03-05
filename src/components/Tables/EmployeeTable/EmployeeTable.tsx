@@ -7,10 +7,15 @@ import './EmployeeTable.less';
 import { useTranslation } from 'react-i18next';
 import { EditOutlined } from '@ant-design/icons';
 
+{/* Interfaz para las propiedades de la tabla de empleados */ }
 interface EmployeeTableProps {
+    /* Lista de empleados a mostrar */
     employees: Resource[];
+    /* Estado de carga de la tabla */
     loading: boolean;
+    /* Función para manejar la visualización de detalles de un empleado */
     onViewDetails: (employee: Resource) => void;
+    /* Configuración de paginación */
     pagination: {
         current: number;
         pageSize: number;
@@ -19,14 +24,18 @@ interface EmployeeTableProps {
     };
 }
 
+{/* Componente para mostrar una tabla de empleados */ }
 const EmployeeTable: React.FC<EmployeeTableProps> = ({
     employees,
     loading,
     pagination,
     onViewDetails,
 }) => {
+    {/* Hook para acceder a las funciones de traducción */ }
     const { t } = useTranslation();
     console.log('employees', employees);
+
+    {/* Definición de columnas de la tabla */ }
     const columns = [
         {
             title: t('employee_table.date'),
@@ -70,10 +79,12 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
         },
     ];
 
+    {/* Muestra un indicador de carga si los datos están cargando */ }
     if (loading) {
         return <Spin />;
     }
 
+    {/* Renderiza la tabla de empleados */ }
     return (
         <Table
             size="middle"

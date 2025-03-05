@@ -14,26 +14,38 @@ import { JunoButtonTypes } from '../../../components/common/JunoButton/JunoButto
 import { PageContainer } from '@ant-design/pro-layout';
 import CompanyUpdateModal from '../../../components/Modals/CompanyUpdateModal/CompanyUpdateModal';
 
-
-
+/**
+ * Página para mostrar y gestionar la tabla de compañías
+ */
 const CompaniesTablePage: React.FC = () => {
+    /* Hook para acceder a las funciones de traducción */
     const { t } = useTranslation();
-    const navigate = useNavigate(); // Hook para cambiar de ruta
+    /* Hook para la navegación entre páginas */
+    const navigate = useNavigate();
 
+    /* Estado para almacenar la lista de compañías */
     const [companies, setCompanies] = useState<Company[]>([]);
+    /* Estado para controlar la carga de datos */
     const [loading, setLoading] = useState<boolean>(true);
+    /* Estado para la página actual de la paginación */
     const [currentPage, setCurrentPage] = useState<number>(1);
+    /* Estado para el tamaño de página */
     const [pageSize, setPageSize] = useState<number>(10);
+    /* Estado para el número total de elementos */
     const [totalItems, setTotalItems] = useState<number>(0);
+    /* Estado para el término de búsqueda */
     const [searchTerm, setSearchTerm] = useState<string>('');
+    /* Estado para la visibilidad del modal de actualización */
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+    /* Estado para la compañía seleccionada */
     const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
 
-
+    /* Efecto para cargar los datos iniciales */
     useEffect(() => {
         fetchData(1, pageSize, searchTerm);
     }, []);
 
+    /* Función para obtener los datos de las compañías */
     const fetchData = async (pageNumber: number, pageSize: number, search: string) => {
         try {
             setLoading(true);
@@ -41,7 +53,6 @@ const CompaniesTablePage: React.FC = () => {
             const { results, count } = data;
             setCompanies(results);
             setTotalItems(count);
-
         } catch (error) {
             notification.error({
                 message: '¡Ups! Algo salió mal',
@@ -53,6 +64,7 @@ const CompaniesTablePage: React.FC = () => {
         }
     };
 
+    /* Función de búsqueda con debounce para evitar demasiadas peticiones */
     const debouncedSearch = useMemo(
         () =>
             debounce((value: string) => {
@@ -62,42 +74,48 @@ const CompaniesTablePage: React.FC = () => {
         [pageSize]
     );
 
+    /* Efecto para limpiar el debounce al desmontar el componente */
     useEffect(() => {
         return () => {
             debouncedSearch.cancel();
         };
     }, [debouncedSearch]);
 
+    /* Manejador para el cambio en el campo de búsqueda */
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setSearchTerm(value);
         debouncedSearch(value);
     };
 
+    /* Manejador para el cambio de página */
     const handlePageChange = (page: number, pageSize?: number) => {
         setCurrentPage(page);
         setPageSize(pageSize || 10);
         fetchData(page, pageSize || 10, '');
     };
 
+    /* Manejador para crear una nueva compañía */
     const handleNewCompany = () => {
         navigate('/companies/new');
     };
 
+    /* Manejador para cerrar el modal de actualización */
     const handleModalClose = () => {
         setIsModalVisible(false);
         setSelectedCompany(null);
         fetchData(currentPage, pageSize, searchTerm);
     };
 
+    /* Manejador para mostrar los detalles de una compañía */
     const showCompanyDetails = (company: Company): void => {
         setSelectedCompany(company);
         setIsModalVisible(true);
     }
 
-
     return (
         <PageContainer className='page-container' header={{ title: t('companies_table_page.title') }}>
+            {/* Sección de búsqueda y botón para crear nueva compañía */}
             <Row className='company-search-section'>
                 <Col
                     style={{
@@ -109,12 +127,14 @@ const CompaniesTablePage: React.FC = () => {
                     }}
                     span={24}
                 >
+                    {/* Campo de búsqueda */}
                     <Input
                         style={{ width: '85%' }}
                         placeholder={t('companies_table_page.search_placeholder') || 'Buscar...'}
                         value={searchTerm}
                         onChange={handleSearchChange}
                     />
+                    {/* Botón para crear nueva compañía */}
                     <JunoButton
                         style={{ width: '15%' }}
                         buttonType={JunoButtonTypes.Add}
@@ -126,6 +146,7 @@ const CompaniesTablePage: React.FC = () => {
                 </Col>
             </Row>
 
+            {/* Tabla de compañías */}
             <CompanyTable
                 companies={companies}
                 loading={loading}
@@ -138,6 +159,7 @@ const CompaniesTablePage: React.FC = () => {
                 onViewDetails={showCompanyDetails}
             />
 
+            {/* Modal para actualizar compañía */}
             {isModalVisible && selectedCompany && (
                 <CompanyUpdateModal
                     company={selectedCompany}

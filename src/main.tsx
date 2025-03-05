@@ -4,26 +4,27 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { ThemeProvider } from './context/ThemeContext';
-import './i18n'; // Importa la configuración de i18n
-import { I18nextProvider } from 'react-i18next';
-import i18n from './i18n';
-import { AuthProvider } from './context/AuthContext';
+import './i18n'; // Importa la configuración de i18n pero no necesitamos el proveedor aquí
 
+/**
+ * Punto de entrada principal de la aplicación React
+ * Configura los proveedores de contexto necesarios y renderiza la aplicación
+ */
 
 // Asegurándonos de que el contenedor tiene un tipo correcto
 const rootElement = document.getElementById('root') as HTMLElement;
+
+// Creamos la raíz de React 18 usando createRoot
 const root = createRoot(rootElement);
 
+// Renderizamos la aplicación con los proveedores de contexto
 root.render(
+  /* StrictMode ayuda a detectar problemas potenciales en el desarrollo */
   <StrictMode>
-    <I18nextProvider i18n={i18n}>
-      <ThemeProvider>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
-      </ThemeProvider>
-    </I18nextProvider>
+    {/* Proveedor de tema para manejar el modo claro/oscuro */}
+    <ThemeProvider>
+      {/* Componente principal de la aplicación */}
+      <App />
+    </ThemeProvider>
   </StrictMode>
-
-
 );

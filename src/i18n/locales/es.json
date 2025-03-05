@@ -164,7 +164,8 @@
             "content": "¿Estás seguro que deseas cerrar la sesión?",
             "cancel": "No",
             "confirm": "Si"
-        }
+        },
+        "button": "Cerrar Sesión"
     },
     "login": {
         "form_name": "Iniciar Sesión",
@@ -269,8 +270,17 @@
     "resourcesPage": {
         "title": "Crear Recurso"
     },
-    "companiesPage": {
+    "newEmployeePage": {
+        "title": "Crear Empleado"
+    },
+    "newCompanyPage": {
         "title": "Crear Compañía"
+    },
+    "employeesPage": {
+        "title": "Empleados"
+    },
+    "companiesPage": {
+        "title": "Compañías"
     },
     "duplicate_document_modal": {
         "document_name": "Nombre del Documento",

@@ -61,7 +61,6 @@ const CompanyTable: React.FC<CompanyTableProps> = ({
                 </Button>
             ),
         },
-        //we'll have an edit action with popup 
     ];
 
     if (loading) {

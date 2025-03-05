@@ -10,23 +10,31 @@ import { getResource } from '../../../services/resourceService';
 import { handleDownload } from '../../../services/documentService'; // Importa la función getDocumentFromBlobContainer
 import { useTranslation } from 'react-i18next';
 
-
+{/* Interfaz para las propiedades del modal de detalles de validación */ }
 interface ValidationDetailsModalProps {
+    /* Estado de visibilidad del modal */
     visible: boolean;
+    /* Datos de la validación */
     validation: Validation;
+    /* Función para cerrar el modal */
     onClose: () => void;
 }
 
+{/* Componente para el modal de detalles de validación */ }
 const ValidationDetailsModal: React.FC<ValidationDetailsModalProps> = ({ visible, validation, onClose }) => {
+    /* Estado para almacenar el recurso asociado a la validación */
     const [resource, setResource] = useState<Resource | null>(null);
+    /* Hook para acceder a las funciones de traducción */
     const { t } = useTranslation();
 
+    /* Efecto para cargar los datos del recurso cuando cambia el ID del recurso en la validación */
     useEffect(() => {
         if (validation.resource_id) {
             fetchData(validation.resource_id);
         }
     }, [validation.resource_id]);
 
+    /* Columnas de la tabla para mostrar los campos de validación */
     const columns = [
         {
             title: t('validation_details_modal.columns.field'),
@@ -50,6 +58,7 @@ const ValidationDetailsModal: React.FC<ValidationDetailsModalProps> = ({ visible
         }
     ];
 
+    /* Función para obtener los datos del recurso */
     const fetchData = async (resourceId?: string) => {
         if (resourceId) {
             const resource = await getResource(resourceId);
@@ -58,10 +67,9 @@ const ValidationDetailsModal: React.FC<ValidationDetailsModalProps> = ({ visible
         } else {
             setResource(null);
         }
-
     };
 
-
+    /* Función para renderizar la información del recurso */
     const renderResourceInfo = () => {
         if (resource?.resource_type === ResourceType.VEHICLE) {
             const vehicle = resource.resource_details as VehicleDetails;
@@ -73,9 +81,11 @@ const ValidationDetailsModal: React.FC<ValidationDetailsModalProps> = ({ visible
         return t('validation_details_modal.resource_render.unknown');
     };
 
+    /* Campos a validar y a extraer de la validación */
     const fieldsToValidate = validation.validation_details.fields_to_validate || [];
     const fieldsToExtract = validation.validation_details.fields_to_extract || [];
 
+    /* Columnas para la tabla de campos a extraer */
     const columnsForExtract = columns.filter(
         (col) => col.key !== 'expected_value' && col.key !== 'result'
     );

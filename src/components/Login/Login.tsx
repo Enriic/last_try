@@ -10,22 +10,29 @@ import { ValidateErrorEntity } from 'rc-field-form/lib/interface';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router-dom';
 
-
+{/* Componente para la página de inicio de sesión */ }
 const LoginComponent = () => {
+    {/* Estado para controlar la carga durante el inicio de sesión */ }
     const [loading, setLoading] = useState(false);
+    {/* Hook para acceder a las funciones de autenticación */ }
     const { login, user } = useAuth();
-    const { t, i18n } = useTranslation();
+    {/* Hook para acceder a las funciones de traducción */ }
+    const { t } = useTranslation();
 
+    {/* Hook para la navegación */ }
     const navigate = useNavigate();
 
+    {/* Redirige al usuario a la página de carga si ya está autenticado */ }
     if (user) return <Navigate to="/upload" replace />;
 
+    {/* Función que se ejecuta al enviar el formulario */ }
     const onFinish = async (values: LoginFormValues) => {
         setLoading(true);
         try {
-            console.log('Logging in with:', values.username, values.password);
+            {/* Llama a la función de inicio de sesión del contexto de autenticación */ }
             await login(values.username, values.password);
-            navigate('/upload', { replace: true }); // Redirige al home o a la ruta deseada
+            {/* Redirige al usuario a la página de carga después del inicio de sesión */ }
+            navigate('/upload', { replace: true });
 
         } catch (error: any) {
             console.error('Error al iniciar sesión:', error);
@@ -39,6 +46,7 @@ const LoginComponent = () => {
         }
     };
 
+    {/* Función que se ejecuta si falla la validación del formulario */ }
     const onFinishFailed = (errorInfo: ValidateErrorEntity<LoginFormValues>) => {
         console.log('Error:', errorInfo);
         notification.error({
@@ -50,6 +58,7 @@ const LoginComponent = () => {
 
     return (
         <div style={{ maxWidth: 400, margin: '0 auto', padding: '2em' }}>
+            {/* Formulario de inicio de sesión */}
             <Form<LoginFormValues>
                 name={t('login.form_name')}
                 initialValues={{ remember: true }}
@@ -77,6 +86,7 @@ const LoginComponent = () => {
                     <Input.Password placeholder={t('login.form.password.placeholder')} />
                 </Form.Item>
 
+                {/* Botón de envío del formulario */}
                 <Form.Item>
                     <JunoButton
                         type="primary"

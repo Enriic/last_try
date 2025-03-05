@@ -5,23 +5,26 @@ import { Modal } from 'antd';
 import EmployeeForm from '../../Forms/EmployeeForm/EmployeeForm';
 import { Resource } from '../../../types';
 
+{/* Interfaz para las propiedades del modal de actualización de empleado */ }
 interface EmployeeUpdateModalProps {
     employee: Resource;
     visible: boolean;
     onClose: () => void;
 }
 
+{/* Componente para el modal de actualización de empleado */ }
 const EmployeeUpdateModal: React.FC<EmployeeUpdateModalProps> = ({ employee, visible, onClose }) => {
     return (
-        <Modal
+        < Modal
             open={visible}
             onCancel={onClose}
             footer={null}
             width={'80%'}
             title="Actualizar Compañía"
         >
-            <EmployeeForm update employee={employee} onClose={onClose} />
-        </Modal>
+            {/* Formulario para actualizar el empleado */}
+            < EmployeeForm update employee={employee} onClose={onClose} />
+        </Modal >
     );
 };
 
