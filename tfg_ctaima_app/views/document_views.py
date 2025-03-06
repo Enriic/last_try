@@ -66,7 +66,7 @@ class DocumentRetrieveView(APIView):
 
 
 class DocumentViewSet(viewsets.ModelViewSet):
-    queryset = Document.objects.all().select_related('document_type', 'user', 'resource', 'company')
+    queryset = Document.objects.all().select_related('document_type', 'user', 'resource', 'company').order_by('-timestamp')
     serializer_class = DocumentSerializer
     filter_backends = [rest_framework_filters.SearchFilter, rest_framework_filters.OrderingFilter]
     search_fields = ['name', 'id']

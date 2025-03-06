@@ -19,14 +19,14 @@ from ..models import Validation, Document, Log, EventType
 from ..serializers import ValidationSerializer, LogSerializer
 from .filters import ValidationFilter
 from .pagination import StandardResultsSetPagination
-from ..utils import transform_validation_details, generate_sas_token, update_info, get_param_name, process_api_response, transform_fields
+from ..utils import transform_validation_details, generate_sas_token, update_info, process_api_response, transform_fields
 
 from azure.storage.blob import BlobSasPermissions
 
 logger = logging.getLogger(__name__)
 
 class ValidationViewSet(viewsets.ModelViewSet):
-    queryset = Validation.objects.all().select_related('document__document_type', 'user')
+    queryset = Validation.objects.all().select_related('document__document_type', 'user').order_by('-timestamp')
     serializer_class = ValidationSerializer
     filter_backends = [rest_framework_filters.OrderingFilter, DjangoFilterBackend]
     filterset_class = ValidationFilter
@@ -65,8 +65,6 @@ class ValidationViewSet(viewsets.ModelViewSet):
                 "uuid": "dasdbahhdjaj",
                 "pattern_validation": document.document_type.pattern_validation,
             }
-
-            
 
             if document.document_type.pattern_invalidation is not None:
                 req_params["pattern_invalidation"] = document.document_type.pattern_invalidation
@@ -150,7 +148,6 @@ class ValidationViewSet(viewsets.ModelViewSet):
             status=status_validation,
             **extra_fields
         )
-
 
         logger.info(f"Validación '{serializer.instance.id}' creada para el documento '{serializer.instance.document.name}'.")
         return Response(serializer.data, status=status.HTTP_201_CREATED)

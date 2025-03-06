@@ -8,47 +8,42 @@ from azure.core.exceptions import ResourceExistsError
 import json
 import ast
 
-
-MAX_FILENAME_LENGTH = 50  # Puedes ajustar este valor según necesites
-
-DOCUMENT_TYPE_MAP = {
-    1: 'default',
-    2: 'dni',
-    3: 'company info',
-    # Agrega más tipos de documentos según sea necesario
-}
-
-def get_param_name(document_type_id):
-    """
-    Retorna el nombre del parámetro que el endpoint espera basado en el id del documento.
-    
-    Args:
-        document_type_id (int): El ID del tipo de documento.
-    
-    Returns:
-        str: El nombre del parámetro para el endpoint.
-    """
-    return DOCUMENT_TYPE_MAP.get(document_type_id)
-
-def truncate_filename(filename, max_length):
-    name, ext = os.path.splitext(filename)
-    if len(name) > max_length:
-        name = name[:max_length]
-    return name + ext
+MAX_FILENAME_LENGTH = 50  # Limita la longitud máxima del nombre de archivo
 
 
 def calculate_file_hash(file):
+    """
+    Calcula el hash SHA-256 de un archivo subido.
+    Útil para verificar la integridad y unicidad de archivos.
+    
+    Args:
+        file (File): Objeto de archivo de Django
+        
+    Returns:
+        str: Hash SHA-256 en formato hexadecimal
+    """
     sha256 = hashlib.sha256()
     for chunk in file.chunks():
         sha256.update(chunk)
-    file.seek(0)
+    file.seek(0)  # Resetea el puntero del archivo para futuros usos
     return sha256.hexdigest()
-
-def clean_filename(filename):
-    return re.sub(r'[<>:"/\\|?*\x00-\x1F]', '_', filename)
 
 
 def upload_to_blob_storage(uploaded_file, blob_name):
+    """
+    Sube un archivo al almacenamiento Azure Blob Storage.
+    No sobrescribe archivos existentes con el mismo nombre.
+    
+    Args:
+        uploaded_file (File): Archivo a subir
+        blob_name (str): Nombre para el blob en Azure
+        
+    Returns:
+        str: URL completa del blob subido
+        
+    Raises:
+        Exception: Si ocurre un error durante la subida
+    """
     try:
         # Crear el cliente del servicio Blob
         connect_str = f"DefaultEndpointsProtocol=https;AccountName={settings.AZURE_ACCOUNT_NAME};AccountKey={settings.AZURE_ACCOUNT_KEY};EndpointSuffix=core.windows.net"
@@ -64,8 +59,21 @@ def upload_to_blob_storage(uploaded_file, blob_name):
         return blob_url
     except Exception as e:
         raise Exception(f"Error uploading file to Azure Blob Storage: {str(e)}")
+        
 
 def generate_sas_token(blob_name, permissions, expiry_hours=5):
+    """
+    Genera un token SAS (Firma de Acceso Compartido) para un blob específico.
+    Permite acceso temporal al blob con permisos específicos.
+    
+    Args:
+        blob_name (str): Nombre del blob
+        permissions (BlobSasPermissions): Permisos a otorgar
+        expiry_hours (int): Horas hasta la expiración del token
+        
+    Returns:
+        str: Token SAS generado
+    """
     sas_token = generate_blob_sas(
         account_name=settings.AZURE_ACCOUNT_NAME,
         container_name=settings.AZURE_CONTAINER,
@@ -78,7 +86,16 @@ def generate_sas_token(blob_name, permissions, expiry_hours=5):
 
 
 def transform_validation_details(data):
+    """
+    Transforma datos de validación del formato de entrada al formato interno.
+    Convierte listas en diccionarios indexados por nombre de campo.
     
+    Args:
+        data (str): JSON con campos a validar y extraer
+        
+    Returns:
+        dict: Estructura transformada para procesamiento interno
+    """
     data = json.loads(data)
     transformed_data = {}
 
@@ -109,17 +126,17 @@ def transform_validation_details(data):
 
 def update_info(data_extracted, info):
     """
-    Actualiza la plantilla con los valores extraídos.
+    Actualiza la plantilla con los valores extraídos de la validacion.
+    Compara valores esperados con obtenidos y marca resultados como éxito o fallo.
     
-    Se recorren las secciones 'fields_to_extract' y 'fields_to_validate' de la plantilla.
-    Para cada campo se busca una coincidencia en 'datos_extraidos' usando la clave 'name'.
-    Si el dato encontrado es un diccionario que contiene 'campo_extraido', se utiliza ese valor.
-    
-    :param datos_extraidos: dict con los datos extraídos.
-    :param plantilla: dict con la plantilla a actualizar.
-    :return: dict con la plantilla actualizada.
+    Args:
+        data_extracted (dict): Datos extraídos de la validacion
+        info (dict): Plantilla con campos a validar/extraer
+        
+    Returns:
+        dict: Plantilla actualizada con resultados de validación
     """
-
+    # Actualizar campos de validación
     for field in info.get('fields_to_validate', []):
         field_name = field.get('name')
         if field_name and field_name in data_extracted:
@@ -148,7 +165,7 @@ def update_info(data_extracted, info):
             if extracted_value:
                 field['obtained_value'] = extracted_value
 
-    print(f"Output from update_info: {info}")
+    print(f"\n\nOutput from update_info: {info}")
     return info
 
 
@@ -156,27 +173,39 @@ def update_info(data_extracted, info):
 
 def process_api_response(api_response, template):
     """
-    Procesa una respuesta de API y actualiza la plantilla con la estructura específica.
+    Procesa una respuesta de API y actualiza la plantilla con datos extraídos.
+    Compatible con múltiples formatos de respuesta API.
     
-    :param api_response: La respuesta original de la API (cualquier estructura)
-    :param template: La plantilla con estructura específica que se va a actualizar
-    :return: La plantilla actualizada
+    Args:
+        api_response (dict): Respuesta original de la API
+        template (dict): Plantilla con estructura específica a actualizar
+        
+    Returns:
+        dict: Plantilla actualizada con datos extraídos
     """
     # Paso 1: Aplanar parcialmente los datos
     flattened_data = partial_flatten(api_response)
+
+    print(f"\n\nFlattened data: {flattened_data}")
     
     # Paso 2: Actualizar la plantilla usando los datos aplanados
     updated_template = update_template_structure(flattened_data, template)
+
+    print(f"\n\nUpdated template: {updated_template}")
     
     return updated_template
 
 def partial_flatten(data):
     """
-    Aplana un diccionario recursivamente, pero preserva las estructuras
-    que contienen 'campo_extraido' y 'campo_original'.
+    Aplana parcialmente un diccionario respetando estructuras específicas.
+    Preserva estructuras con 'campo_extraido' y 'campo_original'.
+    Maneja casos especiales como 'matched_extractions' y 'detalle'.
     
-    :param data: El diccionario a aplanar.
-    :return: Un diccionario parcialmente aplanado.
+    Args:
+        data (dict): Diccionario anidado a aplanar
+        
+    Returns:
+        dict: Diccionario parcialmente aplanado
     """
     items = {}
     
@@ -187,7 +216,7 @@ def partial_flatten(data):
     if 'campo_extraido' in data or 'campo_original' in data:
         return data  # Preservamos esta estructura
     
-    # # Para el caso especial de matched_extractions, procesamos cada documento
+    # Para el caso especial de matched_extractions, procesamos cada documento
     if 'matched_extractions' in data:
         items['matched_extractions'] = []
         for match in data['matched_extractions']:
@@ -254,16 +283,19 @@ def partial_flatten(data):
             items[key] = processed_list
         else:
             items[key] = value
-    
+
     return items
 
 def update_template_structure(flattened_data, template):
     """
-    Actualiza la plantilla con estructura específica usando los datos aplanados.
+    Actualiza la plantilla con los datos extraídos de la respuesta API.
     
-    :param flattened_data: Datos parcialmente aplanados
-    :param template: Plantilla con estructura específica a actualizar
-    :return: Plantilla actualizada
+    Args:
+        flattened_data (dict): Datos parcialmente aplanados
+        template (dict): Plantilla a actualizar
+        
+    Returns:
+        dict: Plantilla actualizada con resultados
     """
     # Actualizar campos de validación
     for field_name, field_config in template.get('fields_to_validate', {}).items():
@@ -278,10 +310,10 @@ def update_template_structure(flattened_data, template):
                 
                 # Verificar si cumple con el valor esperado
                 expected_value = field_config.get('value')
-                if expected_value == extracted_value:
-                    field_config['result'] = 'success'
-                else:
-                    field_config['result'] = 'failure'
+                # if expected_value == extracted_value:
+                #     field_config['result'] = 'success'
+                # else:
+                #     field_config['result'] = 'failure'
 
     # Actualizar campos de extracción
     for field_name, field_config in template.get('fields_to_extract', {}).items():
@@ -295,12 +327,15 @@ def update_template_structure(flattened_data, template):
 
 def find_field(data, field_name):
     """
-    Busca un campo en los datos parcialmente aplanados y devuelve 
-    el objeto completo o el valor.
+    Busca un campo específico en una estructura de datos compleja.
+    Maneja casos como búsqueda en 'detalle', 'matched_extractions' y más.
     
-    :param data: Diccionario parcialmente aplanado.
-    :param field_name: Nombre del campo a buscar.
-    :return: El objeto o valor encontrado, o None si no se encuentra.
+    Args:
+        data (dict): Datos donde buscar
+        field_name (str): Nombre del campo a encontrar
+        
+    Returns:
+        mixed: Valor encontrado o None si no existe
     """
     # Verificar si el campo existe directamente
     if field_name in data:
@@ -351,7 +386,14 @@ def find_field(data, field_name):
 
 def extract_value_for_validation(field_data):
     """
-    Extrae el valor para validación.
+    Extrae el valor para validación de un campo.
+    Si es un diccionario con 'campo_extraido', devuelve ese valor.
+    
+    Args:
+        field_data (mixed): Datos del campo
+        
+    Returns:
+        mixed: Valor para validación
     """
     if isinstance(field_data, dict):
         if 'campo_extraido' in field_data:
@@ -359,85 +401,16 @@ def extract_value_for_validation(field_data):
     
     return field_data
 
-# Ejemplo de uso:
-# api_response = {
-#     "coste": 0.000251,
-#     "detalle": {
-#         "company_name": {
-#             "company_name": {
-#                 "campo_extraido": "OVAL ENERGY, S.L.",
-#                 "campo_original": "Oval Energy, S.L."
-#             },
-#             "valido": True
-#         }
-#     },
-#     "company_id": {
-#         "campo_extraido": "B65833733",
-#         "campo_original": "B65833733"
-#     }
-# }
-
-# template = {
-#     "fields_to_validate": {
-#         "company_name": {
-#             "value": "Oval Energy, S.L.", 
-#             "description": "el nombre o razón social de la empresa", 
-#             "threshold": 80
-#         },
-#         "company_id": {
-#             "value": "B65833733", 
-#             "description": "NIF de la empresa", 
-#             "threshold": 80
-#         }
-#     },
-#     "fields_to_extract": {
-#         "issue_date": {
-#             "description": "Fecha de emisión"
-#         }
-#     }
-# }
-
-# updated_template = process_api_response(api_response, template)
-# print(updated_template)
-
-# Para buscar un campo específico después
-# def get_field_from_template(template, field_name):
-#     """
-#     Obtiene un campo específico de la plantilla.
-    
-#     :param template: La plantilla actualizada
-#     :param field_name: Nombre del campo a buscar
-#     :return: La configuración completa del campo o None si no se encuentra
-#     """
-#     # Buscar en campos de validación
-#     if field_name in template.get('fields_to_validate', {}):
-#         return template['fields_to_validate'][field_name]
-    
-#     # Buscar en campos de extracción
-#     if field_name in template.get('fields_to_extract', {}):
-#         return template['fields_to_extract'][field_name]
-    
-#     return None
-
-
 def transform_fields(data):
     """
-    Transforms the input JSON structure to the target format.
-
-    The transformation converts object dictionaries for both 
-    fields_to_validate and fields_to_extract into arrays of objects.
-    Each object will include the original key as its "name" field.
+    Transforma la estructura de datos al formato esperado por el frontend.
+    Convierte diccionarios de campos en arrays de objetos con estructura específica.
     
-    For fields_to_validate, the "expected_value" is taken from "value"
-    and "obtained_value" is set to "pending_to_obtain".
-    
-    For fields_to_extract, the "obtained_value" remains the same.
-    
-    Parameters:
-      data (dict): The original data with "fields_to_validate" and "fields_to_extract".
-      
+    Args:
+        data (dict): Datos con campos_to_validate y fields_to_extract
+        
     Returns:
-      dict: A new dictionary in the target format.
+        dict: Datos transformados para presentación en frontend
     """
     # Transform fields_to_validate.
     new_fields_to_validate = []

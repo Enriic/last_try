@@ -125,11 +125,6 @@ class DocumentType(models.Model):
     pattern_validation = models.JSONField(blank=True, null=True)
     pattern_invalidation = models.JSONField(blank=True, null=True)
 
-    # associated_entity = models.CharField(
-    #     max_length=50,
-    #     choices=AssociatedEntity.choices,
-    #     default=AssociatedEntity.RESOURCE
-    # )
     associated_entities = ArrayField(
         models.CharField(max_length=50, choices=AssociatedEntity.choices),
         default=list,

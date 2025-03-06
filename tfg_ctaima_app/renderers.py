@@ -1,4 +1,5 @@
-# app1/renderers.py (o en un módulo adecuado)
+# app1/renderers.py
+# se usa para asegurarnos que los documentos lleguen al usuario sin ser alterados. Y que el usuario final en el frontend pueda descargar el documento sin problemas.
 
 from rest_framework.renderers import BaseRenderer
 
