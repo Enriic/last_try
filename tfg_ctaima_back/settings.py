@@ -29,7 +29,7 @@ print("Ruta del .env:", os.path.join(BASE_DIR, '.env'))
 print("¿Existe el archivo?:", os.path.exists(os.path.join(BASE_DIR, '.env')))
 
 # Configurar la base de datos y otras variables según el entorno
-env_type = env("ENV", default="qa")  # Si no se define 'ENV', se usará 'qa' por defecto
+env_type = env("ENV", default="pre")  # Si no se define 'ENV', se usará 'qa' por defecto
 ENVIRONMENT = env_type
 
 if env_type not in ['qa', 'pre']:
@@ -99,9 +99,9 @@ LOGGING = {
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 REST_FRAMEWORK = {
@@ -144,6 +144,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  # URL de tu frontend
+    '[*]'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
