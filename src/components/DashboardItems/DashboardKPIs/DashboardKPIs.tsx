@@ -23,7 +23,6 @@ interface DashboardKPIsProps {
  * en un formato de tarjeta visual.
  */
 const DashboardKPIs: React.FC<DashboardKPIsProps> = ({ validations, loading }) => {
-    // Obtener función de traducción para internacionalización
     const { t } = useTranslation();
 
     // Calcular KPIs a partir de las validaciones proporcionadas

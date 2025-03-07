@@ -31,7 +31,6 @@ dayjs.extend(customParseFormat);
  */
 type RangeValue = [Dayjs | null, Dayjs | null] | null;
 
-// Desestructuración de componentes de Ant Design
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
@@ -51,7 +50,6 @@ interface ValidationFiltersProps {
  * Implementa un diseño expandible para optimizar el espacio en pantalla.
  */
 const ValidationFilters: React.FC<ValidationFiltersProps> = ({ onApplyFilters, onClearFilters }) => {
-    // Obtener función de traducción para internacionalización
     const { t } = useTranslation();
 
     // Estados para los diferentes filtros

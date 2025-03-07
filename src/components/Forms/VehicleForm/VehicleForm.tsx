@@ -33,23 +33,17 @@ const VehicleResourceForm: React.FC<VehicleResourceFormProps> = ({ update, vehic
                 resource_type: 'vehicle' // Se asigna el tipo de recurso
             };
 
-            if (update) {
-                if (vehicle) {
-                    await updateResource(vehicle.id, finalValues);
-                }
-            } else {
-                await createResource(finalValues);
-            } notification.success({
+            (update && vehicle) ? await updateResource(vehicle.id, finalValues) : await createResource(finalValues);
+            
+            notification.success({
                 message: t('notification.success.title'),
                 description: t('notification.success.description'),
                 duration: 3,
             });
             form.resetFields();
-            if (onClose) {
-                onClose(); // Cierra el modal y actualiza la tabla
-            } else {
-                navigate('/resources/vehicles'); // Si no hay modal, redirige a la lista
-            }
+
+            onClose ? onClose() : navigate('/resources/vehicles');
+            
         } catch (error) {
             console.error('Error al crear el recurso vehicle', error);
             notification.error({

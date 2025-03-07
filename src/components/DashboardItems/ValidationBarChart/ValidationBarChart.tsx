@@ -35,7 +35,6 @@ const ValidationBarChart: React.FC<ValidationBarChartProps> = ({ validations, lo
      */
     const [selectedYear, setSelectedYear] = useState(ACTUAL_YEAR);
 
-    // Obtener función de traducción para internacionalización
     const { t } = useTranslation();
 
     /**

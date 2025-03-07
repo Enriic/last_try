@@ -78,11 +78,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = () => {
 
     {/* Colapsa automáticamente el menú en pantallas pequeñas */ }
     useEffect(() => {
-        if (xs) {
-            setCollapsed(true);
-        } else {
-            setCollapsed(false);
-        }
+        xs ? setCollapsed(true) : setCollapsed(false);
     }, [xs]);
 
     {/* Filtra los elementos del menú según los roles del usuario */ }

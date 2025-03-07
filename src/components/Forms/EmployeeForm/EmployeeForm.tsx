@@ -27,13 +27,12 @@ interface EmployeeResourceFormProps {
  * y de contacto con soporte para prefijos telefónicos internacionales.
  */
 const EmployeeResourceForm: React.FC<EmployeeResourceFormProps> = ({ update, employee, onClose }) => {
-    // Instancia del formulario para control programático
+    // Instancia del formulario
     const [form] = Form.useForm();
 
     // Hook de navegación para redirigir tras completar acciones
     const navigate = useNavigate();
 
-    // Obtener función de traducción para internacionalización
     const { t } = useTranslation();
 
     /**
@@ -72,7 +71,6 @@ const EmployeeResourceForm: React.FC<EmployeeResourceFormProps> = ({ update, emp
 
             // Establecer todos los valores en el formulario, incluyendo prefijo y número separados
             form.setFieldsValue({
-                // company: employee.company, // Comentado: posiblemente funcionalidad futura
                 ...details,
                 phonePrefix,
                 phoneNumber,
@@ -104,11 +102,7 @@ const EmployeeResourceForm: React.FC<EmployeeResourceFormProps> = ({ update, emp
             console.log('finalValues', finalValues);
 
             // Ejecutar la operación correspondiente según sea actualización o creación
-            if (update && employee) {
-                await updateEmployee(employee.id, finalValues);
-            } else {
-                await createEmployee(finalValues);
-            }
+            (update && employee) ? await updateEmployee(employee.id, finalValues) : await createEmployee(finalValues);
 
             // Notificar éxito al usuario
             notification.success({
@@ -121,11 +115,7 @@ const EmployeeResourceForm: React.FC<EmployeeResourceFormProps> = ({ update, emp
             form.resetFields();
 
             // Manejar navegación según contexto
-            if (onClose) {
-                onClose(); // Si se usa en modal, cerrar y actualizar lista
-            } else {
-                navigate('/resources/employees'); // Si no, navegar a la lista de empleados
-            }
+            onClose ? onClose() : navigate('/resources/employees');
 
         } catch (error) {
             console.error('Error al crear el recurso employee', error);

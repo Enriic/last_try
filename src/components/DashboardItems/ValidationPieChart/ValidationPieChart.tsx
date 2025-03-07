@@ -30,7 +30,6 @@ interface ValidationPieChartProps {
  * con el porcentaje de éxito en el centro.
  */
 const ValidationPieChart: React.FC<ValidationPieChartProps> = ({ validations, loading }) => {
-    // Obtener función de traducción para internacionalización
     const { t } = useTranslation();
 
     /**

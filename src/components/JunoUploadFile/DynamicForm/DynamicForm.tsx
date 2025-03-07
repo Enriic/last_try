@@ -34,7 +34,6 @@ const DynamicInputs: React.FC<DynamicInputsProps> = ({
     handleCompanyChange,
     handleResourceChange,
 }) => {
-    // Obtener función de traducción para internacionalización
     const { t } = useTranslation();
 
     /**

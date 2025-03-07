@@ -28,10 +28,9 @@ interface CompanyFormProps {
  * y localización con soporte para prefijos telefónicos internacionales.
  */
 const CompanyForm: React.FC<CompanyFormProps> = ({ update, company, onClose }) => {
-    // Obtener función de traducción para internacionalización
     const { t } = useTranslation();
 
-    // Instancia del formulario para control programático
+    // Instancia del formulario
     const [companyForm] = Form.useForm();
 
     // Hook de navegación para redirigir tras completar acciones
@@ -48,7 +47,7 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ update, company, onClose }) =
 
     /**
      * Efecto para cargar los datos de la empresa cuando está en modo actualización
-     * Separa el campo de teléfono en prefijo y número para facilitar la edición
+     * Separa el campo de teléfono en prefijo y número para mostrarlos en campos separados
      */
     useEffect(() => {
         if (update && company) {
@@ -97,7 +96,9 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ update, company, onClose }) =
 
             // Limpiar formulario y manejar navegación
             onClear();
+
             onClose ? onClose() : navigate('/companies');
+            
         } catch (error) {
             console.error(update ? 'Error al actualizar la empresa' : 'Error al crear la empresa', error);
 

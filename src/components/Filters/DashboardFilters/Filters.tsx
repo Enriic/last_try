@@ -46,7 +46,6 @@ const { RangePicker } = DatePicker;
  * con soporte para tooltips en pantallas pequeñas
  */
 const Filters: React.FC<FiltersProps> = ({ onApplyFilters, onClearFilters }) => {
-    // Obtener función de traducción para internacionalización
     const { t } = useTranslation();
 
     // Estados para los filtros seleccionados

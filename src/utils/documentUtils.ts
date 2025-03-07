@@ -28,6 +28,7 @@ export const groupByDocumentType = (validations: Validation[]) => {
             acc[type].rejected += 1;
         }
 
+
         return acc;
     }, {} as any); // Acumulador inicial
 

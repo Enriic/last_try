@@ -48,6 +48,7 @@ const ValidationTableHistory: React.FC<ValidationTableHistoryProps> = ({
         } else {
             return <Tag>{status.toLocaleUpperCase()}</Tag>;
         }
+
     };
 
     /* Definición de columnas de la tabla */

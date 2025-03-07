@@ -36,9 +36,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentId, onDownload, style }) 
      * Ajusta la escala del PDF según el tamaño de la pantalla.
      */
     useEffect(() => {
-        if (isLargeWidth) setScale(1.0);
-        else if (isMediumWidth) setScale(0.75);
-        else setScale(0.5);
+        isLargeWidth ? setScale(1.0) : isMediumWidth ? setScale(0.75) : setScale(0.5);
     }, [isLargeWidth, isMediumWidth]);
 
     /**

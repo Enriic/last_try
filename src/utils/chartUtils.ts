@@ -49,7 +49,6 @@ export const calculateValidationDistribution = (validations: Validation[]): Dist
             } else if (val.status === 'failure') {
                 acc.failed += 1;
             }
-            // Si tienes otros estados como 'pending', puedes agregarlos aquí
             return acc;
         },
         { success: 0, failed: 0 }
