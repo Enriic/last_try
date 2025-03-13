@@ -23,9 +23,10 @@ CSRF_COOKIE_SECURE = True
 env = environ.Env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+# environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-
+if os.path.exists(os.path.join(BASE_DIR, '.env')):
+    environ.Env.read_env(os.path.join(BASE_DIR, '.env'))  # Solo cargar si existe el archivo .env
 
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
 if not os.path.exists(LOG_DIR):
@@ -37,19 +38,18 @@ print("¿Existe el archivo?:", os.path.exists(os.path.join(BASE_DIR, '.env')))
 
 # Configurar la base de datos y otras variables según el entorno
 env_type = env("ENV", default="pre")  # Si no se define 'ENV', se usará 'qa' por defecto
-ENVIRONMENT = env_type
+ENVIRONMENT = env_type.upper()
 
-if env_type not in ['qa', 'pre']:
-    raise ValueError(f"El entorno {env_type} no está configurado correctamente")
+if ENVIRONMENT not in ['qa', 'pre']:
+    raise ValueError(f"El entorno {ENVIRONMENT} no está configurado correctamente")
 
-DB_NAME = env(f"{env_type.upper()}_DB_NAME")
-DB_USER = env(f"{env_type.upper()}_DB_USER")
-DB_PASSWORD = env(f"{env_type.upper()}_DB_PASSWORD")
-DB_HOST = env(f"{env_type.upper()}_DB_HOST")
-DB_PORT = env(f"{env_type.upper()}_DB_PORT")
-VALIDATION_ENDPOINT = env(f"{env_type.upper()}_VALIDATION_ENDPOINT")
-OCP_APIM_VALIDATION_SUBSCRIPTION_KEY = env(f"{env_type.upper()}_OCP_APIM_VALIDATION_SUBSCRIPTION_KEY")
-
+DB_NAME = env(f"{ENVIRONMENT}_DB_NAME")
+DB_USER = env(f"{ENVIRONMENT}_DB_USER")
+DB_PASSWORD = env(f"{ENVIRONMENT}_DB_PASSWORD")
+DB_HOST = env(f"{ENVIRONMENT}_DB_HOST")
+DB_PORT = env(f"{ENVIRONMENT}_DB_PORT")
+VALIDATION_ENDPOINT = env(f"{ENVIRONMENT}_VALIDATION_ENDPOINT")
+OCP_APIM_VALIDATION_SUBSCRIPTION_KEY = env(f"{ENVIRONMENT}_OCP_APIM_VALIDATION_SUBSCRIPTION_KEY")
 
 AZURE_ACCOUNT_NAME = env('AZURE_ACCOUNT_NAME')
 AZURE_ACCOUNT_KEY = env('AZURE_ACCOUNT_KEY')
