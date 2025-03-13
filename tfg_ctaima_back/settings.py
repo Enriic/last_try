@@ -37,10 +37,10 @@ print("Ruta del .env:", os.path.join(BASE_DIR, '.env'))
 print("¿Existe el archivo?:", os.path.exists(os.path.join(BASE_DIR, '.env')))
 
 # Configurar la base de datos y otras variables según el entorno
-env_type = env("ENV", default="pre")  # Si no se define 'ENV', se usará 'qa' por defecto
+env_type = env("ENV", default="PRE")  # Si no se define 'ENV', se usará 'qa' por defecto
 ENVIRONMENT = env_type.upper()
 
-if ENVIRONMENT not in ['qa', 'pre']:
+if ENVIRONMENT not in ['QA', 'PRE']:
     raise ValueError(f"El entorno {ENVIRONMENT} no está configurado correctamente")
 
 DB_NAME = env(f"{ENVIRONMENT}_DB_NAME")
