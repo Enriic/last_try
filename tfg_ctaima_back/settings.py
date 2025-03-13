@@ -33,9 +33,6 @@ if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)
 
 
-print("Ruta del .env:", os.path.join(BASE_DIR, '.env'))
-print("¿Existe el archivo?:", os.path.exists(os.path.join(BASE_DIR, '.env')))
-
 # Configurar la base de datos y otras variables según el entorno
 env_type = env("ENV", default="PRE")  # Si no se define 'ENV', se usará 'qa' por defecto
 ENVIRONMENT = env_type.upper()
@@ -217,7 +214,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = 'staticfiles/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
