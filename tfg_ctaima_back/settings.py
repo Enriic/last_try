@@ -131,6 +131,8 @@ INSTALLED_APPS = [
     'tfg_ctaima_app',
     'corsheaders',
     'django_filters',
+    'whitenoise.runserver_nostatic',    
+
 ]
 
 # Habilitar middleware para sesiones
@@ -143,6 +145,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+
 ]
 
 
@@ -216,6 +220,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE="whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),  # Si tienes archivos estáticos personalizados
