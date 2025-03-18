@@ -4,8 +4,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { login as loginService, logout as logoutService } from '../services/authService';
 import axios from 'axios';
 import { Spin } from 'antd';
+import { API_URL } from '../config';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export interface User {
     username: string;

@@ -1,11 +1,7 @@
 // src/services/utilsService.ts
 
 import axios from 'axios';
-
-/**
- * URL base de la API de países, obtenida de las variables de entorno o valor por defecto
- */
-const API_URL = import.meta.env.COUNTRIES_API_URL || 'https://restcountries.com/v3.1';
+import { COUNTRIES_API_URL } from '../config';
 
 /**
  * Obtiene un campo específico para todos los países
@@ -13,7 +9,7 @@ const API_URL = import.meta.env.COUNTRIES_API_URL || 'https://restcountries.com/
  * @returns Datos del campo solicitado para todos los países
  */
 export const getField = async (field: string) => {
-    const response = await axios.get(`${API_URL}/all?fields=${field}`, {
+    const response = await axios.get(`${COUNTRIES_API_URL}/all?fields=${field}`, {
         withCredentials: true,
     });
     return response.data;
@@ -26,7 +22,7 @@ export const getField = async (field: string) => {
  * @returns Datos del campo solicitado para el país especificado
  */
 export const getFieldByName = async (name: string, field: string) => {
-    const response = await axios.get(`${API_URL}/name/${name}?fields=${field}`, {
+    const response = await axios.get(`${COUNTRIES_API_URL}/name/${name}?fields=${field}`, {
         withCredentials: true,
     });
     return response.data;

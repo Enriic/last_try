@@ -26,3 +26,5 @@ dist-ssr
 # IDE
 .env.d.ts
 .env
+
+src/config.ts

@@ -3,11 +3,7 @@
 import axios from 'axios';
 import { Validation, ValidationRequest, ValidationResponse } from '../types';
 import { ValidationFilterOptions } from '../types/filters';
-
-/**
- * URL base de la API, obtenida de las variables de entorno o valor por defecto
- */
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+import { API_URL } from '../config';
 
 /**
  * Obtiene validaciones con filtros y paginación
