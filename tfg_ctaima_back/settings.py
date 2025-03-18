@@ -6,6 +6,8 @@ from logging.handlers import RotatingFileHandler
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Usa base de datos para almacenar sesiones
 
+CORS_ALLOW_CREDENTIALS = True
+
 # Configurar la duración de la sesión (opcional)
 SESSION_COOKIE_AGE = 1209600  # 2 semanas en segundos
 SESSION_COOKIE_HTTPONLY = True  # Proteger cookies de scripts JavaScript
@@ -16,7 +18,7 @@ LOGIN_REDIRECT_URL = '/upload'  # Redirige tras iniciar sesión
 LOGOUT_REDIRECT_URL = '/login'  # Redirige tras cerrar sesión
 
 SESSION_COOKIE_SECURE = True  # Solo sobre HTTPS
-SESSION_COOKIE_SAMESITE = 'Strict'  # Evita que se envíe con solicitudes de otros orígenes
+SESSION_COOKIE_SAMESITE = 'None'  # Evita que se envíe con solicitudes de otros orígenes
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = False  # Necesario para que Axios pueda enviar el token CSRF
 
@@ -163,7 +165,6 @@ CSRF_TRUSTED_ORIGINS = [
 
 ]
 
-CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'tfg_ctaima_back.urls'
 
