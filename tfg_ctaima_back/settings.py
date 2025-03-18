@@ -152,11 +152,13 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  # URL de tu frontend
+    'https://tfg-frontend-rosy.vercel.app',
     'https://tfg-ctaima-backend-production.up.railway.app'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:5173',  # URL de tu frontend
+    'https://tfg-frontend-rosy.vercel.app',
     'https://tfg-ctaima-backend-production.up.railway.app'
 
 ]
@@ -222,9 +224,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE="whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # Si tienes archivos estáticos personalizados
-]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
