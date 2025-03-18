@@ -27,4 +27,3 @@ dist-ssr
 .env.d.ts
 .env
 
-src/config.ts
