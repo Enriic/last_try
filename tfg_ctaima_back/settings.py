@@ -18,7 +18,7 @@ LOGOUT_REDIRECT_URL = '/login'  # Redirige tras cerrar sesión
 SESSION_COOKIE_SECURE = True  # Solo sobre HTTPS
 SESSION_COOKIE_SAMESITE = 'Strict'  # Evita que se envíe con solicitudes de otros orígenes
 CSRF_COOKIE_SECURE = True
-
+CSRF_COOKIE_HTTPONLY = False  # Necesario para que Axios pueda enviar el token CSRF
 
 env = environ.Env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
