@@ -1,23 +1,45 @@
+// {
+//   "compilerOptions": {
+//     // ... otras configuraciones
+//     "types": [
+//       "node"
+//     ],
+//     "baseUrl": ".",
+//     "paths": {
+//       "@/*": [
+//         "src/*"
+//       ]
+//     }
+//   },
+//   "files": [],
+//   "references": [
+//     {
+//       "path": "./tsconfig.app.json"
+//     },
+//     {
+//       "path": "./tsconfig.node.json"
+//     }
+//   ]
+// }
 {
   "compilerOptions": {
-    // ... otras configuraciones
-    "types": [
-      "node"
-    ],
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    }
+    "target": "ES2020", // Compilación a ES2020 para compatibilidad con navegadores modernos
+    "module": "ESNext", // Usamos el sistema de módulos ESNext
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ], // Definiciones para ES2020 y para trabajar con el DOM
+    "jsx": "react-jsx", // Para trabajar con React (si usas React)
+    "strict": true, // Habilitar las comprobaciones estrictas de TypeScript
+    "noUnusedLocals": false, // No fallar si hay variables no utilizadas
+    "noUnusedParameters": false, // No fallar si hay parámetros no utilizados
+    "skipLibCheck": true, // Ignorar la comprobación de tipos de las bibliotecas
+    "moduleResolution": "bundler", // Resolución de módulos en modo bundler
+    "isolatedModules": true, // Asegurar que cada archivo sea independiente para el compilador
+    "noEmit": true // No generar archivos de salida (puede ser útil si solo usas Vite, que se encarga de la compilación)
   },
-  "files": [],
-  "references": [
-    {
-      "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.node.json"
-    }
+  "include": [
+    "src" // Incluir la carpeta `src` en la compilación
   ]
 }

@@ -3,7 +3,10 @@
 import axios from 'axios';
 import { Resource, ResourceResponse } from '../types';
 
-import { API_URL } from '../config';
+/**
+ * URL base de la API, obtenida de las variables de entorno o valor por defecto
+ */
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 /**
  * Obtiene todos los recursos disponibles
