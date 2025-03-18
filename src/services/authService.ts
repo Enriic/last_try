@@ -5,7 +5,7 @@ import axios from 'axios';
 // Configura Axios para enviar cookies en cada petición
 axios.defaults.withCredentials = true;
 
-const API_URL = 'http://localhost:8000'; // URL de tu backend de Django
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 // Función para obtener el token CSRF de las cookies
 const getCsrfTokenFromCookies = () => {

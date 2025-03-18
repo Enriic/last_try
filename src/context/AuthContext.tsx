@@ -5,6 +5,8 @@ import { login as loginService, logout as logoutService } from '../services/auth
 import axios from 'axios';
 import { Spin } from 'antd';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 export interface User {
     username: string;
     id: string;
@@ -33,8 +35,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Función para obtener el usuario actual
     const fetchCurrentUser = async () => {
         try {
-            const response = await axios.get('http://localhost:8000/api/users/current/', {
+            const response = await axios.get(`${API_URL}/api/users/current/`, {
                 withCredentials: true,
+                
             });
 
             console.log(response.data.roles)
