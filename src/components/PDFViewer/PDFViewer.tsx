@@ -10,6 +10,7 @@ import {
 import { Document, Page } from 'react-pdf';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import './PDFViewer.less';
+// @ts-ignore
 import { type PDFDocumentProxy } from "pdfjs-dist";
 import { getDocumentFromBlobContainer } from '../../services/documentService';
 import { useTranslation } from 'react-i18next';
@@ -109,6 +110,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentId, onDownload, style }) 
                 <Button icon={<ZoomInOutlined />} onClick={() => setScale(scale + 0.25)} disabled={scale >= 4} />
                 <Button icon={<RotateLeftOutlined />} onClick={() => setRotation(rotation - 90)} />
                 <Button icon={<RotateRightOutlined />} onClick={() => setRotation(rotation + 90)} />
+                {/* @ts-ignore */}
                 <Button icon={<DownloadOutlined />} onClick={onDownload} />
             </Space>
             <div className="pdf-viewer-content" style={style}>

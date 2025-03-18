@@ -3,22 +3,22 @@
 import React, { useState } from 'react';
 import { Row, Col, DatePicker, Select, Tooltip, Button } from 'antd';
 import { Validation } from '../../../types';
-import { ValidationFilterOptions } from '../../../types/filters.ts';
+import { ValidationFilterOptions } from '../../../types/filters';
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import DocumentSelect from '../../common/SearchableSelect/DocumentSelect/DocumentSelect.tsx';
-import CompanySelect from '../../common/SearchableSelect/CompanySelect/CompanySelect.tsx';
-import ValidationSelect from '../../common/SearchableSelect/ValidationSelect/ValidationSelect.tsx';
-import ResourceSelect from '../../common/SearchableSelect/ResourceSelect/ResourceSelect.tsx';
-import JunoButton from '../../common/JunoButton/JunoButton.tsx';
+import DocumentSelect from '../../common/SearchableSelect/DocumentSelect/DocumentSelect';
+import CompanySelect from '../../common/SearchableSelect/CompanySelect/CompanySelect';
+import ValidationSelect from '../../common/SearchableSelect/ValidationSelect/ValidationSelect';
+import ResourceSelect from '../../common/SearchableSelect/ResourceSelect/ResourceSelect';
+import JunoButton from '../../common/JunoButton/JunoButton';
 import { JunoButtonTypes } from '../../common/JunoButton/JunoButton.types';
-import DocumentTypeSelect from '../../common/SearchableSelect/DocumentTypeSelect/DocumentTypeSelect.tsx';
+import DocumentTypeSelect from '../../common/SearchableSelect/DocumentTypeSelect/DocumentTypeSelect';
 import './ValidationFilters.less';
 import { useTranslation } from 'react-i18next';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
-import { DateFormat } from '../../../types/format.ts';
+import { DateFormat } from '../../../types/format';
 
 // Extender las funcionalidades de dayjs para comparaciones y formato de fechas
 dayjs.extend(isSameOrBefore);
