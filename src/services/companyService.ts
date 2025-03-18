@@ -7,7 +7,7 @@ import { Company, CompanyResponse } from '../types';
 /**
  * URL base de la API, obtenida de las variables de entorno o valor por defecto
  */
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'https://tfg-ctaima-backend-production.up.railway.app';
 
 /**
  * Obtiene una lista paginada de compañías que pueden incluir filtrado por búsqueda

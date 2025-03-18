@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'https://tfg-ctaima-backend-production.up.railway.app';
 
 export const getFields = async (document_type: number | null) => {
     const response = await axios.get(`${API_URL}/api/documentTypes/${document_type}/fields`, {
