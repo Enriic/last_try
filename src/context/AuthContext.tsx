@@ -5,7 +5,7 @@ import { login as loginService, logout as logoutService } from '../services/auth
 import axios from 'axios';
 import { Spin } from 'antd';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'https://tfg-ctaima-backend-production.up.railway.app';
 
 export interface User {
     username: string;
@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
             const response = await axios.get(`${API_URL}/api/users/current/`, {
                 withCredentials: true,
-                
+
             });
 
             console.log(response.data.roles)
