@@ -21,6 +21,8 @@ SESSION_COOKIE_SECURE = True  # Solo sobre HTTPS
 SESSION_COOKIE_SAMESITE = 'None'  # Evita que se envíe con solicitudes de otros orígenes
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = False  # Necesario para que Axios pueda enviar el token CSRF
+CSRF_COOKIE_DOMAIN = ".validatortwind.site"
+SESSION_COOKIE_DOMAIN = ".validatortwind.site"
 
 env = environ.Env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -154,15 +156,14 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  # URL de tu frontend
-    'https://tfg-frontend-rosy.vercel.app',
-    'https://tfg-ctaima-backend-production.up.railway.app'
+    'https://app.validatortwind.site',
+    'https://api.validatortwind.site',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:5173',  # URL de tu frontend
-    'https://tfg-frontend-rosy.vercel.app',
-    'https://tfg-ctaima-backend-production.up.railway.app'
-
+    'https://app.validatortwind.site',
+    'https://api.validatortwind.site',
 ]
 
 
