@@ -23,7 +23,8 @@ def get_csrf_token(request):
     Vista para establecer la cookie CSRF.
     """
     logger.info("CSRF cookie solicitado.")
-    return JsonResponse({'detail': 'CSRF cookie set'})
+    token = get_token(request)
+    return JsonResponse({'csrfToken': token})
 
 
 @api_view(['POST'])
