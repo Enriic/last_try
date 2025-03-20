@@ -8,7 +8,6 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from django.middleware.csrf import get_token
 
 from ..models import Log, EventType
 from ..serializers import UserSerializer  # Asegúrate de que el serializer esté correctamente importado
@@ -24,8 +23,7 @@ def get_csrf_token(request):
     Vista para establecer la cookie CSRF.
     """
     logger.info("CSRF cookie solicitado.")
-    token = get_token(request)
-    return JsonResponse({'csrfToken': token})
+    return JsonResponse({'detail': 'CSRF cookie set'})
 
 
 @api_view(['POST'])
