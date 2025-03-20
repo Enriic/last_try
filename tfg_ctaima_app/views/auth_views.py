@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from django.middleware.csrf import get_token
 
 from ..models import Log, EventType
 from ..serializers import UserSerializer  # Asegúrate de que el serializer esté correctamente importado
