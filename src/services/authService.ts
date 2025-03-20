@@ -17,6 +17,7 @@ const getCsrfTokenFromCookies = () => {
 axios.interceptors.request.use(
     (config) => {
         const csrfToken = getCsrfTokenFromCookies();
+        console.log('csrfToken', csrfToken);
         if (csrfToken) {
             config.headers['X-CSRFToken'] = csrfToken;
         }
