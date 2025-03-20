@@ -5,7 +5,7 @@ import { login as loginService, logout as logoutService } from '../services/auth
 import axios from 'axios';
 import { Spin } from 'antd';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://tfg-ctaima-backend-production.up.railway.app';
+const API_URL = import.meta.env.VITE_API_URL || 'https://api.validatortwind.site';
 
 export interface User {
     username: string;

@@ -5,7 +5,7 @@ import axios from 'axios';
 // Configura Axios para enviar cookies en cada petición
 axios.defaults.withCredentials = true;
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://tfg-ctaima-backend-production.up.railway.app';
+const API_URL = import.meta.env.VITE_API_URL || 'https://api.validatortwind.site';
 let csrfToken: string | null = null;
 
 // Función para obtener el token CSRF de las cookies
