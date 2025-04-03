@@ -22,13 +22,11 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['create']:
             self.permission_classes = [IsAdminUser]
-        elif self.action in ['current']:
-            self.permission_classes = [IsAuthenticated]
         else:
             self.permission_classes = [IsAuthenticated]
         return super(UserViewSet, self).get_permissions()
 
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['get'])
     def current(self, request):
         serializer = self.get_serializer(request.user)
         user = request.user
@@ -73,7 +71,7 @@ class UserViewSet(viewsets.ModelViewSet):
             logger.warning(f"Usuario '{request.user.username}' no autorizado para actualizar el perfil de '{user.username}'.")
             return Response({'detail': 'No autorizado.'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    @action(detail=True, methods=['get'], url_path='documents', permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['get'], url_path='documents')
     def documents(self, request, pk=None):
         user = self.get_object()
         documents = user.document_set.select_related('document_type', 'resource', 'company').all()
@@ -84,7 +82,7 @@ class UserViewSet(viewsets.ModelViewSet):
         logger.info(f"Usuario '{request.user.username}' obtuvo los documentos de '{user.username}'.")
         return Response(serializer.data)
 
-    @action(detail=True, methods=['get'], url_path='validations', permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['get'], url_path='validations')
     def validations(self, request, pk=None):
         user = self.get_object()
         from ..serializers import ValidationSerializer

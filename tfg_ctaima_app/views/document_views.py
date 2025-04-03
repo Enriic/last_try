@@ -77,10 +77,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_permissions(self):
-        if self.action == 'create':
-            self.permission_classes = [IsAdminUser]
-        else:
-            self.permission_classes = [IsAuthenticated]
+        self.permission_classes = [IsAuthenticated]
         return super(DocumentViewSet, self).get_permissions()
 
     @log_event(EventType.CREATE_DOCUMENT)
