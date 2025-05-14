@@ -4,8 +4,7 @@ XXXXX es una aplicacion web diseÃ±ada para gestionar la subida, validacion y a
 
 # Estructura
 
-- Codigo frontend dentro de la carpeta frontend/
-- Codigo backend dentro de la carpeta backend/
+- En el repositorio hay el backend (Django) y el frontend (React), genera la documentacion sobre ellos.
 
 ## Descripcion
 
