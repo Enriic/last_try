@@ -1,0 +1,8 @@
+# Ignore virtual environments and compiled files
+venv/
+*.pyc
+__pycache__/
+
+# Do not ignore these important files
+!requirements.txt
+!config/settings.py
