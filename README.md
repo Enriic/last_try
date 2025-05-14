@@ -1,22 +1,21 @@
-# Gestión de Documentos de Clientes
+# GestiÃ³n de Documentos de Clientes
 
-XXXXX es una aplicación web diseñada para gestionar la subida, validación y almacenamiento de documentos de clientes. Esta aplicación interactúa con un servicio externo para validar los documentos y luego los almacena de manera segura en una base de datos y un contenedor de blobs.
+XXXXX es una aplicaciÃ³n web diseÃ±ada para gestionar la subida, validaciÃ³n y almacenamiento de documentos de clientes. Esta aplicaciÃ³n interactÃºa con un servicio externo para validar los documentos y luego los almacena de manera segura en una base de datos y un contenedor de blobs.
 
-## Descripción
+## DescripciÃ³n
 
-La aplicación permite a los empleados de la empresa XXXXX:
+La aplicaciÃ³n permite a los empleados de la empresa XXXXX:
 
 - Subir documentos de clientes.
-- Validar esos documentos a través de un **endpoint externo** de validación.
-- Almacenar la información de los documentos (metadatos) en una **base de datos**.
-- Guardar los archivos documentales físicos en un **blob container** de almacenamiento.
+- Validar esos documentos a travÃ©s de un **endpoint externo** de validaciÃ³n.
+- Almacenar la informaciÃ³n de los documentos (metadatos) en una **base de datos**.
+- Guardar los archivos documentales fÃ­sicos en un **blob container** de almacenamiento.
 
 ### Funcionalidades
 
-1. **Subida de documentos**: Los clientes pueden subir documentos a través de una interfaz web.
-2. **Validación externa**: Cada documento es validado por un endpoint externo, asegurando que los documentos sean auténticos y cumplan con las normas establecidas.
+1. **Subida de documentos**: Los clientes pueden subir documentos a travÃ©s de una interfaz web.
+2. **ValidaciÃ³n externa**: Cada documento es validado por un endpoint externo, asegurando que los documentos sean autÃ©nticos y cumplan con las normas establecidas.
 3. **Almacenamiento**:
    - Los **metadatos** (como el nombre del cliente, tipo de documento, fecha de carga, etc.) se guardan en una **base de datos**.
    - El **contenido del documento** se guarda de forma segura en un **blob container**, garantizando la disponibilidad y seguridad de los documentos.
 4. **Interfaz intuitiva**: Los empleados de XXXXX pueden acceder a un panel donde visualizar y gestionar los documentos.
-
