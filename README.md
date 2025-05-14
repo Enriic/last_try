@@ -1,10 +1,10 @@
-# Ctaima - Gestión de Documentos de Clientes
+# Gestión de Documentos de Clientes
 
-**Ctaima** es una aplicación web diseñada para gestionar la subida, validación y almacenamiento de documentos de clientes. Esta aplicación interactúa con un servicio externo para validar los documentos y luego los almacena de manera segura en una base de datos y un contenedor de blobs.
+XXXXX es una aplicación web diseñada para gestionar la subida, validación y almacenamiento de documentos de clientes. Esta aplicación interactúa con un servicio externo para validar los documentos y luego los almacena de manera segura en una base de datos y un contenedor de blobs.
 
 ## Descripción
 
-La aplicación permite a los empleados de la empresa **Ctaima**:
+La aplicación permite a los empleados de la empresa XXXXX:
 
 - Subir documentos de clientes.
 - Validar esos documentos a través de un **endpoint externo** de validación.
@@ -18,5 +18,5 @@ La aplicación permite a los empleados de la empresa **Ctaima**:
 3. **Almacenamiento**:
    - Los **metadatos** (como el nombre del cliente, tipo de documento, fecha de carga, etc.) se guardan en una **base de datos**.
    - El **contenido del documento** se guarda de forma segura en un **blob container**, garantizando la disponibilidad y seguridad de los documentos.
-4. **Interfaz intuitiva**: Los empleados de **Ctaima** pueden acceder a un panel donde visualizar y gestionar los documentos.
+4. **Interfaz intuitiva**: Los empleados de XXXXX pueden acceder a un panel donde visualizar y gestionar los documentos.
 
