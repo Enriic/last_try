@@ -1,0 +1,432 @@
+{
+    "menu": {
+        "dashboard": "Dashboard",
+        "upload": "Upload Document",
+        "users": "Users",
+        "usersList": "User List",
+        "usersCreate": "Create User",
+        "settings": "Settings",
+        "login": "Login",
+        "logout": "Logout",
+        "history": "History",
+        "resources": {
+            "label": "Resources",
+            "employees": {
+                "label": "Employees"
+            },
+            "vehicles": {
+                "label": "Vehicles"
+            }
+        },
+        "companies": "Companies",
+        "language": {
+            "es": "Spanish",
+            "en": "English"
+        },
+        "application_title": "My application"
+    },
+    
+    "common": {
+        "apply": "Apply",
+        "clear": "Clear",
+        "back": "Back",
+        "expand": "Expand",
+        "collapse": "Collapse"
+    },
+    "upload": {
+        "successMessage": "File uploaded successfully",
+        "documentTypeLabel": "Document Type",
+        "documentTypeError": "Please select the document type",
+        "documentTypePlaceholder": "Select the document type",
+        "documentType": {
+            "invoice": "Invoice",
+            "receipt": "Receipt",
+            "report": "Report"
+        },
+        "validationFieldsLabel": "Fields to Validate",
+        "validationFieldsError": "Please select at least one field",
+        "extractionFieldsLabel": "Fields to Extract",
+        "extractionFieldsError": "Please select at least one field",
+        "validationFields": {
+            "date": "Date",
+            "amount": "Amount",
+            "client": "Client",
+            "address": "Address",
+            "vendor": "Vendor",
+            "summary": "Summary",
+            "author": "Author"
+        },
+        "fileLabel": "File",
+        "fileError": "Please upload a file",
+        "uploadPrompt": "Click or drag a file to this area to upload",
+        "selectedFile": "Selected file",
+        "submitButton": "Submit",
+        "validateButton": "Validate",
+        "uploadButton": "Upload Document",
+        "uploading": "Uploading...",
+        "step1Title": "Upload Document",
+        "step2Title": "Select Fields",
+        "useExistingDocumentLabel": "Use Existing Document",
+        "useExistingDocument": "Use Existing Document",
+        "existingDocumentLabel": "Existing Document",
+        "existingDocumentError": "Please select an existing document",
+        "existingDocumentPlaceholder": "Select an existing document",
+        "resourceLabel": "Resource",
+        "resourceError": "Please select a resource",
+        "resourcePlaceholder": "Select a resource",
+        "companyLabel": "Company",
+        "companyError": "Please select a company",
+        "companyPlaceholder": "Select a company",
+        "summary": {
+            "documentType": "Document Type",
+            "resource": "Resource"
+        },
+        "backButton": "Previous Step",
+        "continueButton": "Continue",
+        "error": {
+            "fileUploadTitle": "Oops! Something went wrong",
+            "fileUpload": "An error occurred while uploading the document",
+            "documentDetails": "Could not retrieve the details of the selected document",
+            "validationCreate": "An error occurred while creating the validation",
+            "existingDocumentSelect": "An error occurred while selecting the existing document"
+        },
+        "success": {
+            "fileUpload": "Document uploaded successfully",
+            "validationCreate": "Validation created successfully"
+        }
+    },
+    "dashboardKPIs": {
+        "totalValidations": "Total Validations",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "successRate": "Success Rate"
+    },
+    "documentTypeAnalysis": {
+        "documentType": "Document Type",
+        "validations": "Validations",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "successRate": "Success Rate",
+        "analysisTitle": "Document Type Analysis"
+    },
+    "filters": {
+        "dateTooltip": "Select the date range",
+        "dateLabel": "Date",
+        "documentTypeTooltip": "Select the type of document",
+        "documentTypeLabel": "Document Type",
+        "documentTypePlaceholder": "Select a document type"
+    },
+    "notification": {
+        "success": {
+            "title": "Success",
+            "description": "Operation completed successfully"
+        },
+        "error": {
+            "title": "Oops! Something went wrong",
+            "description": "An error occurred while processing the request"
+        }
+    },
+    "validationFilters": {
+        "documentTooltip": "Select the document",
+        "documentLabel": "Document",
+        "documentPlaceholder": "Select a document",
+        "validationTooltip": "Select the validation",
+        "validationLabel": "Validation",
+        "validationPlaceholder": "Select a validation",
+        "dateTooltip": "Select the date range",
+        "dateLabel": "Date",
+        "documentTypeTooltip": "Select a document type",
+        "documentTypeLabel": "Document Type",
+        "documentTypePlaceholder": "Select a document type",
+        "resultTooltip": "Select the result",
+        "resultLabel": "Result",
+        "resultPlaceholder": "Result",
+        "successOption": "Success",
+        "failureOption": "Failure",
+        "resourceTooltip": "Select the resource",
+        "resourceLabel": "Resource",
+        "resourcePlaceholder": "Select a resource",
+        "companyTooltip": "Select the company",
+        "companyLabel": "Company",
+        "companyPlaceholder": "Select a company",
+        "companyRequiredMessage": "Company is required"
+    },
+    "logout": {
+        "success": {
+            "message": "Session closed successfully",
+            "description": "You have been logged out"
+        },
+        "error": {
+            "message": "Oops! Something went wrong",
+            "description": "An error occurred while logging out"
+        },
+        "confirmation": {
+            "title": "Logout",
+            "content": "Are you sure you want to logout?",
+            "cancel": "No",
+            "confirm": "Yes"
+        },
+        "button": "Logout"
+    },
+    "login": {
+        "form_name": "Login",
+        "form": {
+            "username": {
+                "label": "Username",
+                "name": "Username",
+                "placeholder": "Enter your username",
+                "rules": {
+                    "required_message": "Username is required"
+                }
+            },
+            "password": {
+                "label": "Password",
+                "name": "Password",
+                "placeholder": "Enter your password",
+                "rules": {
+                    "required_message": "Password is required"
+                }
+            }
+        },
+        "submit": "Login"
+    },
+    "pdf_viewer": {
+        "doc_load": {
+            "error": {
+                "message": "Oops! Something went wrong",
+                "description": "Could not load the document"
+            }
+        },
+        "document": {
+            "no_data": "No document found"
+        }
+    },
+    "dashboard": {
+        "validation_bar_chart": {
+            "title": "Validations/Month",
+            "select_placeholder": "Select a year"
+        }
+    },
+    "validation_details_modal": {
+        "validation_id": "Validation ID",
+        "document_name": "Document Name",
+        "document_type": "Document Type",
+        "status": "Status",
+        "justification": "Justification",
+        "resource": "Resource",
+        "company": "Company",
+        "timestamp": "Timestamp",
+        "title": "Details of the validation:",
+        "validation_fields": {
+            "title": "Fields to validate"
+        },
+        "extraction_fields": {
+            "title": "Fields to extract"
+        },
+        "columns": {
+            "field": "Field",
+            "obtained_value": "Obtained Value",
+            "expected_value": "Expected Value",
+            "result": "Result"
+        },
+        "resource_render": {
+            "unknown": " - "
+        },
+        "result_render": {
+            "tag": {
+                "success": "Success",
+                "failure": "Failure"
+            }
+        },
+        "status_options": {
+            "success": "APPROVED",
+            "failure": "FAILED"
+        }
+    },
+    "validationPieChart": {
+        "distributionOfResults": "Distribution of Results"
+    },
+    "validationTableHistory": {
+        "date": "Date",
+        "documentName": "Document Name",
+        "documentType": "Document Type",
+        "result": "Result",
+        "actions": "Actions",
+        "success": "Success",
+        "failure": "Failure",
+        "viewDetails": "View Details"
+    },
+    "dashboardPage": {
+        "fetchErrorMessage": "Oops! Something went wrong",
+        "fetchErrorDescription": "An error occurred while fetching the validations"
+    },
+    "uploadPage": {
+        "title": "Document Upload",
+        "download": "Download"
+    },
+    "validationHistoryPage": {
+        "fetchErrorMessage": "Oops! Something went wrong",
+        "fetchErrorDescription": "An error occurred while fetching the validations"
+    },
+    "newEmployeePage": {
+        "title": "Create Employee"
+    },
+    "newCompanyPage": {
+        "title": "Create Company"
+    },
+    "employeesPage": {
+        "title": "Employees"
+    },
+    "companiesPage": {
+        "title": "Companies"
+    },
+    "duplicate_document_modal": {
+        "document_name": "Document Name",
+        "document_type": "Document Type",
+        "upload_date": "Upload Date",
+        "view_document_button": "View Document",
+        "title": "Duplicate Document",
+        "use_existing_document_button": "Use Existent Document"
+    },
+    "resource_form": {
+        "vehicle": {
+            "vehicle_name": {
+                "label": "Vehicle Name",
+                "placeholder": "Enter the vehicle name",
+                "required_message": "Vehicle name is required"
+            },
+            "manufacturer": {
+                "label": "Manufacturer",
+                "placeholder": "Enter the manufacturer",
+                "required_message": "Manufacturer is required"
+            },
+            "registration_id": {
+                "label": "Registration ID",
+                "placeholder": "Enter the registration ID",
+                "required_message": "Registration ID is required"
+            },
+            "model": {
+                "label": "Model",
+                "placeholder": "Enter the model",
+                "required_message": "Model is required"
+            },
+            "weight": {
+                "label": "Weight",
+                "placeholder": "Enter the weight",
+                "required_message": "Weight is required"
+            }
+        },
+        "employee": {
+            "first_name": {
+                "label": "First Name",
+                "placeholder": "Enter the first name",
+                "required_message": "First name is required"
+            },
+            "last_name": {
+                "label": "Last Name",
+                "placeholder": "Enter the last name",
+                "required_message": "Last name is required"
+            },
+            "email": {
+                "label": "Email",
+                "placeholder": "Enter the email",
+                "required_message": "Email is required",
+                "invalid_format_message": "Invalid email format (example@gmail.com)"
+            },
+            "phone": {
+                "label": "Phone",
+                "placeholder": "Enter the phone",
+                "required_message": "Phone is required"
+            },
+            "prefix": {
+                "label": "Prefix",
+                "placeholder": "Prefix (e.g. +1)",
+                "required_message": "Prefix is required"
+            },
+            "country": {
+                "label": "Country",
+                "placeholder": "Enter the country",
+                "required_message": "Country is required"
+            },
+            "worker_id": {
+                "label": "Worker ID",
+                "placeholder": "Enter the worker ID",
+                "required_message": "Worker ID is required"
+            },
+            "company": {
+                "label": "Company",
+                "placeholder": "Select the company",
+                "required_message": "Company is required"
+            }
+        }
+    },
+    "company_form": {
+        "company_id": {
+            "label": "Company ID",
+            "placeholder": "Enter the company ID",
+            "required_message": "Company ID is required"
+        },
+        "company_name": {
+            "label": "Company Name",
+            "placeholder": "Enter the company name",
+            "required_message": "Company name is required"
+        },
+        "industry": {
+            "label": "Industry",
+            "placeholder": "Enter the industry",
+            "required_message": "Industry is required"
+        },
+        "email": {
+            "label": "Email",
+            "placeholder": "Enter the email",
+            "required_message": "Email is required",
+            "invalid_format_message": "Invalid email format (example@gmail.com)"
+        },
+        "phone": {
+            "label": "Phone",
+            "placeholder": "Enter the phone",
+            "required_message": "Phone is required"
+        },
+        "prefix": {
+            "label": "Prefix",
+            "placeholder": "Prefix (e.g. +1)",
+            "required_message": "Prefix is required"
+        },
+        "location": {
+            "label": "Location",
+            "placeholder": "Enter the location",
+            "required_message": "Location is required"
+        },
+        "language": {
+            "label": "Language",
+            "placeholder": "Enter the language",
+            "required_message": "Language is required"
+        },
+        "save": "Save"
+    },
+    "companies_table_page": {
+        "title": "Companies",
+        "search_placeholder": "Search company",
+        "new_company": "+ New"
+    },
+    "employees_table_page": {
+        "title": "Employees",
+        "search_placeholder": "Search employee",
+        "new_employee": "+ New"
+    },
+    "company_table": {
+        "date": "Date",
+        "company_id": "Company ID",
+        "company_name": "Company Name",
+        "industry": "Industry"
+    },
+    "employee_table": {
+        "date": "Date",
+        "first_name": "First Name",
+        "last_name": "Last Name",
+        "email": "Email",
+        "phone": "Phone",
+        "country": "Country",
+        "worker_id": "Worker ID"
+    }
+}

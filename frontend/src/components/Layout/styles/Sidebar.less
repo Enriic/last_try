@@ -1,0 +1,91 @@
+@import '../../../assets/styles/styles.less';
+
+.ant-typography, .ant-pro-base-menu-inline-item-title {
+    width: 100%;
+    padding: 0;
+    color: @text-color;
+}
+
+.ant-layout-sider:not(.ant-layout-sider-collapsed) .ant-menu-item {
+    min-width: @sidebar-width;
+    border-radius: 0px !important;
+    position: relative;
+    padding-left: 16px !important;
+    margin-left: 0px !important;
+}
+
+.ant-layout-sider-collapsed > li.ant-menu-submenu {
+    max-width: 40px !important;
+    margin-left: 0px !important;
+}
+
+.ant-layout-sider:not(.ant-layout-sider-collapsed) .ant-menu-submenu {
+    position: relative;
+    margin-left: -4px !important;
+    min-width: @sidebar-width;
+}
+
+.ant-layout-sider:not(.ant-layout-sider-collapsed) .ant-menu-submenu > li.ant-menu-item {
+    position: relative;
+    margin-left: 9px !important;
+    min-width: @sidebar-width;
+}
+
+.ant-layout-sider:not(.ant-layout-sider-collapsed) .ant-menu-sub > li.ant-menu-item {
+    align-items: center;
+    margin-left: 30px !important;
+}
+
+.ant-menu-submenu > ul {
+    padding: 0px !important
+}
+
+.ant-pro-base-menu-vertical-item-title {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.ant-pro-base-menu-vertical-item-text {
+    text-align: center;
+    width: 100%;
+}
+
+.ant-pro-base-menu-vertical-item-title{
+    color: @text-color;
+}
+
+.ant-menu-submenu-title:hover {
+    background-color: @hover-color  !important;
+}
+
+.ant-menu-sub > li:hover {
+    background-color: @hover-color !important;
+} 
+
+.ant-layout-sider-collapsed .ant-menu-submenu:hover {
+    background-color: @hover-color !important;
+}
+
+.ant-menu-item:hover {
+    background-color: @hover-color !important;
+}
+
+.ant-menu-item-selected {
+    background-color: @hover-color !important;
+    border-right: 3.5px solid @primary-color !important;
+}
+
+.ant-layout-sider-children {
+    background-color: @body-background;
+    margin: 0px !important;
+    padding: 0px !important;
+}
+
+[data-menu-id*="logout"] {
+    position: absolute !important;
+    bottom: 0;
+    margin-bottom: 1em !important;
+    width: 100%;
+}
+
